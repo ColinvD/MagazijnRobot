@@ -8,7 +8,7 @@ public class OrderDialog extends JDialog implements ActionListener {
     private JLabel jlChooseOrder, jlSearchOrder;
     private JTextField jtSearchOrder;
     private JScrollPane jsOrders;
-    private JPanel jpHELP, jpA, jpOrders;
+    private JPanel jpBox, jpA, jpOrders;
     public OrderDialog(){
         setSize(new Dimension(700,500));
         setTitle("Order inladen");
@@ -29,8 +29,8 @@ public class OrderDialog extends JDialog implements ActionListener {
         jpOrders = new JPanel();
         jpOrders.setLayout(new GridLayout(500, 3)); //maak row count het aantal orders
 
-        jpHELP = new JPanel();
-        jpHELP.setLayout(new BorderLayout());
+        jpBox = new JPanel();
+        jpBox.setLayout(new FlowLayout());
 
         jpA = new JPanel();
         jpA.setLayout(new BorderLayout());
@@ -42,9 +42,8 @@ public class OrderDialog extends JDialog implements ActionListener {
         }
 
         jsOrders = new JScrollPane(jpOrders);
-        jsOrders.setPreferredSize(new Dimension(650, 400));
 
-        add(jpHELP); //????
+        add(jpBox); //????
         add(jpA);
         add(jsOrders);
         jpA.add(jbCancel);
