@@ -13,7 +13,7 @@ public class OrderDialog extends JDialog implements ActionListener {
         setSize(new Dimension(700,500));
         setTitle("Order inladen");
         setModal(true);
-        this.setLayout(new GridLayout(2, 1));
+        this.setLayout(new GridLayout(2,1));
 
         jbCancel = new JButton("Annuleer");
         jbCancel.addActionListener(this);
@@ -29,11 +29,11 @@ public class OrderDialog extends JDialog implements ActionListener {
         jpOrders = new JPanel();
         jpOrders.setLayout(new GridLayout(500, 3)); //maak row count het aantal orders
 
+        jpA = new JPanel();
+        jpA.setLayout(new FlowLayout());
+
         jpBox = new JPanel();
         jpBox.setLayout(new FlowLayout());
-
-        jpA = new JPanel();
-        jpA.setLayout(new BorderLayout());
 
         for (int i = 0; i < 500; i++) { //test data
             jpOrders.add(new JLabel("Order " + (i+1)));
@@ -41,11 +41,13 @@ public class OrderDialog extends JDialog implements ActionListener {
             jpOrders.add(new JLabel((int)(Math.random()*31) + "-" + (int)(Math.random()*12) + "-" + ((int)(Math.random()*24) + 2000)));
         }
 
+
+        this.add(jpA);
+        this.add(jpBox);
+
         jsOrders = new JScrollPane(jpOrders);
 
-        add(jpBox); //????
-        add(jpA);
-        add(jsOrders);
+        jpBox.add(jsOrders);
         jpA.add(jbCancel);
         jpA.add(jbConfirm);
         jpA.add(jlChooseOrder);
