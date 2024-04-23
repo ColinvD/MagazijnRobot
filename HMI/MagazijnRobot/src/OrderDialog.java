@@ -8,7 +8,7 @@ public class OrderDialog extends JDialog implements ActionListener {
     private JLabel jlChooseOrder, jlSearchOrder;
     private JTextField jtSearchOrder;
     private JScrollPane jsOrders;
-    private JPanel jpBox, jpA, jpOrders;
+    private JPanel jpA, jpOrders;
     public OrderDialog(){
         setSize(new Dimension(700,500));
         setTitle("Order inladen");
@@ -31,9 +31,8 @@ public class OrderDialog extends JDialog implements ActionListener {
 
         jpA = new JPanel();
         jpA.setLayout(new FlowLayout());
-
-        jpBox = new JPanel();
-        jpBox.setLayout(new FlowLayout());
+        jsOrders = new JScrollPane(jpOrders);
+        jsOrders.setPreferredSize(new Dimension(700,250));
 
         for (int i = 0; i < 500; i++) { //test data
             jpOrders.add(new JLabel("Order " + (i+1)));
@@ -41,19 +40,13 @@ public class OrderDialog extends JDialog implements ActionListener {
             jpOrders.add(new JLabel((int)(Math.random()*31) + "-" + (int)(Math.random()*12) + "-" + ((int)(Math.random()*24) + 2000)));
         }
 
-
         this.add(jpA);
-        this.add(jpBox);
-
-        jsOrders = new JScrollPane(jpOrders);
-
-        jpBox.add(jsOrders);
+        this.add(jsOrders);
         jpA.add(jbCancel);
         jpA.add(jbConfirm);
         jpA.add(jlChooseOrder);
         jpA.add(jlSearchOrder);
         jpA.add(jtSearchOrder);
-        jpA.add(jsOrders);
 
         setVisible(true);
     }
