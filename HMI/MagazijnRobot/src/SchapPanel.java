@@ -17,6 +17,7 @@ public class SchapPanel extends JPanel implements ActionListener{
         setBackground(Color.red);
         schap = new Grid(5,5);
         LegendaPanel legendaPanel = new LegendaPanel();
+        voorraadstiuatieWijzigen.addActionListener(this);
         add(schapNaam);
         add(voorraadstiuatieWijzigen);
         add(schap);
@@ -26,7 +27,9 @@ public class SchapPanel extends JPanel implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if (e.getSource() == voorraadstiuatieWijzigen) {
+            StockSituationDialog stockSituationDialog = new StockSituationDialog();
+        }
     }
 }
 
