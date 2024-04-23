@@ -73,7 +73,7 @@ public class OrderDialog extends JDialog implements ActionListener {
         for (int i = 0; i < orderButtons.size(); i++) {
             if(e.getSource()==orderButtons.get(i)){
                 selectedOrder = foundOrders.get(i);
-                jlChooseOrder.setText("Gekozen order: Order " + (foundOrders.get(i)+1));
+                jlChooseOrder.setText("Gekozen order: Order " + (selectedOrder+1));
                 jpA.updateUI();
             }
         }
@@ -90,12 +90,12 @@ public class OrderDialog extends JDialog implements ActionListener {
           }
         }
         jpOrders.setLayout(new GridLayout(foundOrders.size(),3));
-        for (int i = 0; i < foundOrders.size(); i++) {
+        for (Integer foundOrder : foundOrders) {
             JButton orderButton = new JButton("Selecteer ");
             orderButton.addActionListener(this);
             orderButtons.add(orderButton);
             jpOrders.add(orderButton);
-            jpOrders.add(new JLabel("Order: " + (foundOrders.get(i)+1)));
+            jpOrders.add(new JLabel("Order: " + (foundOrder + 1)));
             jpOrders.add(new JLabel((int) (Math.random() * 31) + "-" + (int) (Math.random() * 12) + "-" + ((int) (Math.random() * 24) + 2000)));
             jpOrders.add(new JLabel((int) (Math.random() * 31) + "-" + (int) (Math.random() * 12) + "-" + ((int) (Math.random() * 24) + 2000)));
         }
