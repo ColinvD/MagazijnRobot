@@ -1,5 +1,9 @@
+import java.sql.*;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         HMIScreen hmiScreen = new HMIScreen();
+        Database database = new Database();
+        database.databaseConnect();
     }
 }
