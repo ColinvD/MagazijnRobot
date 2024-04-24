@@ -18,7 +18,7 @@ public class OrderDialog extends JDialog implements ActionListener {
     private JLabel jlChooseOrder, jlSearchOrder;
     private JTextField jtSearchOrder;
     private JScrollPane jsOrders;
-    private JPanel jpA, jpOrders;
+    private JPanel jpTop, jpOrders;
     private Database database;
     private ResultSet orders;
     private OrderPanel orderPanel;
@@ -39,7 +39,7 @@ public class OrderDialog extends JDialog implements ActionListener {
         jbSearch = new JButton("Zoek");
         jbSearch.addActionListener(this);
 
-        jlChooseOrder = new JLabel("Kies order om in te laden");
+        jlChooseOrder = new JLabel("Gekozen order: geen");
         jlSearchOrder = new JLabel("Zoek ordernummer:");
 
         jtSearchOrder = new JTextField(15);
@@ -48,19 +48,19 @@ public class OrderDialog extends JDialog implements ActionListener {
         jpOrders = new JPanel();
         jpOrders.setLayout(new GridLayout(orderAmount, 3)); //maak row count het aantal orders
 
-        jpA = new JPanel();
-        jpA.setLayout(new FlowLayout());
+        jpTop = new JPanel();
+        jpTop.setLayout(new FlowLayout());
         jsOrders = new JScrollPane(jpOrders);
         jsOrders.setPreferredSize(new Dimension(700,250));
 
-        this.add(jpA);
+        this.add(jpTop);
         this.add(jsOrders);
-        jpA.add(jbCancel);
-        jpA.add(jbConfirm);
-        jpA.add(jlChooseOrder);
-        jpA.add(jlSearchOrder);
-        jpA.add(jtSearchOrder);
-        jpA.add(jbSearch);
+        jpTop.add(jbCancel);
+        jpTop.add(jbConfirm);
+        jpTop.add(jlChooseOrder);
+        jpTop.add(jlSearchOrder);
+        jpTop.add(jtSearchOrder);
+        jpTop.add(jbSearch);
 
         database = new Database();
         database.databaseConnect();
@@ -76,10 +76,12 @@ public class OrderDialog extends JDialog implements ActionListener {
             dispose();
         }
         if (e.getSource() == jbConfirm){
-            if(selectedOrder != -1){
+            if(selectedOrder != -1){ //-1 = geen order selected
                 try {
                     orderPanel.setOrder(selectedOrder);
+                    System.out.println("Order inladen gelukt.");
                 } catch (SQLException ex) {
+                    System.out.println("Order inladen mislukt.");
                     throw new RuntimeException(ex);
                 }
             }
@@ -98,7 +100,7 @@ public class OrderDialog extends JDialog implements ActionListener {
             if(e.getSource()==orderButtons.get(i)){
                 selectedOrder = foundOrders.get(i);
                 jlChooseOrder.setText("Gekozen order: Order " + (selectedOrder));
-                jpA.updateUI();
+                jpTop.updateUI();
             }
         }
     }
@@ -110,9 +112,9 @@ public class OrderDialog extends JDialog implements ActionListener {
 
         while(orders.next()){
             String orderNumber = "";
-            orderNumber += orders.getInt(1);
+            orderNumber += orders.getInt(1); //OrderID
             if (jtSearchOrder.getText().isEmpty() || orderNumber.contains(jtSearchOrder.getText())) {
-                foundOrders.add(orders.getInt(1));
+                foundOrders.add(orders.getInt(1)); //OrderID
                 JButton orderButton = new JButton("Selecteer");
                 orderButton.addActionListener(this);
                 orderButtons.add(orderButton);

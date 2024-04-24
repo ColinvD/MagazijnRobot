@@ -40,4 +40,9 @@ public class Database {
         ResultSet rs = statement.executeQuery("SELECT * FROM orders WHERE OrderID = " + OrderID + ";");
         return rs;
     }
+
+    public ResultSet getOrderlines(int OrderID) throws  SQLException{
+        ResultSet rs = statement.executeQuery("SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = " + OrderID + ";");
+        return rs;
+    }
 }

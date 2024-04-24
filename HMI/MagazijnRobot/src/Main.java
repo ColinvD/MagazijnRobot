@@ -5,8 +5,5 @@ public class Main {
         HMIScreen hmiScreen = new HMIScreen();
         Database database = new Database();
         database.databaseConnect();
-        ResultSet result = database.getOrder(35);
-        ResultSet order = database.getOrder(39);
-        database.printResult(order);
     }
 }
