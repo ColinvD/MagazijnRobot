@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class OrderPanel extends JPanel implements ActionListener {
     private JButton jbOrder;
@@ -16,7 +17,11 @@ public class OrderPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == jbOrder){
-            OrderDialog dialog = new OrderDialog();
+            try {
+                OrderDialog dialog = new OrderDialog();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
