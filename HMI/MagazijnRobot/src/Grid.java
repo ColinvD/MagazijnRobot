@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Grid extends JPanel {
     private GridSpace[][] grid;
@@ -16,6 +18,14 @@ public class Grid extends JPanel {
                 //add(grid[i][j]);
             }
         }
+        addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent me) {
+                //System.out.println(me);
+                System.out.println("X: " + me.getX() + ", Y: " + me.getY());
+                System.out.println(getSelectedCell(me.getX(), me.getY()).getGridText());
+                //System.out.println(grid);
+            }
+        });
     }
 
     public GridSpace[][] getGrid(){
@@ -27,6 +37,12 @@ public class Grid extends JPanel {
         alphabet = alphabet.toUpperCase();
         String text = String.valueOf(alphabet.charAt(position/gridWidth))+ ((position%gridWidth)+1);
         return text;
+    }
+
+    private GridSpace getSelectedCell(int xCoordinate, int yCoordinate){
+        int x = xCoordinate / 60;
+        int y = yCoordinate / 60;
+        return grid[y][x];
     }
 
     @Override
