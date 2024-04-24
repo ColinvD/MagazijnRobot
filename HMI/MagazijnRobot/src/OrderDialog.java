@@ -21,11 +21,14 @@ public class OrderDialog extends JDialog implements ActionListener {
     private JPanel jpA, jpOrders;
     private Database database;
     private ResultSet orders;
-    public OrderDialog() throws SQLException {
+    private OrderPanel orderPanel;
+    public OrderDialog(OrderPanel orderPanel) throws SQLException {
         setSize(new Dimension(700,500));
         setTitle("Order inladen");
         setModal(true);
         this.setLayout(new GridLayout(2,1));
+
+        this.orderPanel = orderPanel;
 
         jbCancel = new JButton("Annuleer");
         jbCancel.addActionListener(this);
@@ -73,7 +76,13 @@ public class OrderDialog extends JDialog implements ActionListener {
             dispose();
         }
         if (e.getSource() == jbConfirm){
-            //Maak code om order door te geven
+            if(selectedOrder != -1){
+                try {
+                    orderPanel.setOrder(selectedOrder);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             dispose();
         }
         if(e.getSource() == jbSearch){
