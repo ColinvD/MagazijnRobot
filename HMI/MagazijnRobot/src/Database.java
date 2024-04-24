@@ -64,13 +64,12 @@ public class Database {
 
     public void printResult(ResultSet rs) throws SQLException {
         while (rs.next()) {
-            for (int i = 1; i < rs.getMetaData().getColumnCount(); i++) {
+            for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                 System.out.print(rs.getMetaData().getColumnLabel(i) + ": ");
                 System.out.print(rs.getString(i) + "; ");
             }
             System.out.println("");
         }
-
     }
 
     public void close() throws SQLException {
@@ -78,4 +77,13 @@ public class Database {
         connection.close();
     }
 
+    public ResultSet getOrder(int OrderID) throws SQLException {
+        ResultSet rs = statement.executeQuery("SELECT * FROM orders WHERE OrderID = " + OrderID + ";");
+        return rs;
+    }
+
+    public ResultSet getOrderlines(int OrderID) throws  SQLException{
+        ResultSet rs = statement.executeQuery("SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = " + OrderID + ";");
+        return rs;
+    }
 }
