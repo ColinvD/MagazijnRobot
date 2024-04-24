@@ -39,7 +39,8 @@ public class OrderDialog extends JDialog implements ActionListener {
         jbSearch = new JButton("Zoek");
         jbSearch.addActionListener(this);
 
-        jlChooseOrder = new JLabel("Gekozen order: geen");
+        jlChooseOrder = new JLabel("Gekozen order: geen", SwingConstants.CENTER);
+        jlChooseOrder.setPreferredSize(new Dimension(700,20));
         jlSearchOrder = new JLabel("Zoek ordernummer:");
 
         jtSearchOrder = new JTextField(15);
