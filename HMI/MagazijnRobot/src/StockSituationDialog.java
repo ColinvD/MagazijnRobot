@@ -213,6 +213,7 @@ public class StockSituationDialog extends JDialog implements ActionListener {
                     if (resultString != null && !resultString.isEmpty()) {
                         for (JButton jButton : gridButton) {
                             if (jButton.getText().equals(resultString)) {
+                                stockStatus.get(1).set(stockStatus.get(0).indexOf(resultString), "false");
                                 jButton.setBackground(Color.WHITE);
                             }
                         }
@@ -228,7 +229,7 @@ public class StockSituationDialog extends JDialog implements ActionListener {
             }
             if (newProduct) {
                 if (resultUpdate > 0) {
-                    activeJButton.setBackground(Color.LIGHT_GRAY);
+                    stockStatus.get(1).set(stockStatus.get(0).indexOf(selectedStockLocation), "true");
                     if (resultString == null || resultString.isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Het product: " + jcbProduct.getSelectedItem().toString() + " is verplaatst  naar schap: " + selectedStockLocation + ".", "voorraad locatie aangepast", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -237,8 +238,8 @@ public class StockSituationDialog extends JDialog implements ActionListener {
                 } else {
                     JOptionPane.showMessageDialog(null, "Er is iets fout gegaan", "error", JOptionPane.ERROR_MESSAGE);
                 }
-            } else {
-                activeJButton.setBackground(Color.WHITE);
+            } else if (jcEmpty.isSelected() || jcFull.isSelected()){
+                stockStatus.get(1).set(stockStatus.get(0).indexOf(selectedStockLocation), "false");
                 JOptionPane.showMessageDialog(null, "Het schap: " + selectedStockLocation + " is geleegd.", "voorraad geleegd", JOptionPane.INFORMATION_MESSAGE);
             }
             database.close();
