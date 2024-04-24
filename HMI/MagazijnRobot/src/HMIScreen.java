@@ -11,9 +11,8 @@ public class HMIScreen extends JFrame implements ActionListener {
         setTitle("HMI magazijn robot");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         SchapPanel schap = new SchapPanel();
-        OrderPanel order = new OrderPanel();
+        ButtonPanel order = new ButtonPanel();
         StatusPanel status = new StatusPanel();
-
         add(schap);
         add(order);
         add(status);

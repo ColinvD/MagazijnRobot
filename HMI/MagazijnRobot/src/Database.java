@@ -8,11 +8,12 @@ public class Database {
     private String dbpassword = "";
 
     private Statement statement;
+    private Connection connection;
 
     //function to connect to the xampp server
     public void databaseConnect() {
         try {
-            Connection connection = DriverManager.getConnection(url + dbName, userName, dbpassword);
+            connection = DriverManager.getConnection(url + dbName, userName, dbpassword);
             statement = connection.createStatement();
             System.out.println("Database Connected");
         } catch (Exception e) {
@@ -26,6 +27,41 @@ public class Database {
         return rs;
     }
 
+    public ResultSet select(String query, String value) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        ResultSet rs = s.executeQuery();
+        return rs;
+    }
+
+    public String selectFirst(String query, String value) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        String result = rs.getString(1);
+        rs.close();
+        return result;
+    }
+
+    public int update(String query) throws SQLException {
+        return statement.executeUpdate(query);
+    }
+
+    public int update(String query, String value) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        return s.executeUpdate();
+    }
+
+    public int update(String query, String value, String value2) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        s.setString(2, value2);
+        System.out.println(s);
+        return s.executeUpdate();
+    }
+
     public void printResult(ResultSet rs) throws SQLException {
         while (rs.next()) {
             for (int i = 1; i < rs.getMetaData().getColumnCount(); i++) {
@@ -35,6 +71,11 @@ public class Database {
             System.out.println("");
         }
 
+    }
+
+    public void close() throws SQLException {
+        statement.close(); //sluit ook de resultset
+        connection.close();
     }
 
 }
