@@ -135,7 +135,7 @@ public class OrderDialog extends JDialog implements ActionListener {
         jpOrders.setLayout(new GridLayout(foundOrders.size(),3));
     }
     public void getOrderAmount() throws SQLException {
-        ResultSet rs = database.select("Select COUNT(*) FROM orders LIMIT 500");
+        ResultSet rs = database.select("Select COUNT(*) FROM orders WHERE PickingCompletedWhen IS NULL ORDER BY OrderID DESC");
         rs.next();
         orderAmount = rs.getInt(1);
     }
