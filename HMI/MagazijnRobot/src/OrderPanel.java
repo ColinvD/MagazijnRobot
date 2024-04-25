@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class OrderPanel extends JPanel {
     private ResultSet selectedOrder;
     private Database database;
-    private JTextField jtSelectedOrder;
+    private JLabel jlSelectedOrder;
     private ResultSet orderItems;
     private JPanel orderItemsPanel;
     public OrderPanel(){
@@ -20,13 +20,13 @@ public class OrderPanel extends JPanel {
         database = new Database();
         database.databaseConnect();
 
-        jtSelectedOrder = new JTextField("Geen order geselecteerd");
+        jlSelectedOrder = new JLabel("Geen order geselecteerd");
 
         orderItemsPanel = new JPanel();
         orderItemsPanel.setLayout(new FlowLayout());
         orderItemsPanel.setPreferredSize(new Dimension(300, 220));
 
-        add(jtSelectedOrder);
+        add(jlSelectedOrder);
         add(orderItemsPanel);
     }
     public void setOrder(int OrderID) throws SQLException {
@@ -41,7 +41,8 @@ public class OrderPanel extends JPanel {
                 orderItemsPanel.add(new JLabel(itemCount + ". " + orderItems.getString("StockItemName") + ", " + orderItems.getString("OrderStatus")));
             }
         }
-        jtSelectedOrder.setText("Order: " + OrderID);
+        if (itemCount==0){orderItemsPanel.add(new JLabel("Lege order."));}
+        jlSelectedOrder.setText("Order: " + OrderID);
         this.updateUI();
     }
 }

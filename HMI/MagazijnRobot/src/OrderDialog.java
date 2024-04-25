@@ -111,6 +111,11 @@ public class OrderDialog extends JDialog implements ActionListener {
         foundOrders.clear();
         orderButtons.clear();
 
+//        jpOrders.add(new JLabel(""));
+//        jpOrders.add(new JLabel("OrderID"), SwingConstants.CENTER);
+//        jpOrders.add(new JLabel("Created"), SwingConstants.CENTER);
+//        jpOrders.add(new JLabel("Last edited"), SwingConstants.CENTER);
+
         while(orders.next()){
             String orderNumber = "";
             orderNumber += orders.getInt(1); //OrderID
@@ -122,9 +127,9 @@ public class OrderDialog extends JDialog implements ActionListener {
                 jpOrders.add(orderButton);
                 String createdDate = dmy.format(orders.getDate(2));
                 String editedDate = dmy.format(orders.getDate(3));
-                jpOrders.add(new JLabel("Order: " + orders.getInt(1)));
-                jpOrders.add(new JLabel(createdDate));
-                jpOrders.add(new JLabel(editedDate));
+                jpOrders.add(new JLabel("Order: " + orders.getInt(1), SwingConstants.CENTER));
+                jpOrders.add(new JLabel(createdDate, SwingConstants.CENTER));
+                jpOrders.add(new JLabel(editedDate, SwingConstants.CENTER));
             }
         }
         jpOrders.setLayout(new GridLayout(foundOrders.size(),3));
