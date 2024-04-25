@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,9 +9,10 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private JButton jbOrder;
     private OrderPanel orderPanel;
     public ButtonPanel(OrderPanel orderPanel){
-        setPreferredSize(new Dimension(200,400));
+        setPreferredSize(new Dimension(300,200));
         setLayout(new FlowLayout());
         setBackground(Color.white);
+        setBorder(new MatteBorder(1, 0, 0, 1, Color.BLACK));
 
         this.orderPanel = orderPanel;
 

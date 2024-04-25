@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,9 +14,10 @@ public class OrderPanel extends JPanel {
     private ResultSet orderItems;
     private JPanel orderItemsPanel;
     public OrderPanel(){
-        setPreferredSize(new Dimension(300,250));
+        setPreferredSize(new Dimension(300,400));
         setLayout(new FlowLayout());
-        setBackground(Color.white);
+        setBackground(new Color(159, 159, 159));
+        setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
 
         database = new Database();
         database.databaseConnect();
@@ -24,7 +26,9 @@ public class OrderPanel extends JPanel {
 
         orderItemsPanel = new JPanel();
         orderItemsPanel.setLayout(new FlowLayout());
-        orderItemsPanel.setPreferredSize(new Dimension(300, 220));
+        orderItemsPanel.setPreferredSize(new Dimension(300, 420));
+        orderItemsPanel.setBackground(new Color(200, 200, 200));
+        orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
         add(jlSelectedOrder);
         add(orderItemsPanel);

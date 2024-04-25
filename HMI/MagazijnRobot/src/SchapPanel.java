@@ -14,7 +14,8 @@ public class SchapPanel extends JPanel implements ActionListener{
         setLayout(new FlowLayout());
         schapNaam.setFont(new Font("default",Font.BOLD,20));
         voorraadstiuatieWijzigen.setPreferredSize(new Dimension(350,30));
-        setBackground(Color.red);
+        setBackground(new Color(247, 238, 115));
+        setBorder(BorderFactory.createLineBorder(Color.black));
         schap = new Grid(5,5);
         LegendaPanel legendaPanel = new LegendaPanel();
         voorraadstiuatieWijzigen.addActionListener(this);

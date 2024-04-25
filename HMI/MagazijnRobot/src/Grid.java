@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 public class Grid extends JPanel {
     private GridSpace[][] grid;
     public Grid(int width, int height){
-        setBackground(Color.red);
+        setBackground(Color.white);
         grid = new GridSpace[width][height];
         setLayout(new FlowLayout());
         //setLayout(new GridLayout(width,height));
