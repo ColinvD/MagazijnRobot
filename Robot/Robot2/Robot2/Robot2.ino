@@ -18,11 +18,18 @@ const int power = 215;
 unsigned long LastTime;
 int waitTime = 2000;
 int currentState = 4;
-const int IsLeft = 10;
+const int IsLeft = 2;
+const int IsRight = 10;
 int sensor_value = 0;
+int sensor_valueLeft = 0;
+bool onRight = false;
+bool onLeft = false;
 
 // microswitch
-int microswitchDown = 0;
+int microswitchDown = A4;
+bool onDown = false;
+int microswitchUp = A5;
+bool onUp = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -33,17 +40,21 @@ void setup() {
   pinMode(pwmPinUP, OUTPUT);
   pinMode(brakeUP, OUTPUT);
   pinMode(IsLeft, INPUT);
+  pinMode(IsRight, INPUT);
   pinMode(JoyconX, INPUT);
   pinMode(JoyconY, INPUT);
-  pinMode(microswitchDown,INPUT);
+  pinMode(microswitchDown,INPUT_PULLUP);
+  pinMode(microswitchUp,INPUT_PULLUP);
   Serial.begin(9600);
 }
 
 void loop() {
-  sensor_value = digitalRead(IsLeft);
   Moving();
+  indictiveSensorReadLeft();
   indictiveSensorRead();
-  //microSwitch();
+
+ microSwitch();
+ microSwitchUp();
 
   // Serial.print("x = ");
   // Serial.print(x);
@@ -51,48 +62,22 @@ void loop() {
   // Serial.print(", y = ");
   // Serial.println(y);
 
-
-  //  put your main code here, to run repeatedly:
-  //   delay(2000);
-  //   digitalWrite(directionPinUP, HIGH);
-  //   analogWrite(pwmPinUP, power);
-  //   digitalWrite(brakeUP, LOW);
-  //   digitalWrite(directionLeftRight, HIGH);
-  //   analogWrite(pwmPinLeftRight, power);
-  //   digitalWrite(brakeLeftRight, LOW);
-  //   delay(2000);
-  //   analogWrite(pwmPinUP, 0);
-  //   digitalWrite(brakeUP, HIGH);
-  //   analogWrite(pwmPinLeftRight, 0);
-  //   digitalWrite(brakeLeftRight, HIGH);
-  //   delay(2000);
-  //   digitalWrite(directionPinUP, LOW);
-  //   analogWrite(pwmPinUP, power);
-  //   digitalWrite(brakeUP, LOW);
-  //   digitalWrite(directionLeftRight, LOW);
-  //   analogWrite(pwmPinLeftRight, power);
-  //   digitalWrite(brakeLeftRight, LOW);
-  //   delay(6000);
-  //   analogWrite(pwmPinUP, 0);
-  //   digitalWrite(brakeUP, HIGH);
-  //   analogWrite(pwmPinLeftRight, 0);
-  //   digitalWrite(brakeLeftRight, HIGH);
 }
 
 
 void Moving() {
   x = analogRead(JoyconX);
   y = analogRead(JoyconY);
-  if (x < 300) {
+  if (x < 300 && !onUp) {
     Up();
-  } else if (x > 700) {
+  } else if (x > 700 && !onDown ) {
     Down();
   } else {
     StopUp();
   }
-  if (y < 300) {
+  if (y < 300 && !onRight) {
     Right();
-  } else if (y > 700) {
+  } else if (y > 700 && !onLeft) {
     Left();
   } else {
     StopLeft();
@@ -131,55 +116,55 @@ void StopUp() {
 }
 
 
-void indictiveSensorRead() {
-  if (sensor_value == HIGH) {
-    digitalWrite(brakeUP, LOW);
+void indictiveSensorReadLeft() {
+  sensor_valueLeft = digitalRead(IsLeft);
+  //Serial.println(sensor_valueLeft);
+  if (sensor_valueLeft == HIGH ) {
+    digitalWrite(brakeLeftRight, LOW);
     Serial.println("aan");
+    onLeft = false;
   } else {
-    // analogWrite(pwmPinUP, 0);
-    // digitalWrite(brakeUP, HIGH);
     Serial.println("dichtbij");
+    onLeft = true;
   }
 }
-//   if (millis() > LastTime + waitTime) {
-//     LastTime = millis();
-//     Something();
-//   }
-// }
+
+void indictiveSensorRead() {
+  sensor_value = digitalRead(IsRight);
+  //Serial.println(sensor_value);
+  if (sensor_value == HIGH) {
+    digitalWrite(brakeLeftRight, LOW);
+     Serial.println("DA");
+     onRight = false;
+  } else {
+     Serial.println("SDADSAS");
+     onRight = true;
+  }
+
+
+}
 
 void microSwitch(){
-  int pressed = digitalRead(0);
+  int pressed = digitalRead(microswitchDown);
+  Serial.println(pressed);
   if(pressed == HIGH){
-    Serial.println("nallfajldk");
+    //Serial.println("nallfajldk");
+    onDown = true;
+  } else if (pressed == LOW){
+    onDown = false;
+    //Serial.println("efijsfrjirgopgi[ph[oieupstipg]0gepto]jepg]prpraop");
   }
 }
 
-// void Something() {
-//   // put your main code here, to run repeatedly:
-//   switch (currentState) {
-//     case 0:
-//       digitalWrite(directionPinUP, HIGH);
-//       analogWrite(pwmPinUP, power);
-//       digitalWrite(brakeUP, LOW);
-//       currentState = 1;
-//       break;
-//     case 1:
-//       analogWrite(pwmPinUP, 0);
-//       digitalWrite(brakeUP, HIGH);
-//       currentState = 2;
-//       break;
-//     case 2:
-//       digitalWrite(directionPinUP, LOW);
-//       analogWrite(pwmPinUP, power);
-//       digitalWrite(brakeUP, LOW);
-//       currentState = 3;
-//       break;
-//     case 3:
-//       analogWrite(pwmPinUP, 0);
-//       digitalWrite(brakeUP, HIGH);
-//       currentState = 0;
-//       break;
-//     default:
-//       currentState = 0;
-//   }
-// }
+void microSwitchUp(){
+  int pressed = digitalRead(microswitchUp);
+  Serial.println(pressed);
+  if(pressed == HIGH){
+    //Serial.println("nallfajldk");
+    onUp = true;
+  } else if (pressed == LOW){
+    onUp = false;
+    //Serial.println("efijsfrjirgopgi[ph[oieupstipg]0gepto]jepg]prpraop");
+  }
+}
+
