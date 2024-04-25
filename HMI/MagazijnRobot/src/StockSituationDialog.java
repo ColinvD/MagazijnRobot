@@ -125,9 +125,9 @@ public class StockSituationDialog extends JDialog implements ActionListener {
             resultCount.next();
             boxValue = new String[resultCount.getInt("count(*)") + 1];
             boxValue[0] = "";
-            ResultSet result = database.select("Select * FROM stockitems");
+            ResultSet result = database.select("Select StockItemName FROM stockitems");
             while (result.next()) {
-                boxValue[count] = result.getString(2);
+                boxValue[count] = result.getString(1);
                 count++;
             }
             result.close();
