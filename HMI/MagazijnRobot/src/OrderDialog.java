@@ -107,7 +107,7 @@ public class OrderDialog extends JDialog implements ActionListener {
     }
 
     public void refreshData() throws SQLException{
-        orders = database.select("SELECT * FROM orders");
+        orders = database.select("SELECT * FROM orders WHERE PickingCompletedWhen IS NULL ORDER BY OrderID DESC");
         foundOrders.clear();
         orderButtons.clear();
 
@@ -118,16 +118,16 @@ public class OrderDialog extends JDialog implements ActionListener {
 
         while(orders.next()){
             String orderNumber = "";
-            orderNumber += orders.getInt(1); //OrderID
+            orderNumber += orders.getInt("OrderID"); //OrderID
             if (jtSearchOrder.getText().isEmpty() || orderNumber.contains(jtSearchOrder.getText())) {
-                foundOrders.add(orders.getInt(1)); //OrderID
+                foundOrders.add(orders.getInt("OrderID")); //OrderID
                 JButton orderButton = new JButton("Selecteer");
                 orderButton.addActionListener(this);
                 orderButtons.add(orderButton);
                 jpOrders.add(orderButton);
-                String createdDate = dmy.format(orders.getDate(2));
-                String editedDate = dmy.format(orders.getDate(3));
-                jpOrders.add(new JLabel("Order: " + orders.getInt(1), SwingConstants.CENTER));
+                String createdDate = dmy.format(orders.getDate("OrderDate"));
+                String editedDate = dmy.format(orders.getDate("LastEditedWhen"));
+                jpOrders.add(new JLabel("Order: " + orders.getInt("OrderID"), SwingConstants.CENTER));
                 jpOrders.add(new JLabel(createdDate, SwingConstants.CENTER));
                 jpOrders.add(new JLabel(editedDate, SwingConstants.CENTER));
             }
@@ -135,7 +135,7 @@ public class OrderDialog extends JDialog implements ActionListener {
         jpOrders.setLayout(new GridLayout(foundOrders.size(),3));
     }
     public void getOrderAmount() throws SQLException {
-        ResultSet rs = database.select("Select COUNT(*) FROM orders");
+        ResultSet rs = database.select("Select COUNT(*) FROM orders LIMIT 500");
         rs.next();
         orderAmount = rs.getInt(1);
     }

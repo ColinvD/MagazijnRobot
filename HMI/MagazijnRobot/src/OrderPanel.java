@@ -38,7 +38,7 @@ public class OrderPanel extends JPanel {
         while (orderItems.next()){
             for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
                 itemCount++;
-                orderItemsPanel.add(new JLabel(itemCount + ". " + orderItems.getString("StockItemName") + ", " + orderItems.getString("OrderStatus")));
+                orderItemsPanel.add(new JLabel(itemCount + ". " + orderItems.getString("StockItemName")));
             }
         }
         if (itemCount==0){orderItemsPanel.add(new JLabel("Lege order."));}
