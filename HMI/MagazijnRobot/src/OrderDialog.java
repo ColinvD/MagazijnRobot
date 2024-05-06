@@ -51,6 +51,7 @@ public class OrderDialog extends JDialog implements ActionListener {
 
         jpTop = new JPanel();
         jpTop.setLayout(new FlowLayout());
+
         jsOrders = new JScrollPane(jpOrders);
         jsOrders.setPreferredSize(new Dimension(700,250));
 
@@ -74,6 +75,7 @@ public class OrderDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == jbCancel){
+            closeDatabase();
             dispose();
         }
         if (e.getSource() == jbConfirm){
@@ -86,6 +88,7 @@ public class OrderDialog extends JDialog implements ActionListener {
                     throw new RuntimeException(ex);
                 }
             }
+            closeDatabase();
             dispose();
         }
         if(e.getSource() == jbSearch){
@@ -138,5 +141,13 @@ public class OrderDialog extends JDialog implements ActionListener {
         ResultSet rs = database.select("Select COUNT(*) FROM orders WHERE PickingCompletedWhen IS NULL ORDER BY OrderID DESC");
         rs.next();
         orderAmount = rs.getInt(1);
+    }
+
+    public void closeDatabase(){
+        try{
+            database.close();
+        } catch (Exception exception){
+
+        }
     }
 }
