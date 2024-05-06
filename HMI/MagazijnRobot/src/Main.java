@@ -4,7 +4,13 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         HMIScreen hmiScreen = new HMIScreen();
         Database d = new Database();
-        d.databaseConnect();
-        System.out.println("ID 1: " + d.getItemQuantity(1));
+        try {
+            d.databaseConnect();
+            System.out.println("Database Connected");
+        } catch (Exception e) {
+            System.out.println("Database Not Connected");
+            System.out.println(e.getMessage());
+        }
+       // System.out.println("ID 1: " + d.getItemQuantity(1));
     }
 }

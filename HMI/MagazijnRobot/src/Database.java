@@ -15,7 +15,7 @@ public class Database {
         try {
             connection = DriverManager.getConnection(url + dbName, userName, dbpassword);
             statement = connection.createStatement();
-            System.out.println("Database Connected");
+
         } catch (Exception e) {
             System.out.println("Database Not Connected");
             System.out.println(e.getMessage());
