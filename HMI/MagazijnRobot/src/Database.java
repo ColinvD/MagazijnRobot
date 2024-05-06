@@ -86,4 +86,22 @@ public class Database {
         ResultSet rs = statement.executeQuery("SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = " + OrderID + ";");
         return rs;
     }
+
+    public int getItemQuantity(int StockitemID) throws SQLException {
+        ResultSet rs = statement.executeQuery("SELECT * FROM stockitemholdings WHERE StockitemID = " + StockitemID + ";");
+        rs.next();
+        return rs.getInt("QuantityOnHand");
+    }
+
+//    public int getItemQuantity(String StockitemName) throws SQLException {
+//        ResultSet rs = statement.executeQuery("SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE '%" + StockitemName + "%';");
+//        rs.next();
+//        int Quantity = -1;
+//        try{
+//            Quantity = rs.getInt("QuantityOnHand");
+//        } catch (Exception e){
+//
+//        }
+//        return Quantity;
+//    }
 }
