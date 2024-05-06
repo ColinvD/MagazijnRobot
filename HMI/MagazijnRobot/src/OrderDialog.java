@@ -23,10 +23,12 @@ public class OrderDialog extends JDialog implements ActionListener {
     private ResultSet orders;
     private OrderPanel orderPanel;
     public OrderDialog(OrderPanel orderPanel) throws SQLException {
-        setSize(new Dimension(700,500));
+        setSize(new Dimension(700,350));
         setTitle("Order inladen");
         setModal(true);
-        this.setLayout(new GridLayout(2,1));
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
 
         this.orderPanel = orderPanel;
 
@@ -55,8 +57,17 @@ public class OrderDialog extends JDialog implements ActionListener {
         jsOrders = new JScrollPane(jpOrders);
         jsOrders.setPreferredSize(new Dimension(700,250));
 
-        this.add(jpTop);
-        this.add(jsOrders);
+
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        this.add(jpTop, c);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 1;
+        c.weighty = 3;
+        this.add(jsOrders, c);
         jpTop.add(jbCancel);
         jpTop.add(jbConfirm);
         jpTop.add(jlChooseOrder);
@@ -114,10 +125,10 @@ public class OrderDialog extends JDialog implements ActionListener {
         foundOrders.clear();
         orderButtons.clear();
 
-//        jpOrders.add(new JLabel(""));
-//        jpOrders.add(new JLabel("OrderID"), SwingConstants.CENTER);
-//        jpOrders.add(new JLabel("Created"), SwingConstants.CENTER);
-//        jpOrders.add(new JLabel("Last edited"), SwingConstants.CENTER);
+        jpOrders.add(new JLabel("", SwingConstants.CENTER));
+        jpOrders.add(new JLabel("OrderID", SwingConstants.CENTER));
+        jpOrders.add(new JLabel("Created", SwingConstants.CENTER));
+        jpOrders.add(new JLabel("Last Edited", SwingConstants.CENTER));
 
         while(orders.next()){
             String orderNumber = "";
@@ -130,12 +141,12 @@ public class OrderDialog extends JDialog implements ActionListener {
                 jpOrders.add(orderButton);
                 String createdDate = dmy.format(orders.getDate("OrderDate"));
                 String editedDate = dmy.format(orders.getDate("LastEditedWhen"));
-                jpOrders.add(new JLabel("Order: " + orders.getInt("OrderID"), SwingConstants.CENTER));
+                jpOrders.add(new JLabel(orders.getString("OrderID"), SwingConstants.CENTER));
                 jpOrders.add(new JLabel(createdDate, SwingConstants.CENTER));
                 jpOrders.add(new JLabel(editedDate, SwingConstants.CENTER));
             }
         }
-        jpOrders.setLayout(new GridLayout(foundOrders.size(),3));
+        jpOrders.setLayout(new GridLayout(foundOrders.size()+1,3));
     }
     public void getOrderAmount() throws SQLException {
         ResultSet rs = database.select("Select COUNT(*) FROM orders WHERE PickingCompletedWhen IS NULL ORDER BY OrderID DESC");
