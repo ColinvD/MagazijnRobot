@@ -30,8 +30,8 @@ public class StockSituationDialog extends JDialog implements ActionListener {
         setSize(new Dimension(500, 500));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-        stockStatus.add(new ArrayList<String>());
-        stockStatus.add(new ArrayList<String>());
+        stockStatus.add(new ArrayList<>());
+        stockStatus.add(new ArrayList<>());
 
 //        top buttons
         buttonPanel = new JPanel();
@@ -182,11 +182,12 @@ public class StockSituationDialog extends JDialog implements ActionListener {
                         activeJButton.setBackground(Color.white);
                     }
                 }
+
                 jButton.setBackground(Color.RED);
                 selectedStockLocation = jButton.getText();
                 String boxValueSelected = getProductFromStock(jButton);
                 activeJButton = jButton;
-                if (boxValueSelected == null || boxValueSelected.equals("")) {
+                if (boxValueSelected == null || boxValueSelected.isEmpty()) {
                     jcEmpty.setSelected(true);
                     jcFull.setSelected(false);
                 } else {
@@ -254,12 +255,18 @@ public class StockSituationDialog extends JDialog implements ActionListener {
         try {
             Database database = new Database();
             database.databaseConnect();
+
             ResultSet result = database.select("Select stockItemName From StockItems WHERE StockLocation = ?", stockLocation.getText());
-            result.next();
-            String boxValueSelected = result.getString(1);
+            String boxValueSelected = "";
+            if(result.next()) {
+                if (result.getString(1) != null) {
+                    boxValueSelected = result.getString(1);
+                }
+            }
             result.close();
             database.close();
             return boxValueSelected;
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
