@@ -13,6 +13,8 @@ public class OrderPanel extends JPanel {
     private JLabel jlSelectedOrder;
     private ResultSet orderItems;
     private JPanel orderItemsPanel;
+
+    private JScrollPane orderJSP;
     public OrderPanel(){
         setPreferredSize(new Dimension(300,400));
         setLayout(new FlowLayout());
@@ -25,13 +27,14 @@ public class OrderPanel extends JPanel {
         jlSelectedOrder = new JLabel("Geen order geselecteerd");
 
         orderItemsPanel = new JPanel();
-        orderItemsPanel.setLayout(new FlowLayout());
-        orderItemsPanel.setPreferredSize(new Dimension(300, 420));
+        orderItemsPanel.setLayout(new BoxLayout(orderItemsPanel, BoxLayout.Y_AXIS));
         orderItemsPanel.setBackground(new Color(200, 200, 200));
         orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
+        orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        orderJSP.setPreferredSize(new Dimension(300,420));
         add(jlSelectedOrder);
-        add(orderItemsPanel);
+        add(orderJSP);
     }
     public void setOrder(int OrderID) throws SQLException {
         selectedOrder = database.getOrder(OrderID);
@@ -45,7 +48,8 @@ public class OrderPanel extends JPanel {
                 orderItemsPanel.add(new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName")));
             }
         }
-        if (itemCount==0){orderItemsPanel.add(new JLabel("Lege order."));}
+        if (itemCount==0){
+            orderItemsPanel.add(new JLabel("Lege order."));}
         jlSelectedOrder.setText("Order: " + OrderID);
         this.updateUI();
     }
