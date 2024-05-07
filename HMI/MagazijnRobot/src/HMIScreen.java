@@ -15,6 +15,7 @@ public class HMIScreen extends JFrame implements ActionListener {
         OrderPanel order = new OrderPanel();
         ButtonPanel button = new ButtonPanel(order);
 
+
         GridBagLayout layout = new GridBagLayout(); //create grid bag layout
         this.setLayout(layout);
         GridBagConstraints c = new GridBagConstraints();
@@ -26,6 +27,7 @@ public class HMIScreen extends JFrame implements ActionListener {
         c.gridheight = 1;
         c.gridx = 1;
         c.gridy = 0;
+
         add(button, c);
         c.gridheight = 1;
         c.gridx = 0;

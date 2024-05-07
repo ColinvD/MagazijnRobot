@@ -12,7 +12,7 @@ public class SchapPanel extends JPanel implements ActionListener {
 
     public SchapPanel() throws SQLException {
         voorraadstiuatieWijzigen.setFocusable(false);
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(400, 475));
         setLayout(new FlowLayout());
         schapNaam.setFont(new Font("default", Font.BOLD, 20));
         voorraadstiuatieWijzigen.setPreferredSize(new Dimension(350, 30));
@@ -20,11 +20,15 @@ public class SchapPanel extends JPanel implements ActionListener {
         setBorder(BorderFactory.createLineBorder(Color.black));
         schap = new Grid(5, 5);
         LegendaPanel legendaPanel = new LegendaPanel();
+        StockSituationPanel stockSituationPanel = new StockSituationPanel(schap);
         voorraadstiuatieWijzigen.addActionListener(this);
         add(schapNaam);
         add(voorraadstiuatieWijzigen);
         add(schap);
+        //add(stockSituationPanel);
         add(legendaPanel);
+        add(stockSituationPanel);
+
         addStockitems();
 
     }

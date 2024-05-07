@@ -142,6 +142,22 @@ public static String getProductFromStock(JButton stockLocation) {
     }
     return null;
 }
+
+public  ArrayList<String> getStockInfo(String positie) throws SQLException {
+        ArrayList<String> results = new ArrayList<>();
+    positie = "'" + positie + "'";
+    ResultSet result = statement.executeQuery("Select StockItemID,StockItemName From stockitems WHERE StockLocation = " + positie);
+
+    if (result.next()) {
+        int StockitemId = result.getInt("StockItemID");
+        String StockitemName = result.getString("StockItemName");
+        int voorraad = getItemQuantity(StockitemId);
+        results.add("Naam: " + StockitemName);
+        results.add("Voorraad: " + voorraad);
+    }
+    return results;
+    }
+
 }
 
 

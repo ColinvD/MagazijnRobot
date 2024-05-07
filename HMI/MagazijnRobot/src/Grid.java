@@ -1,28 +1,44 @@
+import com.mysql.cj.x.protobuf.MysqlxCrud;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 public class Grid extends JPanel {
     private GridSpace[][] grid;
-    public Grid(int width, int height){
+
+    private String name;
+    public Grid(int width, int height) {
         setBackground(Color.white);
         grid = new GridSpace[width][height];
         setLayout(new FlowLayout());
         //setLayout(new GridLayout(width,height));
-        setPreferredSize(new Dimension(300,300));
+        setPreferredSize(new Dimension(300, 300));
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 //grid[i][j] = new GridSpace(60,60, Color.BLACK, getSpaceText(width,height,i*5+j));
-                grid[i][j] = new GridSpace(Color.BLACK, getSpaceText(width,height,i*5+j), Color.white, Color.white);
+                grid[i][j] = new GridSpace(Color.BLACK, getSpaceText(width, height, i * 5 + j), Color.white, Color.white);
                 //add(grid[i][j]);
             }
         }
+        getSpaceName();
+
+    }
+
+    public void getSpaceName(){
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
                 //System.out.println(me);
                 System.out.println("X: " + me.getX() + ", Y: " + me.getY());
-                System.out.println(getSelectedCell(me.getX(), me.getY()).getGridText());
+                //System.out.println(getSelectedCell(me.getX(), me.getY()).getGridText());
+                name = getSelectedCell(me.getX(), me.getY()).getGridText();
+                try {
+                    StockSituationPanel.changePosition();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 //System.out.println(grid);
             }
         });
@@ -65,6 +81,12 @@ public class Grid extends JPanel {
                 g.drawString(gridcell.getGridText(), j*cellWidth + 25, i*cellHeight + 35);
             }
         }
+
+    }
+
+    public String getNamePositie() {
+        System.out.println(name);
+        return name;
 
     }
 }
