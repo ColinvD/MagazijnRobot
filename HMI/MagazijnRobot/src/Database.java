@@ -168,11 +168,13 @@ public class Database {
         return results;
     }
 
-    public int[] getWeights() throws SQLException {
+    public Integer[] getWeights() throws SQLException {
         Database database = new Database();
         database.databaseConnect();
         int i = 0;
-        int[] weights = new int[25];
+        ResultSet result1 = database.select("SELECT Count(*) FROM stockitems WHERE StockLocation IS NOT NULL ");
+        result1.next();
+        Integer[] weights = new Integer[result1.getInt("count(*)")];
         ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL ");
         while (result.next()) {
             int d = result.getInt("Weight");
