@@ -32,7 +32,7 @@ public class OrderPanel extends JPanel {
         orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
         orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        orderJSP.setPreferredSize(new Dimension(300,420));
+        orderJSP.setPreferredSize(new Dimension(300,375));
         add(jlSelectedOrder);
         add(orderJSP);
     }
