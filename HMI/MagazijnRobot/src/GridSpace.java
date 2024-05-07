@@ -62,4 +62,6 @@ public class GridSpace extends JPanel {
     public Color getBorderColor() {
         return borderColor;
     }
+
+
 }

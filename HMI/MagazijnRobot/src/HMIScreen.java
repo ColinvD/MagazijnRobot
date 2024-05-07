@@ -2,9 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class HMIScreen extends JFrame implements ActionListener {
-    public HMIScreen(){
+    public HMIScreen() throws SQLException {
         setSize(750, 650);
         getContentPane().setBackground(Color.black);
         setTitle("HMI magazijn robot");
@@ -13,6 +14,7 @@ public class HMIScreen extends JFrame implements ActionListener {
         StatusPanel status = new StatusPanel();
         OrderPanel order = new OrderPanel();
         ButtonPanel button = new ButtonPanel(order);
+
 
         GridBagLayout layout = new GridBagLayout(); //create grid bag layout
         this.setLayout(layout);
@@ -25,6 +27,7 @@ public class HMIScreen extends JFrame implements ActionListener {
         c.gridheight = 1;
         c.gridx = 1;
         c.gridy = 0;
+
         add(button, c);
         c.gridheight = 1;
         c.gridx = 0;
