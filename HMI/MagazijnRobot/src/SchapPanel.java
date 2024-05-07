@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class SchapPanel extends JPanel implements ActionListener {
-    private Grid schap;
+    private static Grid schap;
     private JLabel schapNaam = new JLabel("Schap");
     private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
 
@@ -36,21 +36,23 @@ public class SchapPanel extends JPanel implements ActionListener {
         }
     }
 
-    public void addStockitems() throws SQLException {
+    public static void addStockitems() throws SQLException {
         Database database = new Database();
         for (String s : database.getOrders()) {
-            if (s != null) {
-                for (int i = 0; i < schap.getGrid().length; i++) {
-                    for (int j = 0; j < schap.getGrid().length; j++) {
-                        GridSpace gridcell = schap.getGrid()[i][j];
+            for (int i = 0; i < schap.getGrid().length; i++) {
+                for (int j = 0; j < schap.getGrid().length; j++) {
+                    GridSpace gridcell = schap.getGrid()[i][j];
+                    if (s != null) {
                         if (gridcell.getGridText().equals(s)) {
                             gridcell.setBackgroundColor(Color.gray);
                         }
+                    } else gridcell.setBackgroundColor(Color.black);
 
-                    }
                 }
-
             }
         }
+
+
+        schap.repaint();
     }
 }
