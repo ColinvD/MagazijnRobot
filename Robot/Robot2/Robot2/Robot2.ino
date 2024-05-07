@@ -1,3 +1,4 @@
+#include <Wire.h>;
 //x variabels
 const int directionPinUP = 12;
 const int pwmPinUP = 3;
@@ -25,11 +26,16 @@ int sensor_valueLeft = 0;
 bool onRight = false;
 bool onLeft = false;
 
+//stop Button
+bool stopState = false;
+
 // microswitch
-int microswitchDown = A4;
+// int microswitchDown = A4;
 bool onDown = false;
-int microswitchUp = A5;
+// int microswitchUp = A5;
 bool onUp = false;
+//tilt switch
+bool stopUpBool = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -43,18 +49,27 @@ void setup() {
   pinMode(IsRight, INPUT);
   pinMode(JoyconX, INPUT);
   pinMode(JoyconY, INPUT);
-  pinMode(microswitchDown,INPUT_PULLUP);
-  pinMode(microswitchUp,INPUT_PULLUP);
+  // pinMode(microswitchDown,INPUT_PULLUP);
+  // pinMode(microswitchUp,INPUT_PULLUP);
+
+  Wire.begin(1);
+  Wire.onReceive(receiveData);
+
   Serial.begin(9600);
 }
 
 void loop() {
-  Moving();
-  indictiveSensorReadLeft();
-  indictiveSensorRead();
+  if(stopState) {
+    StopUp();
+    StopLeft();
+  } else {
+    Moving();
+    indictiveSensorReadLeft();
+    indictiveSensorRead();
 
- microSwitch();
- microSwitchUp();
+    microSwitch();
+    microSwitchUp();
+  }
 
   // Serial.print("x = ");
   // Serial.print(x);
@@ -68,7 +83,7 @@ void loop() {
 void Moving() {
   x = analogRead(JoyconX);
   y = analogRead(JoyconY);
-  if (x < 300 && !onUp) {
+  if (x < 300 && !onUp && !stopUpBool) {
     Up();
   } else if (x > 700 && !onDown ) {
     Down();
@@ -121,10 +136,10 @@ void indictiveSensorReadLeft() {
   //Serial.println(sensor_valueLeft);
   if (sensor_valueLeft == HIGH ) {
     digitalWrite(brakeLeftRight, LOW);
-    Serial.println("aan");
+    // Serial.println("aan");
     onLeft = false;
   } else {
-    Serial.println("dichtbij");
+    // Serial.println("dichtbij");
     onLeft = true;
   }
 }
@@ -134,10 +149,10 @@ void indictiveSensorRead() {
   //Serial.println(sensor_value);
   if (sensor_value == HIGH) {
     digitalWrite(brakeLeftRight, LOW);
-     Serial.println("DA");
+    //  Serial.println("DA");
      onRight = false;
   } else {
-     Serial.println("SDADSAS");
+    //  Serial.println("SDADSAS");
      onRight = true;
   }
 
@@ -145,26 +160,37 @@ void indictiveSensorRead() {
 }
 
 void microSwitch(){
-  int pressed = digitalRead(microswitchDown);
-  Serial.println(pressed);
-  if(pressed == HIGH){
-    //Serial.println("nallfajldk");
-    onDown = true;
-  } else if (pressed == LOW){
-    onDown = false;
-    //Serial.println("efijsfrjirgopgi[ph[oieupstipg]0gepto]jepg]prpraop");
-  }
+  // int pressed = digitalRead(microswitchDown);
+  // Serial.println(pressed);
+  // if(pressed == HIGH){
+  //   //Serial.println("nallfajldk");
+  //   onDown = true;
+  // } else if (pressed == LOW){
+  //   onDown = false;
+  //   //Serial.println("efijsfrjirgopgi[ph[oieupstipg]0gepto]jepg]prpraop");
+  // }
 }
 
 void microSwitchUp(){
-  int pressed = digitalRead(microswitchUp);
-  Serial.println(pressed);
-  if(pressed == HIGH){
-    //Serial.println("nallfajldk");
-    onUp = true;
-  } else if (pressed == LOW){
-    onUp = false;
-    //Serial.println("efijsfrjirgopgi[ph[oieupstipg]0gepto]jepg]prpraop");
-  }
+  // int pressed = digitalRead(microswitchUp);
+  // Serial.println(pressed);
+  // if(pressed == HIGH){
+  //   //Serial.println("nallfajldk");
+  //   onUp = true;
+  // } else if (pressed == LOW){
+  //   onUp = false;
+  //   //Serial.println("efijsfrjirgopgi[ph[oieupstipg]0gepto]jepg]prpraop");
+  // }
 }
 
+void receiveData() {
+  int function = Wire.read();
+  switch(function) {
+    case 1: 
+      stopState = Wire.read();
+      break;
+    case 2: 
+      stopUpBool = Wire.read();
+      break;
+  }
+}

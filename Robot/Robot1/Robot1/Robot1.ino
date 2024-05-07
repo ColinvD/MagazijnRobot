@@ -1,8 +1,10 @@
+#include <Wire.h>;
 const int directionPinUP = 12;
 const int pwmPinUP = 3;
 const int brakeUP = 9;
 
 const int distance = A2;
+
 //const int encoderZ = 5;
 
 const int power = 135;
@@ -18,11 +20,19 @@ bool pressedOut = false;
 bool isReleasedOut = true;
 bool pressedIn = false;
 bool isReleasedIn = true;
+
+//Stop Button
+const int stopButton = 2;
+bool buttonPressed;
+bool stopState = false;
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
 float previousDistance = -1;
 float diffrenceAllowed = 0.3;
+
+int tiltSensor = 6;
+bool pastTilt = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -33,57 +43,91 @@ void setup() {
   pinMode(uit, INPUT);
   pinMode(in, INPUT);
   pinMode(distance,INPUT);
+  pinMode(stopButton,INPUT);
+  pinMode(tiltSensor,INPUT_PULLUP);
+
+  Wire.begin();
   Serial.begin(9600);
 }
 
 void loop() {
-  pressedOut = digitalRead(uit);
-  pressedIn = digitalRead(in);
-  if (pressedOut && isReleasedOut && Distance() < 7.7) {
-    isReleasedOut = false;
-    GoOut();
-    stoppedOut = false;
-   // Serial.println("OUT!!!!!!");
-  } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 8  && !stoppedOut)) {
-    isReleasedOut = true;
-    stoppedOut = true;
-    Stop();
+  int stopValue = digitalRead(stopButton);
+  if (!stopValue) {
+    buttonPressed = false; 
   }
 
-  if (pressedIn && isReleasedIn && Distance() > 4.30) {
-    isReleasedIn = false;
-    GoIn();
-    stoppedIn = false;
-    //Serial.println("In!!!!!!");
-  } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 4.15 && !stoppedIn)) {
-    isReleasedIn = true;
-    stoppedIn = true;
-    Stop();
+  if (stopValue && stopState && !buttonPressed) {
+    stopState = false;
+    buttonPressed = true;
+    sendValue(1, 1, stopState);
+  } else if (stopValue && !stopState && !buttonPressed) {
+    stopState = true;
+    buttonPressed = true;
+    sendValue(1, 1, stopState);
   }
+  if(stopState) {
+    Stop();
+  } else {
+    bool tiltState = shelfTilt();
+    pressedOut = digitalRead(uit);
+    pressedIn = digitalRead(in);
+  Serial.println(tiltState);
+    if(tiltState && !pastTilt) {
+      pastTilt = tiltState;
+      if(pressedOut) {
+        Stop();
+      }
+      sendValue(1, 2, tiltState);
+    } else if(!tiltState && pastTilt) {
+      pastTilt = tiltState;
+      sendValue(1, 2, tiltState);
+    }
+    if (pressedOut && isReleasedOut && Distance() < 7.7 && !tiltState) {
+      isReleasedOut = false;
+      GoOut();
+      stoppedOut = false;
+    // Serial.println("OUT!!!!!!");
+    } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 8  && !stoppedOut)) {
+      isReleasedOut = true;
+      stoppedOut = true;
+      Stop();
+    }
 
-  // int sensor_value = digitalRead(IsLeft);
-  //int encoder_variable = digitalRead(encoderZ);
-  //Serial.println(encoder_variable);
-  // if(sensor_value == HIGH){
-  //   digitalWrite(directionPinUP, LOW);
-  //   analogWrite(pwmPinUP, power);
-  //   digitalWrite(brakeUP, LOW);
-  //   Serial.println("aan");
-  // }
-  // else {
-  //   analogWrite(pwmPinUP, 0);
-  //   digitalWrite(brakeUP, HIGH);
-  //   Serial.println("dichtbij");
-  // }
+    if (pressedIn && isReleasedIn && Distance() > 4.28) {
+      isReleasedIn = false;
+      GoIn();
+      stoppedIn = false;
+      //Serial.println("In!!!!!!");
+    } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 4.13 && !stoppedIn)) {
+      isReleasedIn = true;
+      stoppedIn = true;
+      Stop();
+    }
 
-  // if (millis() > LastTime + waitTime) {
-  //   LastTime = millis();
-  //   Something();
-  // }
-  // if(encoder_variable == HIGH){
-  //   Serial.println("Rotation");
-  // }
-  //Serial.println(encoder_variable);
+    // int sensor_value = digitalRead(IsLeft);
+    //int encoder_variable = digitalRead(encoderZ);
+    //Serial.println(encoder_variable);
+    // if(sensor_value == HIGH){
+    //   digitalWrite(directionPinUP, LOW);
+    //   analogWrite(pwmPinUP, power);
+    //   digitalWrite(brakeUP, LOW);
+    //   Serial.println("aan");
+    // }
+    // else {
+    //   analogWrite(pwmPinUP, 0);
+    //   digitalWrite(brakeUP, HIGH);
+    //   Serial.println("dichtbij");
+    // }
+
+    // if (millis() > LastTime + waitTime) {
+    //   LastTime = millis();
+    //   Something();
+    // }
+    // if(encoder_variable == HIGH){
+    //   Serial.println("Rotation");
+    // }
+    //Serial.println(encoder_variable);
+  }
 }
 
 void GoIn() {
@@ -109,8 +153,23 @@ float Distance(){
   if(previousDistance == -1 || (distanceRobot > previousDistance - diffrenceAllowed && distanceRobot < previousDistance + diffrenceAllowed)){
     previousDistance = distanceRobot;
   }
-  Serial.println(previousDistance);
+  // Serial.println(previousDistance);
 
   return previousDistance;
 
+}
+
+bool shelfTilt() {
+  int tiltValue = digitalRead(tiltSensor);
+  if (tiltValue) {
+    return false;
+  }
+  return true;
+}
+
+void sendValue(int location, int functie, bool boolean) {
+    Wire.beginTransmission(location);
+    Wire.write(functie);
+    Wire.write(boolean);
+    Wire.endTransmission();
 }
