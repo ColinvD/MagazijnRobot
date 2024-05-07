@@ -32,8 +32,8 @@ public class StockSituationPanel extends JPanel implements ActionListener {
         database.databaseConnect();
         ArrayList<String> results = database.getStockInfo(schap.getNamePositie());
         if (!results.isEmpty()){
-            name.setText("naam: " + results.get(0));
-            quantity.setText("voorraad: " + results.get(1));
+            name.setText(results.get(0));
+            quantity.setText(results.get(1));
         } else {
             name.setText("");
             quantity.setText("");
