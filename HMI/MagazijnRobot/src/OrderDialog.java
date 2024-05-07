@@ -146,7 +146,13 @@ public class OrderDialog extends JDialog implements ActionListener {
                 jpOrders.add(new JLabel(editedDate, SwingConstants.CENTER));
             }
         }
-        jpOrders.setLayout(new GridLayout(foundOrders.size()+1,3));
+        if(!foundOrders.isEmpty()) {
+            jpOrders.setLayout(new GridLayout(foundOrders.size() + 1, 3));
+        } else {
+            jpOrders.removeAll();
+            jpOrders.setLayout(new GridLayout(1,1));
+            jpOrders.add(new JLabel("Geen orders gevonden.", SwingConstants.CENTER));
+        }
     }
     public void getOrderAmount() throws SQLException {
         ResultSet rs = database.select("Select COUNT(*) FROM orders WHERE PickingCompletedWhen IS NULL ORDER BY OrderID DESC");
