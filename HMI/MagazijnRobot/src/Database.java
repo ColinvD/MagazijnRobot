@@ -95,21 +95,29 @@ public class Database {
     }
 
     public ResultSet getOrder(int OrderID) throws SQLException {
-        ResultSet rs = statement.executeQuery("SELECT * FROM orders WHERE OrderID = " + OrderID + ";");
+        String query = "SELECT * FROM orders WHERE OrderID = ? ;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
         return rs;
     }
 
     public ResultSet getOrderlines(int OrderID) throws  SQLException{
-        ResultSet rs = statement.executeQuery("SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = " + OrderID + ";");
+        String query = "SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = ? ;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
         return rs;
     }
 
     public int getItemQuantity(int StockitemID) throws SQLException {
-        ResultSet rs = statement.executeQuery("SELECT * FROM stockitemholdings WHERE StockitemID = " + StockitemID + ";");
+        String query = "SELECT * FROM stockitemholdings WHERE StockitemID = ? ;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, StockitemID);
+        ResultSet rs = s.executeQuery();
         rs.next();
         return rs.getInt("QuantityOnHand");
     }
-
 //    public int getItemQuantity(String StockitemName) throws SQLException {
 //        ResultSet rs = statement.executeQuery("SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE '%" + StockitemName + "%';");
 //        rs.next();
@@ -157,7 +165,6 @@ public  ArrayList<String> getStockInfo(String positie) throws SQLException {
     }
     return results;
     }
-
 }
 
 
