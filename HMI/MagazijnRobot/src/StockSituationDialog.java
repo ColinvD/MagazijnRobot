@@ -153,7 +153,11 @@ public class StockSituationDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == confirmButton) {
             changeProductStock();
-
+            try {
+                addStockitems();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             return;
         }
         if (e.getSource() == cancelButton) {
@@ -242,6 +246,27 @@ public class StockSituationDialog extends JDialog implements ActionListener {
         }
 
 
+    }
+    public void addStockitems() throws SQLException {
+        Database database = new Database();
+        for (String s : database.getOrders()) {
+                for (int i = 0; i < schap.getGrid().length; i++) {
+                    for (int j = 0; j < schap.getGrid().length; j++) {
+                        GridSpace gridcell = schap.getGrid()[i][j];
+                        if (s != null) {
+                            if (gridcell.getGridText().equals(s)) {
+                                gridcell.setBackgroundColor(Color.gray);
+                            }
+                        }
+                        else gridcell.setBackgroundColor(Color.black);
+
+                    }
+                }
+            }
+
+
+
+        schap.repaint();
     }
 
 
