@@ -8,13 +8,14 @@ public class Database {
     private String dbpassword = "";
 
     private Statement statement;
+    private Connection connection;
 
     //function to connect to the xampp server
     public void databaseConnect() {
         try {
-            Connection connection = DriverManager.getConnection(url + dbName, userName, dbpassword);
+            connection = DriverManager.getConnection(url + dbName, userName, dbpassword);
             statement = connection.createStatement();
-            System.out.println("Database Connected");
+
         } catch (Exception e) {
             System.out.println("Database Not Connected");
             System.out.println(e.getMessage());
@@ -24,6 +25,41 @@ public class Database {
     public ResultSet select(String query) throws SQLException {
         ResultSet rs = statement.executeQuery(query);
         return rs;
+    }
+
+    public ResultSet select(String query, String value) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        ResultSet rs = s.executeQuery();
+        return rs;
+    }
+
+    public String selectFirst(String query, String value) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        String result = rs.getString(1);
+        rs.close();
+        return result;
+    }
+
+    public int update(String query) throws SQLException {
+        return statement.executeUpdate(query);
+    }
+
+    public int update(String query, String value) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        return s.executeUpdate();
+    }
+
+    public int update(String query, String value, String value2) throws SQLException {
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, value);
+        s.setString(2, value2);
+        System.out.println(s);
+        return s.executeUpdate();
     }
 
     public void printResult(ResultSet rs) throws SQLException {
@@ -36,13 +72,48 @@ public class Database {
         }
     }
 
+    public void close() throws SQLException {
+        statement.close(); //sluit ook de resultset
+        connection.close();
+    }
+
     public ResultSet getOrder(int OrderID) throws SQLException {
-        ResultSet rs = statement.executeQuery("SELECT * FROM orders WHERE OrderID = " + OrderID + ";");
+        String query = "SELECT * FROM orders WHERE OrderID = ? ;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
         return rs;
     }
 
     public ResultSet getOrderlines(int OrderID) throws  SQLException{
-        ResultSet rs = statement.executeQuery("SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = " + OrderID + ";");
+        String query = "SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = ? ;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
         return rs;
+    }
+
+    public int getItemQuantity(int StockitemID) throws SQLException {
+        String query = "SELECT * FROM stockitemholdings WHERE StockitemID = ? ;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, StockitemID);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs.getInt("QuantityOnHand");
+    }
+
+    public int getItemQuantity(String StockitemName) throws SQLException {
+        String query = "SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE ?;";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, '%'+StockitemName+'%');
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        int Quantity = -1;
+        try{
+            Quantity = rs.getInt("QuantityOnHand");
+        } catch (Exception e){
+
+        }
+        return Quantity;
     }
 }

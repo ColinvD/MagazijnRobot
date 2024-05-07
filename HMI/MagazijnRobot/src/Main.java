@@ -3,7 +3,14 @@ import java.sql.*;
 public class Main {
     public static void main(String[] args) throws SQLException {
         HMIScreen hmiScreen = new HMIScreen();
-        Database database = new Database();
-        database.databaseConnect();
+        Database d = new Database();
+        try {
+            d.databaseConnect();
+            System.out.println("Database Connected");
+        } catch (Exception e) {
+            System.out.println("Database Not Connected");
+            System.out.println(e.getMessage());
+        }
+       // System.out.println("ID 1: " + d.getItemQuantity(1));
     }
 }
