@@ -2,9 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class HMIScreen extends JFrame implements ActionListener {
-    public HMIScreen(){
+    public HMIScreen() throws SQLException {
         setSize(750, 650);
         getContentPane().setBackground(Color.black);
         setTitle("HMI magazijn robot");

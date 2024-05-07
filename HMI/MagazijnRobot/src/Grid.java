@@ -65,5 +65,6 @@ public class Grid extends JPanel {
                 g.drawString(gridcell.getGridText(), j*cellWidth + 25, i*cellHeight + 35);
             }
         }
+
     }
 }

@@ -1,4 +1,6 @@
+import javax.swing.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Database {
 
@@ -76,6 +78,21 @@ public class Database {
         statement.close(); //sluit ook de resultset
         connection.close();
     }
+    public ArrayList<String> getOrders() throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        ArrayList<String> stockList = new ArrayList<>();
+        try {
+            ResultSet result = database.select("SELECT StockLocation From stockitems");
+            while (result.next()) {
+                stockList.add(result.getString(1));
+            }
+            result.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return stockList;
+    }
 
     public ResultSet getOrder(int OrderID) throws SQLException {
         ResultSet rs = statement.executeQuery("SELECT * FROM orders WHERE OrderID = " + OrderID + ";");
@@ -104,4 +121,27 @@ public class Database {
 //        }
 //        return Quantity;
 //    }
+public static String getProductFromStock(JButton stockLocation) {
+    try {
+        Database database = new Database();
+        database.databaseConnect();
+
+        ResultSet result = database.select("Select stockItemName From StockItems WHERE StockLocation = ?", stockLocation.getText());
+        String boxValueSelected = "";
+        if(result.next()) {
+            if (result.getString(1) != null) {
+                boxValueSelected = result.getString(1);
+            }
+        }
+        result.close();
+        database.close();
+        return boxValueSelected;
+
+    } catch (SQLException e) {
+        System.out.println(e.getMessage());
+    }
+    return null;
 }
+}
+
+
