@@ -23,6 +23,7 @@ public class BBP {
                 if (bin_rem[j] >= weight.get(i).getWeight())
                 {
                     bin_rem[j] = bin_rem[j] - weight.get(i).getWeight();
+                    System.out.println(weight.get(i).getLocation());
                     break;
                 }
             }
@@ -31,6 +32,7 @@ public class BBP {
             if (j == res)
             {
                 bin_rem[res] = c - weight.get(i).getWeight();
+                System.out.println(weight.get(i).getLocation());
                 res++;
             }
         }
@@ -50,15 +52,12 @@ public class BBP {
         Database database = new Database();
         database.databaseConnect();
 
-        ArrayList<Locatie> weight = new ArrayList<>();
-        weight.add(new Locatie("a",2));
-        weight.add(new Locatie("a",5));
-        weight.add(new Locatie("a",4));
-        weight.add(new Locatie("a",7));
-        weight.add(new Locatie("a",1));
-        weight.add(new Locatie("a",3));
-        weight.add(new Locatie("a",8));
-        int c = 10;
+        ArrayList<Locatie> weight = database.getWeights();
+        for (Locatie locatie : weight){
+            System.out.print(locatie.getWeight());
+            System.out.println(locatie.getLocation());
+        }
+        int c = 20;
         int n = weight.size();
         System.out.print("Number of bins required in First Fit : "
                 + firstFitDec(weight, n, c));
