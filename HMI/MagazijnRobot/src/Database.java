@@ -1,4 +1,6 @@
+import javax.swing.*;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Database {
 
@@ -77,6 +79,22 @@ public class Database {
         connection.close();
     }
 
+    public ArrayList<String> getOrders() throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        ArrayList<String> stockList = new ArrayList<>();
+        try {
+            ResultSet result = database.select("SELECT StockLocation From stockitems");
+            while (result.next()) {
+                stockList.add(result.getString(1));
+            }
+            result.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return stockList;
+    }
+
     public ResultSet getOrder(int OrderID) throws SQLException {
         String query = "SELECT * FROM orders WHERE OrderID = ? ;";
         PreparedStatement s = connection.prepareStatement(query);
@@ -85,7 +103,7 @@ public class Database {
         return rs;
     }
 
-    public ResultSet getOrderlines(int OrderID) throws  SQLException{
+    public ResultSet getOrderlines(int OrderID) throws SQLException {
         String query = "SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = ? ;";
         PreparedStatement s = connection.prepareStatement(query);
         s.setInt(1, OrderID);
@@ -102,18 +120,70 @@ public class Database {
         return rs.getInt("QuantityOnHand");
     }
 
-    public int getItemQuantity(String StockitemName) throws SQLException {
-        String query = "SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE ?;";
-        PreparedStatement s = connection.prepareStatement(query);
-        s.setString(1, '%'+StockitemName+'%');
-        ResultSet rs = s.executeQuery();
-        rs.next();
-        int Quantity = -1;
-        try{
-            Quantity = rs.getInt("QuantityOnHand");
-        } catch (Exception e){
+    //    public int getItemQuantity(String StockitemName) throws SQLException {
+//        ResultSet rs = statement.executeQuery("SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE '%" + StockitemName + "%';");
+//        rs.next();
+//        int Quantity = -1;
+//        try{
+//            Quantity = rs.getInt("QuantityOnHand");
+//        } catch (Exception e){
+//
+//        }
+//        return Quantity;
+//    }
+    public static String getProductFromStock(JButton stockLocation) {
+        try {
+            Database database = new Database();
+            database.databaseConnect();
 
+            ResultSet result = database.select("Select stockItemName From StockItems WHERE StockLocation = ?", stockLocation.getText());
+            String boxValueSelected = "";
+            if (result.next()) {
+                if (result.getString(1) != null) {
+                    boxValueSelected = result.getString(1);
+                }
+            }
+            result.close();
+            database.close();
+            return boxValueSelected;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
-        return Quantity;
+        return null;
+    }
+
+    public ArrayList<String> getStockInfo(String positie) throws SQLException {
+        ArrayList<String> results = new ArrayList<>();
+        positie = "'" + positie + "'";
+        ResultSet result = statement.executeQuery("Select StockItemID,StockItemName From stockitems WHERE StockLocation = " + positie);
+
+        if (result.next()) {
+            int StockitemId = result.getInt("StockItemID");
+            String StockitemName = result.getString("StockItemName");
+            int voorraad = getItemQuantity(StockitemId);
+            results.add("Naam: " + StockitemName);
+            results.add("Voorraad: " + voorraad);
+        }
+        return results;
+    }
+
+    public int[] getWeights() throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        int i = 0;
+        int[] weights = new int[25];
+        ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL ");
+        while (result.next()) {
+            int d = result.getInt("Weight");
+            weights[i] = d;
+            i++;
+        }
+        return weights;
+        //System.out.println("Number of bins required: " + nextFit(weight, n, c));
+
     }
 }
+
+
+

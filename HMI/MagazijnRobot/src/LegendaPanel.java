@@ -9,7 +9,7 @@ public class LegendaPanel extends JPanel implements ActionListener {
     private JLabel voorraadLeeg = new JLabel("Schap leeg:");
     private JLabel locatieRobot = new JLabel("Locatie Robot:");
     public LegendaPanel(){
-        setPreferredSize(new Dimension(398,400));
+        setPreferredSize(new Dimension(398,20));
         setLayout(new FlowLayout(FlowLayout.CENTER, 40, 0));
         setBackground(new Color(247, 238, 115));
         add(locatieRobot);

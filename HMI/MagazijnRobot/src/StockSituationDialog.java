@@ -13,7 +13,6 @@ import java.util.EventListener;
 
 public class StockSituationDialog extends JDialog implements ActionListener {
 
-
     private JLabel gridTitle, valueTitle;
     private JButton confirmButton, cancelButton;
     private JPanel buttonPanel, gridPanel, valuePanel;
@@ -24,7 +23,10 @@ public class StockSituationDialog extends JDialog implements ActionListener {
     private String selectedStockLocation;
     private JButton activeJButton;
 
-    public StockSituationDialog() {
+    private Grid schap;
+
+    public StockSituationDialog(Grid schap) {
+        this.schap = schap;
         setModal(true);
         setTitle("Voorraadsituatie");
         setSize(new Dimension(500, 500));
@@ -61,6 +63,7 @@ public class StockSituationDialog extends JDialog implements ActionListener {
         try {
             ResultSet result = database.select("SELECT StockLocation From stockitems");
             while (result.next()) {
+
                 stockList.add(result.getString(1));
             }
             result.close();
@@ -68,25 +71,14 @@ public class StockSituationDialog extends JDialog implements ActionListener {
             System.out.println(e.getMessage());
         }
         for (int i = 1; i <= 5; i++) {
-            String letter = "";
-            switch (i) {
-                case 1:
-                    letter = "A";
-                    break;
-                case 2:
-                    letter = "B";
-                    break;
-                case 3:
-                    letter = "C";
-                    break;
-                case 4:
-                    letter = "D";
-                    break;
-                case 5:
-                    letter = "E";
-                    break;
-
-            }
+            String letter = switch (i) {
+                case 1 -> "A";
+                case 2 -> "B";
+                case 3 -> "C";
+                case 4 -> "D";
+                case 5 -> "E";
+                default -> "";
+            };
 
             for (int j = 1; j <= 5; j++) {
                 String StockLocation = letter + j;
@@ -161,6 +153,11 @@ public class StockSituationDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == confirmButton) {
             changeProductStock();
+            try {
+                SchapPanel.addStockitems();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             return;
         }
         if (e.getSource() == cancelButton) {
@@ -185,7 +182,7 @@ public class StockSituationDialog extends JDialog implements ActionListener {
 
                 jButton.setBackground(Color.RED);
                 selectedStockLocation = jButton.getText();
-                String boxValueSelected = getProductFromStock(jButton);
+                String boxValueSelected = Database.getProductFromStock(jButton);
                 activeJButton = jButton;
                 if (boxValueSelected == null || boxValueSelected.isEmpty()) {
                     jcEmpty.setSelected(true);
@@ -239,7 +236,7 @@ public class StockSituationDialog extends JDialog implements ActionListener {
                 } else {
                     JOptionPane.showMessageDialog(null, "Er is iets fout gegaan", "error", JOptionPane.ERROR_MESSAGE);
                 }
-            } else if (jcEmpty.isSelected() || jcFull.isSelected()){
+            } else if (jcEmpty.isSelected() || jcFull.isSelected()) {
                 stockStatus.get(1).set(stockStatus.get(0).indexOf(selectedStockLocation), "false");
                 JOptionPane.showMessageDialog(null, "Het schap: " + selectedStockLocation + " is geleegd.", "voorraad geleegd", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -251,25 +248,6 @@ public class StockSituationDialog extends JDialog implements ActionListener {
 
     }
 
-    private String getProductFromStock(JButton stockLocation) {
-        try {
-            Database database = new Database();
-            database.databaseConnect();
 
-            ResultSet result = database.select("Select stockItemName From StockItems WHERE StockLocation = ?", stockLocation.getText());
-            String boxValueSelected = "";
-            if(result.next()) {
-                if (result.getString(1) != null) {
-                    boxValueSelected = result.getString(1);
-                }
-            }
-            result.close();
-            database.close();
-            return boxValueSelected;
 
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
 }
