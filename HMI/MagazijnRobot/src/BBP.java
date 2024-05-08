@@ -1,10 +1,9 @@
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class BBP {
-    static int firstFit(Integer[] weight, int n, int c)
+    static int firstFit(ArrayList<Locatie> weight, int n, int c)
     {
         // Initialize result (Count of bins)
         int res = 0;
@@ -21,9 +20,9 @@ public class BBP {
             int j;
             for (j = 0; j < res; j++)
             {
-                if (bin_rem[j] >= weight[i])
+                if (bin_rem[j] >= weight.get(i).getWeight())
                 {
-                    bin_rem[j] = bin_rem[j] - weight[i];
+                    bin_rem[j] = bin_rem[j] - weight.get(i).getWeight();
                     break;
                 }
             }
@@ -31,18 +30,17 @@ public class BBP {
             // If no bin could accommodate weight[i]
             if (j == res)
             {
-                bin_rem[res] = c - weight[i];
+                bin_rem[res] = c - weight.get(i).getWeight();
                 res++;
             }
         }
         return res;
     }
-    static int firstFitDec(Integer[] weight, int n, int c)
+    static int firstFitDec(ArrayList<Locatie> weight, int n, int c)
     {
 
+        weight.sort(new CompareToWeight().reversed());
         // First sort all weights in decreasing order
-        Arrays.sort(weight, Collections.reverseOrder());
-
         // Now call first fit for sorted items
         return firstFit(weight, n, c);
     }
@@ -51,9 +49,17 @@ public class BBP {
     public static void main(String[] args) throws SQLException {
         Database database = new Database();
         database.databaseConnect();
-        Integer[] weight = {1,2,3};
-        int c = 20;
-        int n = weight.length;
+
+        ArrayList<Locatie> weight = new ArrayList<>();
+        weight.add(new Locatie("a",2));
+        weight.add(new Locatie("a",5));
+        weight.add(new Locatie("a",4));
+        weight.add(new Locatie("a",7));
+        weight.add(new Locatie("a",1));
+        weight.add(new Locatie("a",3));
+        weight.add(new Locatie("a",8));
+        int c = 10;
+        int n = weight.size();
         System.out.print("Number of bins required in First Fit : "
                 + firstFitDec(weight, n, c));
 
