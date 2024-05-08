@@ -1,14 +1,17 @@
-#include <Wire.h>;
+#include <Wire.h>
+#include <util/atomic.h>
+
+#define zEncoderA 2
+#define zEncoderB 5
 const int directionPinUP = 12;
 const int pwmPinUP = 3;
 const int brakeUP = 9;
 
 const int distance = A2;
 
-const int zEncoderA = 4;
-const int zEncoderB = 5;
 
-const int power = 135;
+
+const int power = 120;
 unsigned long LastTime;
 int waitTime = 2000;
 int currentState = 4;
@@ -23,23 +26,29 @@ bool pressedIn = false;
 bool isReleasedIn = true;
 
 //Stop Button
-const int stopButton = 2;
+const int stopButton = 4;
 bool buttonPressed;
 bool stopState = false;
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
 float previousDistance = -1;
-float diffrenceBetween = 0.10;
-float diffrenceAllowed = 0.4;
-float diffrenceBigger = 0.7;
+float diffrenceBetween = 0.15;
+float diffrenceAllowed = 0.3;
+float diffrenceBigger = 1;
 
 // tilt switch sensor
 int tiltSensor = 6;
 bool pastTilt = false;
 
-long int zPosition = 0;
+volatile int zPosition = 0;
 int prevEncoderValueA = 0;
+int prevEncoderValueB = 0;
+
+//led light
+int ledGreen = 8;
+int ledYellow = 11;
+int ledRed = 13;
 
 
 void setup() {
@@ -47,7 +56,7 @@ void setup() {
   pinMode(directionPinUP, OUTPUT);
   pinMode(pwmPinUP, OUTPUT);
   pinMode(brakeUP, OUTPUT);
-  //pinMode(encoderZ, INPUT);
+
   pinMode(uit, INPUT);
   pinMode(in, INPUT);
   pinMode(distance,INPUT);
@@ -57,11 +66,25 @@ void setup() {
   pinMode(zEncoderA,INPUT);
   pinMode(zEncoderB,INPUT);
 
+  pinMode(ledGreen,OUTPUT);
+  pinMode(ledYellow,OUTPUT);
+  pinMode(ledRed,OUTPUT);
+
   Wire.begin();
-  Serial.begin(9600);
+  Serial.begin(500000);
+
+  attachInterrupt(digitalPinToInterrupt(zEncoderA),setEncoder,RISING);
 }
 
 void loop() {
+
+int pos = 0; 
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    pos = zPosition;
+  }
+  
+  Serial.println(pos);
+  digitalWrite(ledRed,LOW);
   int stopValue = digitalRead(stopButton);
   if (!stopValue) {
     buttonPressed = false; 
@@ -81,9 +104,10 @@ void loop() {
   if(stopState) {
     // emergency stop button pressed
     Stop();
+    digitalWrite(ledYellow,LOW);
+    digitalWrite(ledRed,HIGH);
   } else {
-    setEncoder(digitalRead(directionPinUP));
-    // Serial.println(zPosition);
+  digitalWrite(ledYellow,HIGH);
     bool tiltState = shelfTilt();
     pressedOut = digitalRead(uit);
     pressedIn = digitalRead(in);
@@ -98,7 +122,7 @@ void loop() {
       sendValue(1, 2, tiltState);
     }
     // Serial.println(Distance());
-    if (pressedOut && isReleasedOut && Distance() < 18.4 && !tiltState) {
+    if (pressedOut && isReleasedOut && Distance() < 18.3 && !tiltState) {
       isReleasedOut = false;
       GoOut();
       stoppedOut = false;
@@ -183,19 +207,26 @@ bool shelfTilt() {
   return true;
 }
 
-void setEncoder(int direction) {
+void setEncoder() {
   int encoderValueA = digitalRead(zEncoderA);
   int encoderValueB = digitalRead(zEncoderB);
-    Serial.print(encoderValueA);
-    Serial.print(" ");
-    Serial.println(encoderValueB);
 
-  if (direction && encoderValueA != prevEncoderValueA) {
-    zPosition--;
-  } else if(!direction && encoderValueA != prevEncoderValueA) {
-    zPosition++;
-  }
-  prevEncoderValueA = encoderValueA;
+  int b = digitalRead(zEncoderB);
+    if(b > 0){
+      zPosition--;
+    }
+    else{
+      zPosition++;
+    }
+
+  // if (encoderValueA != prevEncoderValueA && encoderValueB != prevEncoderValueB) {
+  //   if(direction) {
+  //     zPosition--;
+  //   } else {
+  //     zPosition++;
+  //   }
+  // }
+  // prevEncoderValueA = encoderValueA;
 }
 
 void sendValue(int location, int functie, bool boolean) {
