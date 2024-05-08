@@ -93,7 +93,7 @@ void Down() {
 
 void Up() {
   digitalWrite(directionPinUP, LOW);
-  analogWrite(pwmPinUP, power);
+  analogWrite(pwmPinUP, power + 40);
   digitalWrite(brakeUP, LOW);
 }
 void Right() {
