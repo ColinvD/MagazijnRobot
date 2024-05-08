@@ -6,11 +6,11 @@ import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 
 public class SerialCommunicator implements SerialPortDataListener{
-    private ArrayList<Listener> listeners;
+    private final ArrayList<Listener> listeners;
     private String messages;
     private final String portName;
     private final int rate;
-    private SerialPort port;
+    private final SerialPort port;
 
     public SerialCommunicator(String portName, int bitRate) {
         this.portName = portName;
