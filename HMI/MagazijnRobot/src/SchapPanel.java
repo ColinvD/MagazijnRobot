@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class SchapPanel extends JPanel implements ActionListener {
+
     private static Grid schap;
     private JLabel schapNaam = new JLabel("Schap");
     private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
@@ -28,8 +29,8 @@ public class SchapPanel extends JPanel implements ActionListener {
         //add(stockSituationPanel);
         add(legendaPanel);
         add(stockSituationPanel);
-
         addStockitems();
+
 
     }
 
@@ -55,8 +56,11 @@ public class SchapPanel extends JPanel implements ActionListener {
                 }
             }
         }
-
-
         schap.repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
     }
 }
