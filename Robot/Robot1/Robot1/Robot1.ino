@@ -18,6 +18,14 @@ bool pressedOut = false;
 bool isReleasedOut = true;
 bool pressedIn = false;
 bool isReleasedIn = true;
+// infra red sensor
+bool stoppedOut = true;
+bool stoppedIn = true;
+float previousDistance = -1;
+float diffrenceAllowed = 0.3;
+
+bool send = false;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(directionPinUP, OUTPUT);
@@ -26,32 +34,43 @@ void setup() {
   //pinMode(encoderZ, INPUT);
   pinMode(uit, INPUT);
   pinMode(in, INPUT);
-  pinMode(distance,INPUT);
+  pinMode(distance, INPUT);
   Serial.begin(9600);
 }
 
 void loop() {
-  Distance();
   pressedOut = digitalRead(uit);
   pressedIn = digitalRead(in);
-  //Serial.println(pressedOut);
-  if (pressedOut && isReleasedOut) {
+  if (pressedOut && isReleasedOut && Distance() < 7.7) {
     isReleasedOut = false;
     GoOut();
-   // Serial.println("OUT!!!!!!");
-  } else if (!pressedOut && !isReleasedOut) {
+    stoppedOut = false;
+    // Serial.println("OUT!!!!!!");
+  } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 8 && !stoppedOut)) {
     isReleasedOut = true;
-    Stop();
-  }
-  if (pressedIn && isReleasedIn) {
-    isReleasedIn = false;
-    GoIn();
-    //Serial.println("In!!!!!!");
-  } else if (!pressedIn && !isReleasedIn) {
-    isReleasedIn = true;
+    stoppedOut = true;
     Stop();
   }
 
+  if (pressedIn && isReleasedIn && Distance() > 4.30) {
+    isReleasedIn = false;
+    GoIn();
+    stoppedIn = false;
+    //Serial.println("In!!!!!!");
+  } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 4.15 && !stoppedIn)) {
+    isReleasedIn = true;
+    stoppedIn = true;
+    Stop();
+  }
+
+  if (Serial.available()) {
+    String message = Serial.readStringUntil('\n');
+    OnMessageReceived(message);
+  } else if (!send) {
+    Serial.println("Done");
+    send = true;
+    Stop();
+  }
   // int sensor_value = digitalRead(IsLeft);
   //int encoder_variable = digitalRead(encoderZ);
   //Serial.println(encoder_variable);
@@ -88,13 +107,31 @@ void GoOut() {
   analogWrite(pwmPinUP, power);
   digitalWrite(brakeUP, LOW);
 }
-void Stop(){
-      analogWrite(pwmPinUP, 0);
-      digitalWrite(brakeUP, HIGH);
+void Stop() {
+  analogWrite(pwmPinUP, 0);
+  digitalWrite(brakeUP, HIGH);
 }
 
-void Distance(){
-  float volts = analogRead(distance)*0.0048828125;  // value from sensor * (5/1024)
-  int distanceRobot = 13*pow(volts, -1); // worked out from datasheet graph
-  Serial.println(distanceRobot);
+float Distance() {
+  float volts = analogRead(distance) * 0.0048828125;  // value from sensor * (5/1024)
+  float distanceRobot = 13 * pow(volts, -1);          // worked out from datasheet graph
+
+  if (previousDistance == -1 || (distanceRobot > previousDistance - diffrenceAllowed && distanceRobot < previousDistance + diffrenceAllowed)) {
+    previousDistance = distanceRobot;
+  }
+  //Serial.println(previousDistance);
+
+  return previousDistance;
+}
+
+void OnMessageReceived(String message) {
+  Serial.println(message);
+  if (message.equals("Uit")) {
+    GoOut();
+    delay(2500);
+  } else if (message.equals("In")) {
+    GoIn();
+    delay(2500);
+  }
+  send = false;
 }

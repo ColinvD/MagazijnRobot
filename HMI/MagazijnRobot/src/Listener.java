@@ -1,5 +1,3 @@
 public interface Listener {
-        void onMessageReceived(String message);
-
-
+    void onMessageReceived(String message);
 }
