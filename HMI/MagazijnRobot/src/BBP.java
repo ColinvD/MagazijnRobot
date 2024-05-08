@@ -21,6 +21,22 @@ public class BBP {
         return res+1;
     }
 
+    static int[] nextFitBox(int[] weight, int n, int c){
+        int box[] = new int[weight.length];
+        int res = 0, bin_rem = c;
+
+        for (int i = 0; i < n; i++){
+            if (weight[i] > bin_rem){
+                res++;
+                bin_rem = c - weight[i];
+            } else {
+                bin_rem -= weight[i];
+            }
+            box[i] = res;
+        }
+        return box;
+    }
+
     // Driver program
     public static void main(String[] args) throws SQLException {
         Database database = new Database();

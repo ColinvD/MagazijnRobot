@@ -181,7 +181,24 @@ public class Database {
         }
         return weights;
         //System.out.println("Number of bins required: " + nextFit(weight, n, c));
+    }
 
+    public int getWeight(int StockItemID) throws SQLException {
+        String query = "SELECT Weight FROM stockitems WHERE StockItemID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, StockItemID);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs.getInt("Weight");
+    }
+
+    public int getOrderSize(int OrderID) throws SQLException{
+        String query = "SELECT SUM(Quantity) FROM orderlines WHERE OrderID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 }
 

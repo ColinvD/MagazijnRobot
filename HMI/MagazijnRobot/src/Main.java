@@ -12,5 +12,6 @@ public class Main {
             System.out.println(e.getMessage());
         }
        // System.out.println("ID 1: " + d.getItemQuantity(1));
+//        System.out.println(d.getWeight(1));
     }
 }
