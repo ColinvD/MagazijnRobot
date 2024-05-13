@@ -1,12 +1,13 @@
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class BBP {
-    static int firstFit(ArrayList<Locatie> weight, int n, int c)
-    {
+    static int[] firstFit(ArrayList<Locatie> weight, int n, int c) {
         // Initialize result (Count of bins)
         int res = 0;
+        int Box[] = new int[weight.size()];
 
         // Create an array to store remaining space in bins
         // there can be at most n bins
@@ -35,10 +36,11 @@ public class BBP {
                 System.out.println(weight.get(i).getLocation());
                 res++;
             }
+            Box[i] = res;
         }
-        return res;
+        return Box;
     }
-    static int firstFitDec(ArrayList<Locatie> weight, int n, int c)
+    static int[] firstFitDec(ArrayList<Locatie> weight, int n, int c)
     {
 
         weight.sort(new CompareToWeight().reversed());
@@ -60,7 +62,7 @@ public class BBP {
         int c = 20;
         int n = weight.size();
         System.out.print("Number of bins required in First Fit : "
-                + firstFitDec(weight, n, c));
+                + Arrays.toString(firstFitDec(weight, n, c)));
 
     }
 }

@@ -181,8 +181,15 @@ public class Database {
             weights.add(new Locatie(result.getString("StockLocation"),d));
         }
         return weights;
+    }
 
-
+    public int getOrderSize(int OrderID) throws SQLException{
+        String query = "SELECT SUM(Quantity) FROM orderlines WHERE OrderID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 }
 
