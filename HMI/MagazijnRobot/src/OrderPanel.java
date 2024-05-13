@@ -60,7 +60,6 @@ public class OrderPanel extends JPanel implements ActionListener {
 //                }
 //            }
 
-
             while (orderItems.next()) {
                 for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
                     JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
