@@ -2,7 +2,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class BBP {
+public class  BBP {
     static int firstFit(ArrayList<Locatie> weight, int n, int c)
     {
         // Initialize result (Count of bins)
@@ -23,7 +23,7 @@ public class BBP {
                 if (bin_rem[j] >= weight.get(i).getWeight())
                 {
                     bin_rem[j] = bin_rem[j] - weight.get(i).getWeight();
-                    System.out.println(weight.get(i).getLocation());
+                    System.out.println(weight.get(i).getLocation() + weight.get(i).getWeight());
                     break;
                 }
             }
@@ -32,7 +32,8 @@ public class BBP {
             if (j == res)
             {
                 bin_rem[res] = c - weight.get(i).getWeight();
-                System.out.println(weight.get(i).getLocation());
+                System.out.println(weight.get(i).getLocation() + weight.get(i).getWeight());
+
                 res++;
             }
         }
