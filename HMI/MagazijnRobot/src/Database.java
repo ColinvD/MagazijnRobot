@@ -168,20 +168,28 @@ public class Database {
         return results;
     }
 
-    public int[] getWeights() throws SQLException {
+    public ArrayList<Locatie> getWeights() throws SQLException {
         Database database = new Database();
         database.databaseConnect();
-        int i = 0;
-        int[] weights = new int[25];
+//        int i = 0;
+        ResultSet result1 = database.select("SELECT Count(*) FROM stockitems WHERE StockLocation IS NOT NULL ");
+        result1.next();
+        ArrayList<Locatie> weights = new ArrayList<>();
         ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL ");
         while (result.next()) {
             int d = result.getInt("Weight");
-            weights[i] = d;
-            i++;
+            weights.add(new Locatie(result.getString("StockLocation"),d));
         }
         return weights;
-        //System.out.println("Number of bins required: " + nextFit(weight, n, c));
+    }
 
+    public int getOrderSize(int OrderID) throws SQLException{
+        String query = "SELECT SUM(Quantity) FROM orderlines WHERE OrderID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 }
 

@@ -4,7 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
-public class HMIScreen extends JFrame implements ActionListener {
+public class HMIScreen extends JFrame implements ActionListener,Listener {
+    private static String location;
+    private String status;
+
     public HMIScreen() throws SQLException {
         setSize(750, 650);
         getContentPane().setBackground(Color.black);
@@ -41,8 +44,24 @@ public class HMIScreen extends JFrame implements ActionListener {
     }
 
 
+    public static String getLocationRobot() {
+        return location;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
+    }
+
+    @Override
+    public void onMessageReceived(String message) {
+        if (!message.isEmpty()){
+            Grid.locationRobot2 = (message.substring(0,message.indexOf(',')));
+            status =  message.substring(message.indexOf(','));
+        }
     }
 }

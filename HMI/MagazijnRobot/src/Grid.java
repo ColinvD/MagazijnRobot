@@ -9,6 +9,8 @@ import java.sql.SQLException;
 public class Grid extends JPanel {
     private GridSpace[][] grid;
 
+    protected static String locationRobot2 = "X:20 Y:40";
+
     private String name;
     public Grid(int width, int height) {
         setBackground(Color.white);
@@ -65,8 +67,12 @@ public class Grid extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         DrawGrid(g);
+        locationRobot(locationRobot1(locationRobot1(locationRobot2)),g);
     }
-
+    public String locationRobot1(String location){
+        repaint();
+        return location;
+    }
     public void DrawGrid(Graphics g){
         int cellWidth = 60;
         int cellHeight = 60;
@@ -81,6 +87,14 @@ public class Grid extends JPanel {
                 g.drawString(gridcell.getGridText(), j*cellWidth + 25, i*cellHeight + 35);
             }
         }
+
+    }
+
+    public void locationRobot(String locatieRobot,Graphics g){
+        g.setColor(Color.green);
+        int x = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(':')+1,locatieRobot.indexOf('Y')-1));
+        int y = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(":",locatieRobot.indexOf(':')+1)+1));
+        g.fillOval(x,y,15,15);
 
     }
 
