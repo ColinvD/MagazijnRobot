@@ -11,7 +11,8 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
     private String status;
 
     public HMIScreen() throws SQLException {
-        if (!nood) {
+     //   SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
+       // serialCommunicator.AddListener(this);
             setSize(800, 650);
             getContentPane().setBackground(Color.black);
             setTitle("HMI magazijn robot");
@@ -20,7 +21,6 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
             StatusPanel status = new StatusPanel();
             OrderPanel order = new OrderPanel();
             ButtonPanel button = new ButtonPanel(order);
-
 
             GridBagLayout layout = new GridBagLayout(); //create grid bag layout
             this.setLayout(layout);
@@ -45,10 +45,6 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
             add(order, c);
             setVisible(true);
         }
-        else {
-            dispatchEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
-        }
-    }
 
 
     public static String getLocationRobot() {
@@ -66,16 +62,23 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
 
     @Override
     public void onMessageReceived(String message) {
-        if (!message.isEmpty()){
-            Grid.locationRobot2 = (message.substring(0,message.indexOf(',')));
-            status =  message.substring(message.indexOf(','));
-        }
+//        if (!message.isEmpty()){
+//            Grid.locationRobot2 = (message.substring(0,message.indexOf(',')));
+//            status =  message.substring(message.indexOf(','));
+//        }
         if (message.equals("STOP")){
-            nood = false;
+            System.out.println("STO");
+            JPopupMenu jPopupMenu = new JPopupMenu();
+            jPopupMenu.setLabel("Noodstop is ingedrukt");
+
         }
         if (message.equals("Unlock")){
-            nood = true;
+            JPopupMenu jPopupMenu = new JPopupMenu();
+            jPopupMenu.setLabel("Noodstop is ontgrendeld");
+
 
         }
     }
+
+
 }
