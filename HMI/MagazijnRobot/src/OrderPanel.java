@@ -64,14 +64,13 @@ public class OrderPanel extends JPanel implements ActionListener {
                         currentBox = Box[i];
                         JLabel jlBox = new JLabel("Doos " + (Box[i]+1)+":");
                         jlBox.setFont(new Font("Arial", Font.BOLD,15));
-                        jlBox.setPreferredSize(new Dimension(280, 45));
                         if(currentBox>0){
                             jlBox.setBorder(BorderFactory.createEmptyBorder(15,0,0,0));
                         }
                         orderItemsPanel.add(jlBox);
                     }
                     JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
-                    product.setPreferredSize(new Dimension(280, 15));
+                    product.setPreferredSize(new Dimension(280, 12));
                     orderItemsPanel.add(product);
                 }
             }
