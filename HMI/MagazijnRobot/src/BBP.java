@@ -7,7 +7,7 @@ public class BBP {
     static int[] firstFit(ArrayList<Locatie> weight, int n, int c) {
         // Initialize result (Count of bins)
         int res = 0;
-        int Box[] = new int[weight.size()];
+        int[] Box = new int[weight.size()];
 
         // Create an array to store remaining space in bins
         // there can be at most n bins
@@ -54,7 +54,7 @@ public class BBP {
         Database database = new Database();
         database.databaseConnect();
 
-        ArrayList<Locatie> weight = database.getWeights();
+        ArrayList<Locatie> weight = database.getWeights(73595);
         for (Locatie locatie : weight){
             System.out.print(locatie.getWeight());
             System.out.println(locatie.getLocation());
