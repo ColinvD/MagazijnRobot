@@ -48,7 +48,6 @@ public class BBP {
         // Now call first fit for sorted items
         return firstFit(weight, n, c);
     }
-
     // Driver program
     public static void main(String[] args) throws SQLException {
         Database database = new Database();
@@ -63,7 +62,6 @@ public class BBP {
         int n = weight.size();
         System.out.print("Number of bins required in First Fit : "
                 + Arrays.toString(firstFitDec(weight, n, c)));
-
     }
 }
 

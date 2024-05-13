@@ -16,7 +16,7 @@ public class OrderPanel extends JPanel implements ActionListener {
     private JButton jbStartOrder;
     private JScrollPane orderJSP;
     public OrderPanel(){
-        setPreferredSize(new Dimension(300,400));
+        setPreferredSize(new Dimension(350,400));
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
         setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
@@ -36,7 +36,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
         orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        orderJSP.setPreferredSize(new Dimension(300,360));
+        orderJSP.setPreferredSize(new Dimension(350,360));
         add(jlSelectedOrder);
         add(jbStartOrder);
         add(orderJSP);
@@ -63,7 +63,7 @@ public class OrderPanel extends JPanel implements ActionListener {
 
             while (orderItems.next()) {
                 for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
-                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
+                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName")  + ".  "+orderItems.getString("StockLocation"));
                     product.setPreferredSize(new Dimension(280, 12));
                     orderItemsPanel.add(product);
                 }

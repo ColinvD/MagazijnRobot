@@ -8,8 +8,10 @@ import java.sql.SQLException;
 public class ButtonPanel extends JPanel implements ActionListener {
     private JButton jbOrder;
     private OrderPanel orderPanel;
+
+    private JButton emergencyStop;
     public ButtonPanel(OrderPanel orderPanel){
-        setPreferredSize(new Dimension(300,200));
+        setPreferredSize(new Dimension(350,200));
         setLayout(new FlowLayout());
         setBackground(Color.white);
         setBorder(new MatteBorder(1, 0, 0, 1, Color.BLACK));
@@ -17,7 +19,16 @@ public class ButtonPanel extends JPanel implements ActionListener {
         this.orderPanel = orderPanel;
 
         jbOrder = new JButton("Order inladen");
+
         jbOrder.addActionListener(this);
+        emergencyStop = new JButton("Noodstop");
+        emergencyStop.addActionListener(this);
+        emergencyStop.setPreferredSize(new Dimension(340,30));
+       // emergencyStop.setBackground(Color.red);
+        emergencyStop.setFocusable(false);
+        emergencyStop.setBorder(BorderFactory.createLineBorder(Color.black));
+        jbOrder.setFocusable(false);
+        add(emergencyStop);
         add(jbOrder);
     }
     @Override
