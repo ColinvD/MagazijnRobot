@@ -52,19 +52,11 @@ public class TSP {
             }
             path[i] = coordinates[coordinatesID].getLocation();
         }
-
-
-        carryCount++;
-
-        for (int i = 0; i < coordinates.length; i++) {
-
-        }
-
         return path;
     }
 
     public static void main(String args[]){
-        String Doos[] = {"A1","B2","A3","C5","D3"};
+        String Doos[] = {"A1","B2","A3","C5","D3"}; //testData
         System.out.println(Arrays.toString(getRoute(Doos)));
     }
 }

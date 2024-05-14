@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener {
@@ -51,22 +52,29 @@ public class OrderPanel extends JPanel implements ActionListener {
         if(itemCount==0){
             orderItemsPanel.add(new JLabel("Lege order."));
         } else {
-//            int products[] = new int[itemCount];
-//            int value = 0;
-//            while (orderItems.next()){
-//                for(int i = 0; i < orderItems.getInt("Quantity"); i++){
-//                    products[value] = orderItems.getInt("StockItemID");
-//                    value++;
-//                }
-//            }
-
-            while (orderItems.next()) {
-                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
-                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
-                    product.setPreferredSize(new Dimension(280, 12));
-                    orderItemsPanel.add(product);
+            ArrayList<Locatie> products = new ArrayList<>();
+            while (orderItems.next()){
+                Locatie locatie = new Locatie(orderItems.getString("StockLocation"), orderItems.getInt("Weight"));
+                for(int i = 0; i < orderItems.getInt("Quantity"); i++){
+                    products.add(locatie);
                 }
             }
+            ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 20);
+            for (int i = 0; i < Boxes.size(); i++) {
+                String[] Box = new String[Boxes.get(i).size()];
+                for (int j = 0; j < Boxes.get(i).size(); j++) {
+                    Box[j] = Boxes.get(i).get(j).getLocation();
+                }
+                System.out.println(Arrays.toString(TSP.getRoute(Box)));
+            }
+
+//            while (orderItems.next()) {
+//                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
+//                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
+//                    product.setPreferredSize(new Dimension(280, 12));
+//                    orderItemsPanel.add(product);
+//                }
+//            }
         }
         jlSelectedOrder.setText("Order: " + OrderID + " ");
         this.updateUI();
