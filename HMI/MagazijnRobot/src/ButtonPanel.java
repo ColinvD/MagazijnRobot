@@ -11,7 +11,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private OrderPanel orderPanel;
 
     private boolean emergencyStatus;
-    SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
+  //  SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
     private JButton emergencyStop;
     public ButtonPanel(OrderPanel orderPanel){
         setPreferredSize(new Dimension(350,200));
@@ -54,11 +54,11 @@ public class ButtonPanel extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Noodstop vergrendeld.");
                     emergencyStatus = true;
                     emergencyStop.setText("Schakel noodstop uit");
-                    try {
-                        serialCommunicator.sendMessageToArduino("STOP");
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+//                    try {
+//                        serialCommunicator.sendMessageToArduino("STOP");
+//                    } catch (IOException ex) {
+//                        throw new RuntimeException(ex);
+//                    }
                 } else if (choice == JOptionPane.NO_OPTION) {
                     JOptionPane.showMessageDialog(null, "Noodstop niet vergrendeld.");
                 }
@@ -74,11 +74,11 @@ public class ButtonPanel extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Noodstop ontgrendeld.");
                     emergencyStop.setText("Schakel noodstop in");
                     emergencyStatus = false;
-                    try {
-                        serialCommunicator.sendMessageToArduino("Unlock");
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+//                    try {
+//                        serialCommunicator.sendMessageToArduino("Unlock");
+//                    } catch (IOException ex) {
+//                        throw new RuntimeException(ex);
+//                    }
                 } else if (choice == JOptionPane.NO_OPTION) {
                     JOptionPane.showMessageDialog(null, "Noodstop niet ontgrendeldt.");
                 }
