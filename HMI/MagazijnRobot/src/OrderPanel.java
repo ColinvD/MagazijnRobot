@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener {
     private ResultSet selectedOrder;
@@ -15,7 +17,7 @@ public class OrderPanel extends JPanel implements ActionListener {
     private JButton jbStartOrder;
     private JScrollPane orderJSP;
     public OrderPanel(){
-        setPreferredSize(new Dimension(300,400));
+        setPreferredSize(new Dimension(350,400));
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
         setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
@@ -23,7 +25,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         database = new Database();
         database.databaseConnect();
 
-        jlSelectedOrder = new JLabel("Geen order geselecteerd ");
+        jlSelectedOrder = new JLabel("Geen order geselecteerd");
 
         jbStartOrder = new JButton("Start");
         jbStartOrder.setPreferredSize(new Dimension(100,30));
@@ -35,7 +37,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
         orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        orderJSP.setPreferredSize(new Dimension(300,360));
+        orderJSP.setPreferredSize(new Dimension(350,360));
         add(jlSelectedOrder);
         add(jbStartOrder);
         add(orderJSP);
@@ -45,28 +47,47 @@ public class OrderPanel extends JPanel implements ActionListener {
         database.printResult(selectedOrder);
         orderItems = database.getOrderlines(OrderID);
         orderItemsPanel.removeAll();
-        int itemCount = 0;
+        int itemCount = database.getOrderSize(OrderID);
 
-        while (orderItems.next()){
-            for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
-                itemCount++;
-                JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
-                product.setPreferredSize(new Dimension(280,15));
+        if(itemCount==0){
+            orderItemsPanel.add(new JLabel("Lege order."));
+            SchapPanel.drawRoute(null);
+        } else {
+            ArrayList<Locatie> products = new ArrayList<>();
+            while (orderItems.next()){
+                Locatie locatie = new Locatie(orderItems.getString("StockLocation"), orderItems.getInt("Weight"));
+                for(int i = 0; i < orderItems.getInt("Quantity"); i++){
+                    products.add(locatie);
+                }
+            }
+            ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 20);
 
-                orderItemsPanel.add(product);
+            String[] box = new String[Boxes.get(0).size()];
+
+            for (int i = 0; i < Boxes.get(0).size(); i++) {
+                box[i] = Boxes.get(0).get(i).getLocation();
+            }
+
+            SchapPanel.drawRoute(TSP.getRoute(box));
+
+            orderItems = database.getOrderlines(OrderID);
+
+            while (orderItems.next()) {
+                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
+                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName")  + ".  "+orderItems.getString("StockLocation"));
+                    product.setPreferredSize(new Dimension(280, 12));
+                    orderItemsPanel.add(product);
+                }
             }
         }
-
-        if (itemCount==0){
-            orderItemsPanel.add(new JLabel("Lege order."));
-        }
-
         jlSelectedOrder.setText("Order: " + OrderID + " ");
         this.updateUI();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource()==jbStartOrder){
 
+        }
     }
 }

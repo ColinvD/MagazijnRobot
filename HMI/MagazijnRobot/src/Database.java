@@ -78,6 +78,7 @@ public class Database {
         statement.close(); //sluit ook de resultset
         connection.close();
     }
+
     public ArrayList<String> getOrders() throws SQLException {
         Database database = new Database();
         database.databaseConnect();
@@ -102,7 +103,7 @@ public class Database {
         return rs;
     }
 
-    public ResultSet getOrderlines(int OrderID) throws  SQLException{
+    public ResultSet getOrderlines(int OrderID) throws SQLException {
         String query = "SELECT * FROM orderlines o INNER JOIN stockitems s ON s.StockItemID = o.StockItemID WHERE OrderID = ? ;";
         PreparedStatement s = connection.prepareStatement(query);
         s.setInt(1, OrderID);
@@ -118,7 +119,8 @@ public class Database {
         rs.next();
         return rs.getInt("QuantityOnHand");
     }
-//    public int getItemQuantity(String StockitemName) throws SQLException {
+
+    //    public int getItemQuantity(String StockitemName) throws SQLException {
 //        ResultSet rs = statement.executeQuery("SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE '%" + StockitemName + "%';");
 //        rs.next();
 //        int Quantity = -1;
@@ -129,42 +131,67 @@ public class Database {
 //        }
 //        return Quantity;
 //    }
-public static String getProductFromStock(JButton stockLocation) {
-    try {
+    public static String getProductFromStock(JButton stockLocation) {
+        try {
+            Database database = new Database();
+            database.databaseConnect();
+
+            ResultSet result = database.select("Select stockItemName From StockItems WHERE StockLocation = ?", stockLocation.getText());
+            String boxValueSelected = "";
+            if (result.next()) {
+                if (result.getString(1) != null) {
+                    boxValueSelected = result.getString(1);
+                }
+            }
+            result.close();
+            database.close();
+            return boxValueSelected;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public ArrayList<String> getStockInfo(String positie) throws SQLException {
+        ArrayList<String> results = new ArrayList<>();
+        positie = "'" + positie + "'";
+        ResultSet result = statement.executeQuery("Select StockItemID,StockItemName From stockitems WHERE StockLocation = " + positie);
+
+        if (result.next()) {
+            int StockitemId = result.getInt("StockItemID");
+            String StockitemName = result.getString("StockItemName");
+            int voorraad = getItemQuantity(StockitemId);
+            results.add("Naam: " + StockitemName);
+            results.add("Voorraad: " + voorraad);
+        }
+        return results;
+    }
+
+    public ArrayList<Locatie> getWeights() throws SQLException {
         Database database = new Database();
         database.databaseConnect();
-
-        ResultSet result = database.select("Select stockItemName From StockItems WHERE StockLocation = ?", stockLocation.getText());
-        String boxValueSelected = "";
-        if(result.next()) {
-            if (result.getString(1) != null) {
-                boxValueSelected = result.getString(1);
-            }
+//        int i = 0;
+        ResultSet result1 = database.select("SELECT Count(*) FROM stockitems WHERE StockLocation IS NOT NULL");
+        result1.next();
+        ArrayList<Locatie> weights = new ArrayList<>();
+        ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL");
+        while (result.next()) {
+            int d = result.getInt("Weight");
+            weights.add(new Locatie(result.getString("StockLocation"),d));
         }
-        result.close();
-        database.close();
-        return boxValueSelected;
-
-    } catch (SQLException e) {
-        System.out.println(e.getMessage());
+        return weights;
     }
-    return null;
-}
 
-public  ArrayList<String> getStockInfo(String positie) throws SQLException {
-        ArrayList<String> results = new ArrayList<>();
-    positie = "'" + positie + "'";
-    ResultSet result = statement.executeQuery("Select StockItemID,StockItemName From stockitems WHERE StockLocation = " + positie);
-
-    if (result.next()) {
-        int StockitemId = result.getInt("StockItemID");
-        String StockitemName = result.getString("StockItemName");
-        int voorraad = getItemQuantity(StockitemId);
-        results.add("Naam: " + StockitemName);
-        results.add("Voorraad: " + voorraad);
-    }
-    return results;
+    public int getOrderSize(int OrderID) throws SQLException{
+        String query = "SELECT SUM(Quantity) FROM orderlines WHERE OrderID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs.getInt(1);
     }
 }
+
 
 

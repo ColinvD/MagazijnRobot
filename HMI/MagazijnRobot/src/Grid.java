@@ -5,10 +5,15 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Grid extends JPanel {
     private GridSpace[][] grid;
-
+    protected static String locationRobot2 = "X:290 Y:290";
+    private int robotX;
+    private int robotY;
+    private String[] route;
     private String name;
     public Grid(int width, int height) {
         setBackground(Color.white);
@@ -65,8 +70,15 @@ public class Grid extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         DrawGrid(g);
+        locationRobot(locationRobot1(locationRobot2),g);
+        if(route != null) {
+            drawRoute(route, g);
+        }
     }
-
+    public String locationRobot1(String location){
+        repaint();
+        return location;
+    }
     public void DrawGrid(Graphics g){
         int cellWidth = 60;
         int cellHeight = 60;
@@ -84,9 +96,67 @@ public class Grid extends JPanel {
 
     }
 
+    public void locationRobot(String locatieRobot,Graphics g){
+        g.setColor(Color.green);
+        robotX = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(':')+1,locatieRobot.indexOf('Y')-1));
+        robotY = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(":",locatieRobot.indexOf(':')+1)+1));
+        g.fillOval(robotX,robotY,15,15);
+
+    }
+
     public String getNamePositie() {
         System.out.println(name);
         return name;
+    }
 
+    public void drawRoute(String[] route, Graphics g){
+        int prevX = robotX+10;
+        int prevY = robotY+10;
+        g.setColor(Color.RED);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(3));
+        for (int i = 0; i < (route.length); i++) {
+            int xy[] = convertLocationToXY(route[i]);
+            int x = xy[0];
+            int y = xy[1];
+            g.drawLine(prevX, prevY, x, y);
+            prevX = x;
+            prevY = y;
+            if(i==2 || i==route.length-1){
+                g.drawLine(prevX, prevY, 300, 300);
+                prevX = 300;
+                prevY = 300;
+                g.setColor(Color.BLUE);
+            }
+        }
+    }
+
+    public int[] convertLocationToXY(String location){
+        int xy[] = new int[2];
+
+        xy[0] = (Integer.parseInt(location.substring(1,2))-1) * 60 + 30;
+
+        switch (location.substring(0,1)){
+            case "A":
+                xy[1] = 30;
+                break;
+            case "B":
+                xy[1] = 90;
+                break;
+            case "C":
+                xy[1] = 150;
+                break;
+            case "D":
+                xy[1] = 210;
+                break;
+            case "E":
+                xy[1] = 270;
+                break;
+        }
+        return xy;
+    }
+
+    public void setRoute(String[] r){
+        route = r;
     }
 }

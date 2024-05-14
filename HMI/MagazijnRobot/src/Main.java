@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
@@ -11,6 +12,5 @@ public class Main {
             System.out.println("Database Not Connected");
             System.out.println(e.getMessage());
         }
-       // System.out.println("ID 1: " + d.getItemQuantity(1));
     }
 }

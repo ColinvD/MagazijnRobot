@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class SchapPanel extends JPanel implements ActionListener {
+    private static String[] route;
     private static Grid schap;
     private JLabel schapNaam = new JLabel("Schap");
     private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
@@ -28,9 +29,7 @@ public class SchapPanel extends JPanel implements ActionListener {
         //add(stockSituationPanel);
         add(legendaPanel);
         add(stockSituationPanel);
-
         addStockitems();
-
     }
 
     @Override
@@ -48,15 +47,23 @@ public class SchapPanel extends JPanel implements ActionListener {
                     GridSpace gridcell = schap.getGrid()[i][j];
                     if (s != null) {
                         if (gridcell.getGridText().equals(s)) {
-                            gridcell.setBackgroundColor(Color.gray);
+                            gridcell.setBackgroundColor(Color.black);
                         }
-                    } else gridcell.setBackgroundColor(Color.black);
+                    } else gridcell.setBackgroundColor(Color.gray);
 
                 }
             }
         }
-
-
         schap.repaint();
+    }
+
+    public static void drawRoute(String[] r){
+        schap.setRoute(r);
+        schap.repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
     }
 }
