@@ -12,6 +12,7 @@ public class BBP {
         ArrayList<ArrayList<Locatie>> Boxes = new ArrayList<>();
         ArrayList<Locatie> Box = new ArrayList<>();
 
+
         // Create an array to store remaining space in bins
         // there can be at most n bins
         int []bin_rem = new int[n];
@@ -61,12 +62,10 @@ public class BBP {
         // Now call first fit for sorted items
         return firstFit(weight, n, c);
     }
-
     // Driver program
     public static void main(String[] args) throws SQLException {
         Database database = new Database();
         database.databaseConnect();
-
         ArrayList<Locatie> weight = database.getWeights();
 //        for (Locatie locatie : weight){
 //            System.out.print(locatie.getWeight());
@@ -85,6 +84,7 @@ public class BBP {
             }
             System.out.println(Arrays.toString(TSP.getRoute(box)));
         }
+
     }
 }
 

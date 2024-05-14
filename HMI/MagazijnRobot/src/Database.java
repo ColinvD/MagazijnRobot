@@ -168,14 +168,14 @@ public class Database {
         return results;
     }
 
-    public ArrayList<Locatie> getWeights() throws SQLException {
+    public ArrayList<Locatie> getWeights(int order) throws SQLException {
         Database database = new Database();
         database.databaseConnect();
 //        int i = 0;
-        ResultSet result1 = database.select("SELECT Count(*) FROM stockitems WHERE StockLocation IS NOT NULL ");
+        ResultSet result1 = database.select("SELECT Count(*) FROM stockitems WHERE StockLocation IS NOT NULL");
         result1.next();
         ArrayList<Locatie> weights = new ArrayList<>();
-        ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL ");
+        ResultSet result = database.select("SELECT stockitems.StockLocation,stockitems.Weight FROM stockitems INNER JOIN orderlines ON stockitems.StockItemID = orderlines.StockItemID WHERE StockLocation IS NOT NULL AND OrderID = ?", String.valueOf(order));
         while (result.next()) {
             int d = result.getInt("Weight");
             weights.add(new Locatie(result.getString("StockLocation"),d));
