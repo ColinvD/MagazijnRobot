@@ -56,7 +56,7 @@ public class TSP {
     }
 
     public static void main(String args[]){
-        String Doos[] = {"A1","B2","A3","C5","D3"}; //testData
+        String Doos[] = {"A1","B2","A2"}; //testData
         System.out.println(Arrays.toString(getRoute(Doos)));
     }
 }

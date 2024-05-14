@@ -12,6 +12,5 @@ public class Main {
             System.out.println("Database Not Connected");
             System.out.println(e.getMessage());
         }
-       // System.out.println("ID 1: " + d.getItemQuantity(1));
     }
 }

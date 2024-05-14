@@ -51,6 +51,7 @@ public class OrderPanel extends JPanel implements ActionListener {
 
         if(itemCount==0){
             orderItemsPanel.add(new JLabel("Lege order."));
+            SchapPanel.drawRoute(null);
         } else {
             ArrayList<Locatie> products = new ArrayList<>();
             while (orderItems.next()){
@@ -60,6 +61,14 @@ public class OrderPanel extends JPanel implements ActionListener {
                 }
             }
             ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 20);
+
+            String[] box = new String[Boxes.get(0).size()];
+
+            for (int i = 0; i < Boxes.get(0).size(); i++) {
+                box[i] = Boxes.get(0).get(i).getLocation();
+            }
+
+            SchapPanel.drawRoute(TSP.getRoute(box));
 
             orderItems = database.getOrderlines(OrderID);
 
@@ -77,7 +86,8 @@ public class OrderPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==jbStartOrder){
+        if (e.getSource()==jbStartOrder){
+
         }
     }
 }
