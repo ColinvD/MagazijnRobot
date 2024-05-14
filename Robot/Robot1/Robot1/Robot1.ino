@@ -9,8 +9,6 @@ const int brakeUP = 9;
 
 const int distance = A2;
 
-
-
 const int power = 120;
 unsigned long LastTime;
 int waitTime = 2000;
