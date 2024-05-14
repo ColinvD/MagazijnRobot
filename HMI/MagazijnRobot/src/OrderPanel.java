@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener {
@@ -24,7 +25,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         database = new Database();
         database.databaseConnect();
 
-        jlSelectedOrder = new JLabel("Geen order geselecteerd ");
+        jlSelectedOrder = new JLabel("Geen order geselecteerd");
 
         jbStartOrder = new JButton("Start");
         jbStartOrder.setPreferredSize(new Dimension(100,30));
@@ -51,15 +52,16 @@ public class OrderPanel extends JPanel implements ActionListener {
         if(itemCount==0){
             orderItemsPanel.add(new JLabel("Lege order."));
         } else {
-//            int products[] = new int[itemCount];
-//            int value = 0;
-//            while (orderItems.next()){
-//                for(int i = 0; i < orderItems.getInt("Quantity"); i++){
-//                    products[value] = orderItems.getInt("StockItemID");
-//                    value++;
-//                }
-//            }
+            ArrayList<Locatie> products = new ArrayList<>();
+            while (orderItems.next()){
+                Locatie locatie = new Locatie(orderItems.getString("StockLocation"), orderItems.getInt("Weight"));
+                for(int i = 0; i < orderItems.getInt("Quantity"); i++){
+                    products.add(locatie);
+                }
+            }
+            ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 20);
 
+            orderItems = database.getOrderlines(OrderID);
 
             while (orderItems.next()) {
                 for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
@@ -75,6 +77,7 @@ public class OrderPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if(e.getSource()==jbStartOrder){
+        }
     }
 }
