@@ -26,7 +26,7 @@ public class BBP {
             {
                 if (bin_rem[j] >= weight.get(i).getWeight())
                 {
-                    System.out.println("Doos " + j + ": " + bin_rem[j] + " - " + weight.get(i).getWeight());
+//                    System.out.println("Doos " + j + ": " + bin_rem[j] + " - " + weight.get(i).getWeight());
                     bin_rem[j] = bin_rem[j] - weight.get(i).getWeight();
 //                    System.out.println(weight.get(i).getLocation());
                     break;
@@ -37,13 +37,13 @@ public class BBP {
             if (j == res)
             {
                 bin_rem[res] = c;
-                System.out.println("doos " + j + ": " + bin_rem[j] + " - " + weight.get(i).getWeight());
+//                System.out.println("doos " + j + ": " + bin_rem[j] + " - " + weight.get(i).getWeight());
                 bin_rem[res] -= weight.get(i).getWeight();
 //                System.out.println(weight.get(i).getLocation());
                 res++;
             }
 
-            System.out.println(weight.get(i).getLocation() + ":  " + weight.get(i).getWeight());
+//            System.out.println(weight.get(i).getLocation() + ":  " + weight.get(i).getWeight());
             if(oldres < res){
                 Box = new ArrayList<>();
                 Boxes.add(Box);

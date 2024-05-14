@@ -25,7 +25,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         database = new Database();
         database.databaseConnect();
 
-        jlSelectedOrder = new JLabel("Geen order geselecteerd ");
+        jlSelectedOrder = new JLabel("Geen order geselecteerd");
 
         jbStartOrder = new JButton("Start");
         jbStartOrder.setPreferredSize(new Dimension(100,30));
@@ -60,21 +60,16 @@ public class OrderPanel extends JPanel implements ActionListener {
                 }
             }
             ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 20);
-            for (int i = 0; i < Boxes.size(); i++) {
-                String[] Box = new String[Boxes.get(i).size()];
-                for (int j = 0; j < Boxes.get(i).size(); j++) {
-                    Box[j] = Boxes.get(i).get(j).getLocation();
-                }
-                System.out.println(Arrays.toString(TSP.getRoute(Box)));
-            }
 
-//            while (orderItems.next()) {
-//                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
-//                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
-//                    product.setPreferredSize(new Dimension(280, 12));
-//                    orderItemsPanel.add(product);
-//                }
-//            }
+            orderItems = database.getOrderlines(OrderID);
+
+            while (orderItems.next()) {
+                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
+                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName"));
+                    product.setPreferredSize(new Dimension(280, 12));
+                    orderItemsPanel.add(product);
+                }
+            }
         }
         jlSelectedOrder.setText("Order: " + OrderID + " ");
         this.updateUI();
@@ -82,6 +77,7 @@ public class OrderPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if(e.getSource()==jbStartOrder){
+        }
     }
 }
