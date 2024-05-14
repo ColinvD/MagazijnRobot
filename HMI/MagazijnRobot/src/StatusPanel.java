@@ -5,9 +5,9 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
 public class StatusPanel extends JPanel implements ActionListener {
-    private JLabel jlStatus, jlRobotStatus;
-    private boolean robotOnline;
-    private JButton jbTest;
+    private JLabel jlStatus;
+    private static JLabel jlRobotStatus, jlRoute;
+    private static boolean robotOnline;
     public StatusPanel(){
         setPreferredSize(new Dimension(400,125));
         setLayout(new FlowLayout());
@@ -15,27 +15,47 @@ public class StatusPanel extends JPanel implements ActionListener {
         setBorder(BorderFactory.createLineBorder(Color.black));
 
         jlStatus = new JLabel("Status", SwingConstants.CENTER);
-        jlStatus.setPreferredSize(new Dimension(400,25));
+        jlStatus.setFont(new Font("Arial", Font.BOLD, 16));
+        jlStatus.setPreferredSize(new Dimension(390,16));
         jlRobotStatus = new JLabel("Robot: offline");
-        jbTest = new JButton("Robot status veranderen");
-        jbTest.addActionListener(this);
+        jlRobotStatus.setPreferredSize(new Dimension(390,16));
+        jlRoute = new JLabel("Route: geen route gevonden.");
+        jlRoute.setPreferredSize(new Dimension(390,16));
+
 
         add(jlStatus);
         add(jlRobotStatus);
-        add(jbTest);
+        add(jlRoute);
 
         setVisible(true);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource()==jbTest){
-            changeRobotStatus(!robotOnline);
-        }
     }
 
-    public void changeRobotStatus(boolean Online){
-        this.robotOnline = Online;
+    public static void changeRobotStatus(boolean Online){
+        robotOnline = Online;
         jlRobotStatus.setText(robotOnline == true ? "Robot: online" : "Robot: offline");
-        this.updateUI();
+    }
+
+    public static void displayRoute(String[] r){
+        if(r != null) {
+            int c = 0;
+            String route = "Route: ";
+            for (int i = 0; i <r.length; i++) {
+                if(i%3==0){
+                   c++;
+                   route += (c+". ");
+                }
+                if((i-2)%3!=0){
+                    route += (r[i] + ", ");
+                } else {
+                    route += (r[i] + ".  ");
+                }
+            }
+            jlRoute.setText(route);
+        } else {
+            jlRoute.setText("Route: geen route gevonden.");
+        }
     }
 }

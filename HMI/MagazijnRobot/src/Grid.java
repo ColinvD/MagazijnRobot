@@ -123,7 +123,6 @@ public class Grid extends JPanel {
             prevX = x;
             prevY = y;
             if(i==2 || i==route.length-1){
-                g.drawLine(prevX, prevY, 300, 300);
                 prevX = 300;
                 prevY = 300;
                 g.setColor(Color.BLUE);

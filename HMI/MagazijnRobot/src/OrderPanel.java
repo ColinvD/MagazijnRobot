@@ -52,6 +52,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         if(itemCount==0){
             orderItemsPanel.add(new JLabel("Lege order."));
             SchapPanel.drawRoute(null);
+            StatusPanel.displayRoute(null);
         } else {
             ArrayList<Locatie> products = new ArrayList<>();
             while (orderItems.next()){
@@ -62,20 +63,31 @@ public class OrderPanel extends JPanel implements ActionListener {
             }
             ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 20);
 
-            String[] box = new String[Boxes.get(0).size()];
+            //This only shows the first box of the order
+            String[] box = new String[Boxes.get(0).size()];//get the  first box
 
             for (int i = 0; i < Boxes.get(0).size(); i++) {
                 box[i] = Boxes.get(0).get(i).getLocation();
             }
 
-            SchapPanel.drawRoute(TSP.getRoute(box));
+            String[] route = TSP.getRoute(box);
+            StatusPanel.displayRoute(route);
+            SchapPanel.drawRoute(route);
+            //
 
             orderItems = database.getOrderlines(OrderID);
 
-            while (orderItems.next()) {
-                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
-                    JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName")  + ".  "+orderItems.getString("StockLocation"));
-                    product.setPreferredSize(new Dimension(280, 12));
+            for (int i = 0; i < Boxes.size(); i++) {
+                JLabel doos = new JLabel("Doos " + (i+1) + ": ");
+                doos.setFont(new Font("Arial", Font.BOLD, 16));
+                if(i>0){
+                    doos.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
+                }
+                orderItemsPanel.add(doos);
+                for (int j = 0; j < Boxes.get(i).size(); j++) {
+                    String location = Boxes.get(i).get(j).getLocation();
+                    ResultSet stockitem = database.getStockitem(location);
+                    JLabel product = new JLabel(location + ": " + stockitem.getInt("StockItemID") + ". " + stockitem.getString("StockItemName") + ".");
                     orderItemsPanel.add(product);
                 }
             }
