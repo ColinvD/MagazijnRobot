@@ -26,6 +26,7 @@ public class BBP {
             {
                 if (bin_rem[j] >= weight.get(i).getWeight())
                 {
+                    System.out.println("Doos " + j + ": " + bin_rem[j] + " - " + weight.get(i).getWeight());
                     bin_rem[j] = bin_rem[j] - weight.get(i).getWeight();
 //                    System.out.println(weight.get(i).getLocation());
                     break;
@@ -35,7 +36,9 @@ public class BBP {
             // If no bin could accommodate weight[i]
             if (j == res)
             {
-                bin_rem[res] = c - weight.get(i).getWeight();
+                bin_rem[res] = c;
+                System.out.println("doos " + j + ": " + bin_rem[j] + " - " + weight.get(i).getWeight());
+                bin_rem[res] -= weight.get(i).getWeight();
 //                System.out.println(weight.get(i).getLocation());
                 res++;
             }
@@ -46,7 +49,7 @@ public class BBP {
                 Boxes.add(Box);
                 oldres = res;
             }
-            Box.add(weight.get(i));
+            Boxes.get(j).add(weight.get(i));
         }
         return Boxes;
     }
