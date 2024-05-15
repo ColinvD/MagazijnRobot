@@ -1,11 +1,15 @@
+#include <Wire.h>
+#include <util/atomic.h>
+
+#define zEncoderA 2
+#define zEncoderB 5
 const int directionPinUP = 12;
 const int pwmPinUP = 3;
 const int brakeUP = 9;
 
 const int distance = A2;
-//const int encoderZ = 5;
 
-const int power = 135;
+const int power = 120;
 unsigned long LastTime;
 int waitTime = 2000;
 int currentState = 4;
@@ -18,11 +22,32 @@ bool pressedOut = false;
 bool isReleasedOut = true;
 bool pressedIn = false;
 bool isReleasedIn = true;
+
+//Stop Button
+const int stopButton = 4;
+bool buttonPressed;
+bool stopState = false;
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
 float previousDistance = -1;
+float diffrenceBetween = 0.15;
 float diffrenceAllowed = 0.3;
+float diffrenceBigger = 1;
+
+// tilt switch sensor
+int tiltSensor = 6;
+bool pastTilt = false;
+
+volatile int zPosition = 0;
+int prevEncoderValueA = 0;
+int prevEncoderValueB = 0;
+
+//led light
+int ledGreen = 8;
+int ledYellow = 11;
+int ledRed = 13;
+
 
 bool send = false;
 
@@ -31,7 +56,7 @@ void setup() {
   pinMode(directionPinUP, OUTPUT);
   pinMode(pwmPinUP, OUTPUT);
   pinMode(brakeUP, OUTPUT);
-  //pinMode(encoderZ, INPUT);
+
   pinMode(uit, INPUT);
   pinMode(in, INPUT);
   pinMode(distance, INPUT);
@@ -52,15 +77,15 @@ void loop() {
     Stop();
   }
 
-  if (pressedIn && isReleasedIn && Distance() > 4.30) {
-    isReleasedIn = false;
-    GoIn();
-    stoppedIn = false;
-    //Serial.println("In!!!!!!");
-  } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 4.15 && !stoppedIn)) {
-    isReleasedIn = true;
-    stoppedIn = true;
-    Stop();
+  // stop button state
+  if (stopValue && stopState && !buttonPressed) {
+    stopState = false;
+    buttonPressed = true;
+    sendValue(1, 1, stopState);
+  } else if (stopValue && !stopState && !buttonPressed) {
+    stopState = true;
+    buttonPressed = true;
+    sendValue(1, 1, stopState);
   }
 
   if (Serial.available()) {
@@ -86,14 +111,41 @@ void loop() {
   //   Serial.println("dichtbij");
   // }
 
-  // if (millis() > LastTime + waitTime) {
-  //   LastTime = millis();
-  //   Something();
-  // }
-  // if(encoder_variable == HIGH){
-  //   Serial.println("Rotation");
-  // }
-  //Serial.println(encoder_variable);
+    if (pressedIn && isReleasedIn && Distance() > 7.2) {
+      isReleasedIn = false;
+      GoIn();
+      stoppedIn = false;
+      //Serial.println("In!!!!!!");
+    } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 7 && !stoppedIn)) {
+      isReleasedIn = true;
+      stoppedIn = true;
+      Stop();
+    }
+
+    // int sensor_value = digitalRead(IsLeft);
+    //int encoder_variable = digitalRead(encoderZ);
+    //Serial.println(encoder_variable);
+    // if(sensor_value == HIGH){
+    //   digitalWrite(directionPinUP, LOW);
+    //   analogWrite(pwmPinUP, power);
+    //   digitalWrite(brakeUP, LOW);
+    //   Serial.println("aan");
+    // }
+    // else {
+    //   analogWrite(pwmPinUP, 0);
+    //   digitalWrite(brakeUP, HIGH);
+    //   Serial.println("dichtbij");
+    // }
+
+    // if (millis() > LastTime + waitTime) {
+    //   LastTime = millis();
+    //   Something();
+    // }
+    // if(encoder_variable == HIGH){
+    //   Serial.println("Rotation");
+    // }
+    //Serial.println(encoder_variable);
+  }
 }
 
 void GoIn() {
@@ -134,4 +186,5 @@ void OnMessageReceived(String message) {
     delay(2500);
   }
   send = false;
+
 }
