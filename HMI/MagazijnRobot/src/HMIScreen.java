@@ -2,41 +2,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 
 public class HMIScreen extends JFrame implements ActionListener {
-    public HMIScreen() throws SQLException {
-        setSize(750, 650);
+    public HMIScreen(){
+        setSize(800,800);
+        setLayout(new FlowLayout());
         getContentPane().setBackground(Color.black);
         setTitle("HMI magazijn robot");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         SchapPanel schap = new SchapPanel();
-        StatusPanel status = new StatusPanel();
         OrderPanel order = new OrderPanel();
-        ButtonPanel button = new ButtonPanel(order);
+        StatusPanel status = new StatusPanel();
 
-
-        GridBagLayout layout = new GridBagLayout(); //create grid bag layout
-        this.setLayout(layout);
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridheight = 2;
-        c.gridx = 0;
-        c.gridy = 0;
-        add(schap, c);
-        c.gridheight = 1;
-        c.gridx = 1;
-        c.gridy = 0;
-
-        add(button, c);
-        c.gridheight = 1;
-        c.gridx = 0;
-        c.gridy = 2;
-        add(status, c);
-        c.gridheight = 2;
-        c.gridx = 1;
-        c.gridy = 1;
-        add(order, c);
+        add(schap);
+        add(order);
+        add(status);
         setVisible(true);
     }
 
