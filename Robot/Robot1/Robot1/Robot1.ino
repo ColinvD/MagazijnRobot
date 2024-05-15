@@ -49,6 +49,8 @@ int ledYellow = 11;
 int ledRed = 13;
 
 
+bool send = false;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(directionPinUP, OUTPUT);
@@ -57,35 +59,22 @@ void setup() {
 
   pinMode(uit, INPUT);
   pinMode(in, INPUT);
-  pinMode(distance,INPUT);
-  pinMode(stopButton,INPUT);
-  pinMode(tiltSensor,INPUT_PULLUP);
-
-  pinMode(zEncoderA,INPUT);
-  pinMode(zEncoderB,INPUT);
-
-  pinMode(ledGreen,OUTPUT);
-  pinMode(ledYellow,OUTPUT);
-  pinMode(ledRed,OUTPUT);
-
-  Wire.begin();
-  Serial.begin(500000);
-
-  attachInterrupt(digitalPinToInterrupt(zEncoderA),setEncoder,RISING);
+  pinMode(distance, INPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
-
-int pos = 0; 
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    pos = zPosition;
-  }
-  
-  Serial.println(pos);
-  digitalWrite(ledRed,LOW);
-  int stopValue = digitalRead(stopButton);
-  if (!stopValue) {
-    buttonPressed = false; 
+  pressedOut = digitalRead(uit);
+  pressedIn = digitalRead(in);
+  if (pressedOut && isReleasedOut && Distance() < 7.7) {
+    isReleasedOut = false;
+    GoOut();
+    stoppedOut = false;
+    // Serial.println("OUT!!!!!!");
+  } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 8 && !stoppedOut)) {
+    isReleasedOut = true;
+    stoppedOut = true;
+    Stop();
   }
 
   // stop button state
@@ -99,37 +88,28 @@ int pos = 0;
     sendValue(1, 1, stopState);
   }
 
-  if(stopState) {
-    // emergency stop button pressed
+  if (Serial.available()) {
+    String message = Serial.readStringUntil('\n');
+    OnMessageReceived(message);
+  } else if (!send) {
+    Serial.println("Done");
+    send = true;
     Stop();
-    digitalWrite(ledYellow,LOW);
-    digitalWrite(ledRed,HIGH);
-  } else {
-  digitalWrite(ledYellow,HIGH);
-    bool tiltState = shelfTilt();
-    pressedOut = digitalRead(uit);
-    pressedIn = digitalRead(in);
-    if(tiltState && !pastTilt) {
-      pastTilt = tiltState;
-      if(pressedOut) {
-        Stop();
-      }
-      sendValue(1, 2, tiltState);
-    } else if(!tiltState && pastTilt) {
-      pastTilt = tiltState;
-      sendValue(1, 2, tiltState);
-    }
-    // Serial.println(Distance());
-    if (pressedOut && isReleasedOut && Distance() < 18.3 && !tiltState) {
-      isReleasedOut = false;
-      GoOut();
-      stoppedOut = false;
-    // Serial.println("OUT!!!!!!");
-    } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 18.7  && !stoppedOut)) {
-      isReleasedOut = true;
-      stoppedOut = true;
-      Stop();
-    }
+  }
+  // int sensor_value = digitalRead(IsLeft);
+  //int encoder_variable = digitalRead(encoderZ);
+  //Serial.println(encoder_variable);
+  // if(sensor_value == HIGH){
+  //   digitalWrite(directionPinUP, LOW);
+  //   analogWrite(pwmPinUP, power);
+  //   digitalWrite(brakeUP, LOW);
+  //   Serial.println("aan");
+  // }
+  // else {
+  //   analogWrite(pwmPinUP, 0);
+  //   digitalWrite(brakeUP, HIGH);
+  //   Serial.println("dichtbij");
+  // }
 
     if (pressedIn && isReleasedIn && Distance() > 7.2) {
       isReleasedIn = false;
@@ -179,57 +159,32 @@ void GoOut() {
   analogWrite(pwmPinUP, power);
   digitalWrite(brakeUP, LOW);
 }
-void Stop(){
-      analogWrite(pwmPinUP, 0);
-      digitalWrite(brakeUP, HIGH);
+void Stop() {
+  analogWrite(pwmPinUP, 0);
+  digitalWrite(brakeUP, HIGH);
 }
 
-float Distance(){
-  float volts = analogRead(distance)*0.0048828125;  // value from sensor * (5/1024)
-  float distanceRobot = 13*pow(volts, -1); // worked out from datasheet graph
-  
-  if(previousDistance == -1 || (distanceRobot <= previousDistance + diffrenceAllowed && distanceRobot >= previousDistance - diffrenceAllowed) || distanceRobot >= previousDistance + diffrenceBigger || distanceRobot <= previousDistance - diffrenceBigger){
+float Distance() {
+  float volts = analogRead(distance) * 0.0048828125;  // value from sensor * (5/1024)
+  float distanceRobot = 13 * pow(volts, -1);          // worked out from datasheet graph
+
+  if (previousDistance == -1 || (distanceRobot > previousDistance - diffrenceAllowed && distanceRobot < previousDistance + diffrenceAllowed)) {
     previousDistance = distanceRobot;
   }
-  // Serial.println(previousDistance);
+  //Serial.println(previousDistance);
 
   return previousDistance;
-
 }
 
-bool shelfTilt() {
-  int tiltValue = digitalRead(tiltSensor);
-  if (tiltValue) {
-    return false;
+void OnMessageReceived(String message) {
+  Serial.println(message);
+  if (message.equals("Uit")) {
+    GoOut();
+    delay(2500);
+  } else if (message.equals("In")) {
+    GoIn();
+    delay(2500);
   }
-  return true;
-}
+  send = false;
 
-void setEncoder() {
-  int encoderValueA = digitalRead(zEncoderA);
-  int encoderValueB = digitalRead(zEncoderB);
-
-  int b = digitalRead(zEncoderB);
-    if(b > 0){
-      zPosition--;
-    }
-    else{
-      zPosition++;
-    }
-
-  // if (encoderValueA != prevEncoderValueA && encoderValueB != prevEncoderValueB) {
-  //   if(direction) {
-  //     zPosition--;
-  //   } else {
-  //     zPosition++;
-  //   }
-  // }
-  // prevEncoderValueA = encoderValueA;
-}
-
-void sendValue(int location, int functie, bool boolean) {
-    Wire.beginTransmission(location);
-    Wire.write(functie);
-    Wire.write(boolean);
-    Wire.endTransmission();
 }
