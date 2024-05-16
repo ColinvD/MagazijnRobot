@@ -120,6 +120,15 @@ public class Database {
         return rs.getInt("QuantityOnHand");
     }
 
+    public ResultSet getStockitem(String locatie) throws SQLException {
+        String query = "SELECT * FROM stockitems WHERE StockLocation = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setString(1, locatie);
+        ResultSet rs = s.executeQuery();
+        rs.next();
+        return rs;
+    }
+
     //    public int getItemQuantity(String StockitemName) throws SQLException {
 //        ResultSet rs = statement.executeQuery("SELECT QuantityOnHand FROM stockitemholdings sih JOIN stockitems si ON sih.StockItemID = si.StockItemID  WHERE si.StockItemName LIKE '%" + StockitemName + "%';");
 //        rs.next();
@@ -167,7 +176,6 @@ public class Database {
         }
         return results;
     }
-
     public ArrayList<Locatie> getWeights() throws SQLException {
         Database database = new Database();
         database.databaseConnect();
