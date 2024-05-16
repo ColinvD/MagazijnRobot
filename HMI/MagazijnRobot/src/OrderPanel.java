@@ -88,6 +88,15 @@ public class OrderPanel extends JPanel implements ActionListener {
                     String location = Boxes.get(i).get(j).getLocation();
                     ResultSet stockitem = database.getStockitem(location);
                     JLabel product = new JLabel(location + ": " + stockitem.getInt("StockItemID") + ". " + stockitem.getString("StockItemName") + ".");
+//             while (orderItems.next()) {
+//                 for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
+
+//                     String Stocklocation = orderItems.getString("StockLocation");
+//                     if (Stocklocation == null){
+//                         Stocklocation = "Niet aanwezig";
+//                     }
+//                     JLabel product = new JLabel(orderItems.getInt("StockItemID") + ". " + orderItems.getString("StockItemName")  + ".  "+Stocklocation);
+//                     product.setPreferredSize(new Dimension(280, 12));
                     orderItemsPanel.add(product);
                 }
             }

@@ -9,10 +9,7 @@ const int brakeUP = 9;
 
 const int distance = A2;
 
-//readfromjavavariables
-const int BUFFER_SIZE = 50;
-char buf[BUFFER_SIZE];
-String empty = "";
+
 
 const int power = 120;
 unsigned long LastTime;
@@ -68,18 +65,22 @@ void setup() {
 
   pinMode(zEncoderA, INPUT);
   pinMode(zEncoderB, INPUT);
+  pinMode(xEncoderA, INPUT);
+  pinMode(xEncoderB, INPUT);
 
   pinMode(ledGreen, OUTPUT);
   pinMode(ledYellow, OUTPUT);
   pinMode(ledRed, OUTPUT);
 
   Wire.begin();
-  Serial.begin(500000);
+  Serial.begin(9600);
 
   attachInterrupt(digitalPinToInterrupt(zEncoderA), setEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(xEncoderA), setEncoder, RISING);
 }
 
 void loop() {
+  Serial.println(Distance());
   if (Serial.available()) {
     String message = Serial.readStringUntil('\n');
     if (message.equals("STOP")) {
@@ -93,12 +94,10 @@ void loop() {
       sendValue(1, 1, stopState);
     }
   }
-  int pos = 0;
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    pos = zPosition;
-  }
 
-  Serial.println(pos);
+
+
+
   digitalWrite(ledRed, LOW);
   int stopValue = digitalRead(stopButton);
   if (!stopValue) {
@@ -119,11 +118,11 @@ void loop() {
   if (stopState) {
     // emergency stop button pressed
     Stop();
-    Serial.println("STOP");
+   // Serial.println("STOP");
     digitalWrite(ledYellow, LOW);
     digitalWrite(ledRed, HIGH);
   } else {
-    Serial.println("Unlock");
+   // Serial.println("Unlock");
     digitalWrite(ledYellow, HIGH);
     bool tiltState = shelfTilt();
     pressedOut = digitalRead(uit);
@@ -139,12 +138,12 @@ void loop() {
       sendValue(1, 2, tiltState);
     }
     // Serial.println(Distance());
-    if (pressedOut && isReleasedOut && Distance() < 18.3 && !tiltState) {
+    if (pressedOut && isReleasedOut && Distance() < 17.8 && !tiltState) {
       isReleasedOut = false;
       GoOut();
       stoppedOut = false;
       // Serial.println("OUT!!!!!!");
-    } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 18.7 && !stoppedOut)) {
+    } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 18 && !stoppedOut)) {
       isReleasedOut = true;
       stoppedOut = true;
       Stop();
@@ -154,8 +153,10 @@ void loop() {
       isReleasedIn = false;
       GoIn();
       stoppedIn = false;
+
       //Serial.println("In!!!!!!");
     } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 7 && !stoppedIn)) {
+
       isReleasedIn = true;
       stoppedIn = true;
       Stop();
@@ -185,6 +186,8 @@ void loop() {
     // }
     //Serial.println(encoder_variable);
   }
+
+ // Serial.println(zPosition);
 }
 
 void GoIn() {
@@ -223,16 +226,34 @@ bool shelfTilt() {
   return true;
 }
 
-void setEncoder() {
-  int encoderValueA = digitalRead(zEncoderA);
-  int encoderValueB = digitalRead(zEncoderB);
+void setEncoderZ() {
+  //int encoderValueA = digitalRead(zEncoderA);
+  //int encoderValueB = digitalRead(zEncoderB);
 
-  int b = digitalRead(zEncoderB);
-  if (b > 0) {
-    zPosition--;
-  } else {
-    zPosition++;
-  }
+  // int b = digitalRead(zEncoderB);
+  // if (b > 0) {
+  //   zPosition--;
+  //   if (zPosition < 0) {
+  //     zPosition = 0;
+  //   }
+  // } else {
+  //   zPosition++;
+  // }
+}
+
+// void setEncoderX() {
+//   //int encoderValueA = digitalRead(zEncoderA);
+//   //int encoderValueB = digitalRead(zEncoderB);
+
+//   int b = digitalRead(xEncoderB);
+//   if (b > 0) {
+//     xPosition--;
+//     if (zPosition < 0) {
+//       zPosition = 0;
+//     }
+//   } else {
+//     zPosition++;
+//   }
 
   // if (encoderValueA != prevEncoderValueA && encoderValueB != prevEncoderValueB) {
   //   if(direction) {
@@ -242,7 +263,7 @@ void setEncoder() {
   //   }
   // }
   // prevEncoderValueA = encoderValueA;
-}
+//}
 
 void sendValue(int location, int functie, bool boolean) {
   Wire.beginTransmission(location);
