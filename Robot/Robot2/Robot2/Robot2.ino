@@ -39,8 +39,8 @@ bool onUp = false;
 bool stopUpBool = false;
 
 // encoders
-const int yEncoderA = 2;
-const int yEncoderB = 6;
+#define yEncoderA 2
+#define yEncoderB 6
 int yPosition = 0;
 int yPos = 0;
 int oldYPos = -1;
@@ -83,7 +83,6 @@ void setup() {
   Wire.onRequest(requestEvent);
 
   attachInterrupt(digitalPinToInterrupt(yEncoderA),setEncoderY,RISING);
-
 
   Serial.begin(9600);  // pin 0 & 1
 }

@@ -118,7 +118,7 @@ void loop() {
       pickUP(1);
     }
   } else {
-  digitalWrite(ledYellow,HIGH);
+    digitalWrite(ledYellow,HIGH);
     bool tiltState = shelfTilt();
     pressedOut = digitalRead(uit);
     pressedIn = digitalRead(in);
@@ -220,7 +220,6 @@ bool shelfTilt() {
 
 void setEncoder() {
   int zEncoderValueB = digitalRead(zEncoderB);
-  Serial.println(zEncoderValueB);
   if(zEncoderValueB > 0){
     zPosition--;
   } else {
@@ -247,25 +246,26 @@ void sendValue(int location, int functie, bool boolean) {
 // }
 
 void pickUP(int count) {
+  int value = 0;
   switch(count) {
     case 1:
-      if(pos < 830) {
-        pickUpBool = true;
-        pickUpDataSend = true;
-        GoOut();
-      } else {
-        extendBool = true;
-      }
+      value = 830;
       break;
     case 2:
+      value = 800;
       break;
-
     case 3:
+      value = 770;
       break;
   }
-      // Serial.println(pos);
-  if(extendBool) {
+  if(!extendBool && pos < value) {
+    pickUpBool = true;
+    pickUpDataSend = true;
+    GoOut();
+  } else {
+    extendBool = true;
     if(pickUpBool) {
+      Serial.println(pickUpDataSend);
       if(pickUpDataSend) {
         sendValue(1, 3, true);
         pickUpDataSend = false;
@@ -283,6 +283,7 @@ void pickUP(int count) {
         GoIn();
       } else {
         Stop();
+        pickUpFinished = true;
         extendBool = false;
       }
     }
