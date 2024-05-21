@@ -1,11 +1,12 @@
-#include <Wire.h>;
+#include <Wire.h>
+#include <util/atomic.h>
 //x variabels
 const int directionPinUP = 12;
 const int pwmPinUP = 3;
 const int brakeUP = 9;
 //joystick variabels
-const int JoyconX = A2;
-const int JoyconY = A3;
+const int JoyconY = A2;
+const int JoyconX = A3;
 int x = 0;
 int y = 0;
 
@@ -19,7 +20,7 @@ const int power = 215;
 unsigned long LastTime;
 int waitTime = 2000;
 int currentState = 4;
-const int IsLeft = 2;
+const int IsLeft = 4;
 const int IsRight = 10;
 int sensor_value = 0;
 int sensor_valueLeft = 0;
@@ -38,8 +39,11 @@ bool onUp = false;
 bool stopUpBool = false;
 
 // encoders
-const int encoderX = 6;
-const int encoderY = 4;
+const int yEncoderA = 2;
+const int yEncoderB = 6;
+int yPosition = 0;
+int yPos = 0;
+int oldYPos = -1;
 
 int rotationsX = 0;
 int rotationsY = 0;
@@ -48,6 +52,13 @@ int startStateX = HIGH;
 int startStateY = HIGH;
 int previousXState = -1;
 int previousYState = -1;
+
+
+//automatic
+bool autoBool = true;
+bool upSmallBool = false;
+bool pickUpFinishBool = false;
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -59,24 +70,38 @@ void setup() {
   pinMode(brakeUP, OUTPUT);                // pin 9
   pinMode(IsLeft, INPUT);                  // pin 2
   pinMode(IsRight, INPUT);                 // pin 10
-  pinMode(JoyconX, INPUT);                 // pin A2
-  pinMode(JoyconY, INPUT);                 // pin A3
+  pinMode(JoyconY, INPUT);                 // pin A2
+  pinMode(JoyconX, INPUT);                 // pin A3
   pinMode(microswitchDown, INPUT_PULLUP);  // pin 5
   pinMode(microswitchUp, INPUT_PULLUP);    // pin 7
 
-  pinMode(encoderX, INPUT);  // pin 6
-  pinMode(encoderY, INPUT);  // pin 4
+  pinMode(yEncoderA, INPUT);  // pin 2
+  pinMode(yEncoderB, INPUT);  // pin 6
 
   Wire.begin(1);  // pin A0 & A1
   Wire.onReceive(receiveData);
+  Wire.onRequest(requestEvent);
+
+  attachInterrupt(digitalPinToInterrupt(yEncoderA),setEncoderY,RISING);
+
 
   Serial.begin(9600);  // pin 0 & 1
 }
 
 void loop() {
+  yPos = 0;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    yPos = yPosition;
+  }
+
   if (stopState) {
     StopUp();
     StopLeft();
+  } else if(autoBool) {
+    if(upSmallBool) {
+      UpSmall();
+    }
+
   } else {
     Moving();
     indictiveSensorReadLeft();
@@ -95,18 +120,18 @@ void loop() {
 
 
 void Moving() {
-  x = analogRead(JoyconX);
   y = analogRead(JoyconY);
-  if (x < 300 && !onUp && !stopUpBool) {
+  x = analogRead(JoyconX);
+  if (y < 300 && !onUp && !stopUpBool) {
     Up();
-  } else if (x > 700 && !onDown) {
+  } else if (y > 700 && !onDown) {
     Down();
   } else {
     StopUp();
   }
-  if (y < 300 && !onRight) {
+  if (x < 300 && !onRight) {
     Right();
-  } else if (y > 700 && !onLeft) {
+  } else if (x > 700 && !onLeft) {
     Left();
   } else {
     StopLeft();
@@ -118,27 +143,27 @@ void Down() {
   digitalWrite(directionPinUP, HIGH);
   analogWrite(pwmPinUP, power);
   digitalWrite(brakeUP, LOW);
-  CheckRotation("Y", false);
+  // CheckRotation("Y", false);
 }
 
 void Up() {
-  digitalWrite(directionPinUP, LOW);
-  analogWrite(pwmPinUP, power + 40);
-  digitalWrite(brakeUP, LOW);
-  CheckRotation("Y", true);
+    digitalWrite(directionPinUP, LOW);
+    analogWrite(pwmPinUP, power + 40);
+    digitalWrite(brakeUP, LOW);
+    // CheckRotation("Y", true);
 }
 
 void Right() {
   digitalWrite(directionLeftRight, HIGH);
   analogWrite(pwmPinLeftRight, power);
   digitalWrite(brakeLeftRight, LOW);
-  CheckRotation("X", false);
+  // CheckRotation("X", false);
 }
 void Left() {
   digitalWrite(directionLeftRight, LOW);
   analogWrite(pwmPinLeftRight, power);
   digitalWrite(brakeLeftRight, LOW);
-  CheckRotation("X", true);
+  // CheckRotation("X", true);
 }
 void StopLeft() {
   analogWrite(pwmPinLeftRight, 0);
@@ -150,35 +175,35 @@ void StopUp() {
 }
 
 void CheckRotation(String axis, bool direction) {
-  if (axis.equals("X")) {
-  int encoderValueX = digitalRead(encoderX);
-    if (previousXState == -1 || previousXState != encoderValueX) {
-      if (previousXState != -1 || encoderValueX == startStateX) {
-        if (direction) {
-          rotationsX += 1;
-        } else {
-          rotationsX -= 1;
-        }
-        Serial.print("Rotations X: ");
-        Serial.println(rotationsX);
-      }
-      previousXState = encoderValueX;
-    }
-  } else if (axis.equals("Y")) {
-  int encoderValueY = digitalRead(encoderY);
-    if (previousYState == -1 || previousYState != encoderValueY) {
-      if (previousYState != -1 || encoderValueY == startStateY) {
-        if (direction) {
-          rotationsY += 1;
-        } else {
-          rotationsY -= 1;
-        }
-        Serial.print("Rotations Y: ");
-        Serial.println(rotationsY);
-      }
-      previousYState = encoderValueY;
-    }
-  }
+  // if (axis.equals("X")) {
+  // int encoderValueX = digitalRead(encoderX);
+  //   if (previousXState == -1 || previousXState != encoderValueX) {
+  //     if (previousXState != -1 || encoderValueX == startStateX) {
+  //       if (direction) {
+  //         rotationsX += 1;
+  //       } else {
+  //         rotationsX -= 1;
+  //       }
+  //       Serial.print("Rotations X: ");
+  //       Serial.println(rotationsX);
+  //     }
+  //     previousXState = encoderValueX;
+  //   }
+  // } else if (axis.equals("Y")) {
+  // int encoderValueY = digitalRead(encoderY);
+  //   if (previousYState == -1 || previousYState != encoderValueY) {
+  //     if (previousYState != -1 || encoderValueY == startStateY) {
+  //       if (direction) {
+  //         rotationsY += 1;
+  //       } else {
+  //         rotationsY -= 1;
+  //       }
+  //       Serial.print("Rotations Y: ");
+  //       Serial.println(rotationsY);
+  //     }
+  //     previousYState = encoderValueY;
+  //   }
+  // }
 }
 
 void indictiveSensorReadLeft() {
@@ -233,12 +258,57 @@ void microSwitchUp() {
 
 void receiveData() {
   int function = Wire.read();
+  Serial.println(function);
   switch (function) {
     case 1:
+    // emergency stop
       stopState = Wire.read();
       break;
     case 2:
+    // Stop going up
       stopUpBool = Wire.read();
       break;
+    case 3:
+      upSmallBool = Wire.read();
+      break;
+    // go a litle bit up to pick up the box
   }
+}
+
+void requestEvent() {
+  Wire.write(upSmallBool);
+}
+
+void UpSmall() {
+  if (oldYPos == -1) {
+    pickUpFinishBool = false;
+    oldYPos = yPos;
+  }
+    if(yPos < oldYPos + 100) {
+    Up();
+  } else {
+    pickUpFinishBool = true;
+    upSmallBool = false;
+    oldYPos = -1;
+    
+    StopUp();
+  }
+}
+
+void sendValue(int location, int functie, bool boolean) {
+    Wire.beginTransmission(location);
+    Wire.write(functie);
+    Wire.write(boolean);
+    Wire.endTransmission();
+}
+
+void setEncoderY() {
+  int b = digitalRead(yEncoderB);
+  if(b > 0){
+    yPosition--;
+  }
+  else{
+    yPosition++;
+  }
+
 }

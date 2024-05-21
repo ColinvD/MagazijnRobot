@@ -26,7 +26,15 @@ bool isReleasedIn = true;
 //Stop Button
 const int stopButton = 4;
 bool buttonPressed;
-bool stopState = false;
+bool stopState = true;
+
+//automatic
+bool autoBool = true;
+bool pickUpBool = false;
+bool pickUpFinished = false;
+bool pickUpDataSend = false;
+bool extendBool = false;
+long int receiveMillis;
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
@@ -42,6 +50,8 @@ bool pastTilt = false;
 volatile int zPosition = 0;
 int prevEncoderValueA = 0;
 int prevEncoderValueB = 0;
+int pos = 0; 
+
 
 //led light
 int ledGreen = 8;
@@ -69,19 +79,18 @@ void setup() {
   pinMode(ledRed,OUTPUT);
 
   Wire.begin();
-  Serial.begin(500000);
+  Serial.begin(9600);
 
   attachInterrupt(digitalPinToInterrupt(zEncoderA),setEncoder,RISING);
 }
 
 void loop() {
 
-int pos = 0; 
+  pos = 0; 
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     pos = zPosition;
   }
   
-  Serial.println(pos);
   digitalWrite(ledRed,LOW);
   int stopValue = digitalRead(stopButton);
   if (!stopValue) {
@@ -104,6 +113,10 @@ int pos = 0;
     Stop();
     digitalWrite(ledYellow,LOW);
     digitalWrite(ledRed,HIGH);
+  } else if(autoBool) {
+    if(!pickUpFinished) {
+      pickUP(1);
+    }
   } else {
   digitalWrite(ledYellow,HIGH);
     bool tiltState = shelfTilt();
@@ -120,7 +133,7 @@ int pos = 0;
       sendValue(1, 2, tiltState);
     }
     // Serial.println(Distance());
-    if (pressedOut && isReleasedOut && Distance() < 18.3 && !tiltState) {
+    if (pressedOut && isReleasedOut && Distance() < 18.5 && !tiltState) {
       isReleasedOut = false;
       GoOut();
       stoppedOut = false;
@@ -131,12 +144,12 @@ int pos = 0;
       Stop();
     }
 
-    if (pressedIn && isReleasedIn && Distance() > 7.2) {
+    if (pressedIn && isReleasedIn && Distance() > 6.8) {
       isReleasedIn = false;
       GoIn();
       stoppedIn = false;
       //Serial.println("In!!!!!!");
-    } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 7 && !stoppedIn)) {
+    } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 6.5 && !stoppedIn)) {
       isReleasedIn = true;
       stoppedIn = true;
       Stop();
@@ -206,25 +219,14 @@ bool shelfTilt() {
 }
 
 void setEncoder() {
-  int encoderValueA = digitalRead(zEncoderA);
-  int encoderValueB = digitalRead(zEncoderB);
+  int zEncoderValueB = digitalRead(zEncoderB);
+  Serial.println(zEncoderValueB);
+  if(zEncoderValueB > 0){
+    zPosition--;
+  } else {
+    zPosition++;
+  }
 
-  int b = digitalRead(zEncoderB);
-    if(b > 0){
-      zPosition--;
-    }
-    else{
-      zPosition++;
-    }
-
-  // if (encoderValueA != prevEncoderValueA && encoderValueB != prevEncoderValueB) {
-  //   if(direction) {
-  //     zPosition--;
-  //   } else {
-  //     zPosition++;
-  //   }
-  // }
-  // prevEncoderValueA = encoderValueA;
 }
 
 void sendValue(int location, int functie, bool boolean) {
@@ -232,4 +234,64 @@ void sendValue(int location, int functie, bool boolean) {
     Wire.write(functie);
     Wire.write(boolean);
     Wire.endTransmission();
+}
+
+// void receiveEvent() {
+//   int function = Wire.read();
+//   Serial.println(function);
+//   switch (function) {
+//     case 1:
+//       pickUpBool = Wire.read();
+//       break;
+//   }
+// }
+
+void pickUP(int count) {
+  switch(count) {
+    case 1:
+      if(pos < 830) {
+        pickUpBool = true;
+        pickUpDataSend = true;
+        GoOut();
+      } else {
+        extendBool = true;
+      }
+      break;
+    case 2:
+      break;
+
+    case 3:
+      break;
+  }
+      // Serial.println(pos);
+  if(extendBool) {
+    if(pickUpBool) {
+      if(pickUpDataSend) {
+        sendValue(1, 3, true);
+        pickUpDataSend = false;
+      }
+      if(wait(receiveMillis, 200)) {
+        Wire.requestFrom(1, 6);
+        receiveMillis = millis();
+        if(Wire.available()) {
+          pickUpBool = Wire.read();
+        }
+      }
+      Stop();
+    } else {
+      if(pos > 20) {
+        GoIn();
+      } else {
+        Stop();
+        extendBool = false;
+      }
+    }
+  }
+}
+
+bool wait(long int mil, int wait) {
+  if(millis() - mil > wait) {
+    return true;
+  }
+  return false;
 }
