@@ -92,6 +92,7 @@ void loop() {
   }
   
   digitalWrite(ledRed,LOW);
+  digitalWrite(ledGreen,LOW);
   int stopValue = digitalRead(stopButton);
   if (!stopValue) {
     buttonPressed = false; 
@@ -114,8 +115,10 @@ void loop() {
     digitalWrite(ledYellow,LOW);
     digitalWrite(ledRed,HIGH);
   } else if(autoBool) {
+    digitalWrite(ledYellow,LOW);
+    digitalWrite(ledGreen,HIGH);
     if(!pickUpFinished) {
-      pickUP(1);
+      pickUP(3);
     }
   } else {
     digitalWrite(ledYellow,HIGH);
@@ -249,13 +252,13 @@ void pickUP(int count) {
   int value = 0;
   switch(count) {
     case 1:
-      value = 830;
+      value = 850;
       break;
     case 2:
-      value = 800;
+      value = 600;
       break;
     case 3:
-      value = 770;
+      value = 350;
       break;
   }
   if(!extendBool && pos < value) {
