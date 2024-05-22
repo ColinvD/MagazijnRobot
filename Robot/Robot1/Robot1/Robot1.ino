@@ -79,14 +79,15 @@ void setup() {
 
   pinMode(zEncoderA, INPUT);
   pinMode(zEncoderB, INPUT);
-  pinMode(xEncoderA, INPUT);
+  pinMode(xEncoderA, INPUT_PULLUP);
+  pinMode(xEncoderB, INPUT_PULLUP);
 
   pinMode(ledGreen, OUTPUT);
   pinMode(ledYellow, OUTPUT);
   pinMode(ledRed, OUTPUT);
 
   Wire.begin();
-  Serial.begin(9600);
+  Serial.begin(500000);
 
   attachInterrupt(digitalPinToInterrupt(zEncoderA), setEncoder, RISING);
   attachInterrupt(digitalPinToInterrupt(xEncoderA), setEncoderX, RISING);
@@ -101,7 +102,6 @@ void loop() {
     pos = zPosition;
     xPos = xPosition;
   }
-
   sendIntValue(1, 4, xPos);
 
   digitalWrite(ledRed, LOW);

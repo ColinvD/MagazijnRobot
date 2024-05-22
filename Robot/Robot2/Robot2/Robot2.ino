@@ -56,9 +56,17 @@ int previousYState = -1;
 
 
 //automatic
-bool autoBool = false;
+bool autoBool = true;
 bool upSmallBool = false;
 bool pickUpFinishBool = false;
+
+int startY = 2080;
+int addOnY = -510;
+
+int startX = 4450;
+int addOnX = -680;
+
+
 
 
 void setup() {
@@ -89,20 +97,24 @@ void setup() {
 }
 
 void loop() {
+  // Serial.println(xPos);
+
   // Serial.print("xPos: ");
   // Serial.println(xPos);
   yPos = 0;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     yPos = yPosition;
   }
+  Serial.println(yPos);
 
   if (stopState) {
     StopUp();
     StopLeft();
   } else if (autoBool) {
-    if (upSmallBool) {
-      UpSmall();
-    }
+    goTo("D3");
+    // if (upSmallBool) {
+    //   UpSmall();
+    // }
 
   } else {
     Moving();
@@ -278,8 +290,8 @@ void receiveData() {
       // get xPos of robot
       int byte1 = Wire.read();
       int byte2 = Wire.read();
-      int value = (int16_t)(byte1 << 8) + byte2;
-      Serial.println(value);
+      xPos = (int16_t)(byte1 << 8) + byte2;
+      // Serial.println(value);
       break;
   }
 }
@@ -318,4 +330,33 @@ void setEncoderY() {
   } else {
     yPosition++;
   }
+}
+
+void goTo(char location[1]) {
+  char xChar = location[1];
+  char yChar = toupper(location[0]);
+  
+  int x = (xChar - 49) * addOnX + startX;
+  int y = (yChar - 65) * addOnY + startY;
+
+
+  if(xPos > x + 5) {
+    Right();
+  } else if(xPos < x - 5) {
+    Left();
+  } else {
+    StopLeft();
+  }
+
+if(yPos > y + 5) {
+    Down();
+  } else if(yPos < y - 5) {
+    Up();
+  } else {
+    StopUp();
+  }
+
+  Serial.print(y);
+  Serial.print("  -  ");
+  Serial.println(yPos);
 }
