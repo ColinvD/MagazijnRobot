@@ -3,6 +3,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener {
     private ResultSet selectedOrder;
+    private int selectedOrderID;
     private Database database;
     private JLabel jlSelectedOrder;
     private ResultSet orderItems;
@@ -43,6 +45,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         add(orderJSP);
     }
     public void setOrder(int OrderID) throws SQLException {
+        this.selectedOrderID = OrderID;
         selectedOrder = database.getOrder(OrderID);
         database.printResult(selectedOrder);
         orderItems = database.getOrderlines(OrderID);
@@ -102,6 +105,7 @@ public class OrderPanel extends JPanel implements ActionListener {
             }
         }
         jlSelectedOrder.setText("Order: " + OrderID + " ");
+        ButtonPanel.SetUpdateButtonEnabled(true);
         this.updateUI();
     }
 
@@ -110,5 +114,9 @@ public class OrderPanel extends JPanel implements ActionListener {
         if (e.getSource()==jbStartOrder){
 
         }
+    }
+
+    public int getSelectedOrderID() {
+        return selectedOrderID;
     }
 }
