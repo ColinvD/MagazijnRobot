@@ -89,8 +89,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("xPos: ");
-  Serial.println(xPos);
+  // Serial.print("xPos: ");
+  // Serial.println(xPos);
   yPos = 0;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     yPos = yPosition;
@@ -276,7 +276,10 @@ void receiveData() {
       break;
     case 4:
       // get xPos of robot
-      xPos = Wire.read();
+      int byte1 = Wire.read();
+      int byte2 = Wire.read();
+      int value = (int16_t)(byte1 << 8) + byte2;
+      Serial.println(value);
       break;
   }
 }

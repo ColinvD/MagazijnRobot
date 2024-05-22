@@ -261,7 +261,9 @@ void sendValue(int location, int function, bool boolean) {
 void sendIntValue(int location, int function, int value){
   Wire.beginTransmission(location);
   Wire.write(function);
-  Wire.write(value);
+  Serial.println(value);
+  Wire.write(highByte(value));
+  Wire.write(lowByte(value));
   Wire.endTransmission();
 }
 
