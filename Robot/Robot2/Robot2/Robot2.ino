@@ -41,6 +41,7 @@ bool stopUpBool = false;
 // encoders
 #define yEncoderA 2
 #define yEncoderB 6
+int xPos = 0;
 int yPosition = 0;
 int yPos = 0;
 int oldYPos = -1;
@@ -55,7 +56,7 @@ int previousYState = -1;
 
 
 //automatic
-bool autoBool = true;
+bool autoBool = false;
 bool upSmallBool = false;
 bool pickUpFinishBool = false;
 
@@ -82,12 +83,14 @@ void setup() {
   Wire.onReceive(receiveData);
   Wire.onRequest(requestEvent);
 
-  attachInterrupt(digitalPinToInterrupt(yEncoderA),setEncoderY,RISING);
+  attachInterrupt(digitalPinToInterrupt(yEncoderA), setEncoderY, RISING);
 
   Serial.begin(9600);  // pin 0 & 1
 }
 
 void loop() {
+  Serial.print("xPos: ");
+  Serial.println(xPos);
   yPos = 0;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     yPos = yPosition;
@@ -96,8 +99,8 @@ void loop() {
   if (stopState) {
     StopUp();
     StopLeft();
-  } else if(autoBool) {
-    if(upSmallBool) {
+  } else if (autoBool) {
+    if (upSmallBool) {
       UpSmall();
     }
 
@@ -146,10 +149,10 @@ void Down() {
 }
 
 void Up() {
-    digitalWrite(directionPinUP, LOW);
-    analogWrite(pwmPinUP, power + 40);
-    digitalWrite(brakeUP, LOW);
-    // CheckRotation("Y", true);
+  digitalWrite(directionPinUP, LOW);
+  analogWrite(pwmPinUP, power + 40);
+  digitalWrite(brakeUP, LOW);
+  // CheckRotation("Y", true);
 }
 
 void Right() {
@@ -257,20 +260,24 @@ void microSwitchUp() {
 
 void receiveData() {
   int function = Wire.read();
-  Serial.println(function);
+  // Serial.println(function);
   switch (function) {
     case 1:
-    // emergency stop
+      // emergency stop
       stopState = Wire.read();
       break;
     case 2:
-    // Stop going up
+      // stop going up
       stopUpBool = Wire.read();
       break;
     case 3:
+      // go a litle bit up to pick up the box
       upSmallBool = Wire.read();
       break;
-    // go a litle bit up to pick up the box
+    case 4:
+      // get xPos of robot
+      xPos = Wire.read();
+      break;
   }
 }
 
@@ -283,31 +290,29 @@ void UpSmall() {
     pickUpFinishBool = false;
     oldYPos = yPos;
   }
-    if(yPos < oldYPos + 100) {
+  if (yPos < oldYPos + 100) {
     Up();
   } else {
     pickUpFinishBool = true;
     upSmallBool = false;
     oldYPos = -1;
-    
+
     StopUp();
   }
 }
 
 void sendValue(int location, int functie, bool boolean) {
-    Wire.beginTransmission(location);
-    Wire.write(functie);
-    Wire.write(boolean);
-    Wire.endTransmission();
+  Wire.beginTransmission(location);
+  Wire.write(functie);
+  Wire.write(boolean);
+  Wire.endTransmission();
 }
 
 void setEncoderY() {
   int b = digitalRead(yEncoderB);
-  if(b > 0){
+  if (b > 0) {
     yPosition--;
-  }
-  else{
+  } else {
     yPosition++;
   }
-
 }
