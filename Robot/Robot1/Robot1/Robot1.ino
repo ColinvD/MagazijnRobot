@@ -1,10 +1,11 @@
 #include <Wire.h>
 #include <util/atomic.h>
-bool a = false;
 #define zEncoderA 2
 #define zEncoderB 5
 #define xEncoderA 3
 #define xEncoderB A3
+
+String testPackage[3] = { "C3", "E5", "D4" };
 
 int xPos = 0;
 int xPosition = 0;
@@ -39,6 +40,7 @@ bool autoBool = true;
 bool pickUpBool = false;
 
 bool pickUpAction = false;
+bool pickingItem = false;
 
 bool pickUpDataSend = false;
 bool extendBool = false;
@@ -69,7 +71,7 @@ int ledGreen = A0;
 int ledYellow = 9;
 int ledRed = 12;
 
-
+int i = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -100,10 +102,11 @@ void setup() {
 }
 
 void loop() {
-  if (a == false) {
-    Serial.println("??");
-    sendString(1, 7, "C3");
-    a = true;
+  if (pickingItem == false && i < 3) {
+    sendString(1, 7, testPackage[i]);
+    Serial.println(testPackage[i]);
+    pickingItem = true;
+    i++;
   }
   pos = 0;
   xPos = 0;
@@ -294,7 +297,7 @@ void sendSmallIntValue(int location, int function, int value) {
   Wire.endTransmission();
 }
 
-void sendString(int location, int function, char value[1]) {
+void sendString(int location, int function, String value) {
   Wire.beginTransmission(location);
   Wire.write(function);
   Wire.write(value[0]);
@@ -354,6 +357,8 @@ void pickUP(int count) {
         pickUpAction = false;
         sendValue(1, 6, true);
         extendBool = false;
+        pickingItem = false;
+        Serial.println("Finished");
       }
     }
   }

@@ -58,12 +58,13 @@ int previousYState = -1;
 //automatic
 bool autoBool = true;
 bool upSmallBool = false;
+bool gettingItem = false;
 
-bool PuckUpStap[2] = {false, false};
+bool PickUpStep[2] = { false, false };
 
 String stockLocation = "";
 
-bool goToPos = true;
+bool goToPos = false;
 bool finishedPickUP = true;
 
 int startY = 2100;
@@ -121,7 +122,7 @@ void loop() {
     if (goToPos) {
       goTo(stockLocation);
     }
-    if (PuckUpStap[1] && upSmallBool) {
+    if (PickUpStep[1] && upSmallBool) {
       UpSmall();
     }
 
@@ -281,64 +282,66 @@ void microSwitchUp() {
 
 void receiveData() {
   int function = Wire.read();
- 
-  if(function == 1) {
+  if (function != 4) {
+    Serial.println(function);
+  }
+  if (function == 1) {
     // emergency stop
     stopState = Wire.read();
-  } else if(function == 2) {
+  } else if (function == 2) {
     // stop going up
     stopUpBool = Wire.read();
-  } else if(function == 3) {
+  } else if (function == 3) {
     // go a litle bit up to pick up the box
     upSmallBool = Wire.read();
-  } else if(function == 4) {
+  } else if (function == 4) {
     // get xPos of robot
     int byte1 = Wire.read();
     int byte2 = Wire.read();
     xPos = (int16_t)(byte1 << 8) + byte2;
     // Serial.println(value);
-  } else if(function == 5) {
+  } else if (function == 5) {
     requestCase = Wire.read();
-  } else if(function == 6) {
+  } else if (function == 6) {
     // z axis is back in start position
-    finishedPickUP = true;
-  } else if(function == 7){
+    finishedPickUP = Wire.read();
+  } else if (function == 7) {
+    goToPos = true;
     char receivedString[1];
     receivedString[0] = Wire.read();
     receivedString[1] = Wire.read();
     stockLocation = String(receivedString[0]) + String(receivedString[1]);
-    Serial.print(stockLocation);
+    Serial.println(stockLocation);
   }
 }
 
 void requestEvent() {
   // Serial.println(requestCase);
-  switch(requestCase) {
+  switch (requestCase) {
     case 1:
       // check if the product is on the robot
       Wire.write(upSmallBool);
       break;
     case 2:
-      // check if the robot is in the richt location
-      if(!finishedPickUP) {
-        Wire.write(PuckUpStap[1]);
+      // check if the robot is in the right location
+      if (!finishedPickUP) {
+        Wire.write(PickUpStep[1]);
       } else {
         Wire.write(false);
       }
       break;
-
   }
 }
 
 void UpSmall() {
   if (oldYPos == -1) {
-    PuckUpStap[0] = false;
+    PickUpStep[0] = false;
     oldYPos = yPos;
   }
   if (yPos < oldYPos + 100) {
     Up(power);
   } else {
-    PuckUpStap[0] = true;
+    PickUpStep[0] = true;
     upSmallBool = false;
     oldYPos = -1;
 
@@ -366,10 +369,10 @@ void goTo(String location) {
   char xChar = location[1];
   char yChar = toupper(location[0]);
 
-  Serial.print(xChar);
-  Serial.print(" + ");
-  Serial.println(yChar);
-  
+  // Serial.print(xChar);
+  // Serial.print(" + ");
+  // Serial.println(yChar);
+
   int x = (xChar - 49) * addOnX + startX;
   int y = (yChar - 65) * addOnY + startY;
 
@@ -381,22 +384,21 @@ void goTo(String location) {
   bool xPosBool = goToPosX(x);
   bool yPosBool = goToPosY(y);
 
-  if(xPosBool && yPosBool) {
+  if (xPosBool && yPosBool) {
     goToPos = false;
-    PuckUpStap[1] = true;
+    PickUpStep[1] = true;
     finishedPickUP = false;
   }
-  
 }
 
 bool goToPosX(int x) {
-  if(xPos > x + 100) {
+  if (xPos > x + 100) {
     Right(power);
-  } else if(xPos < x - 100) {
+  } else if (xPos < x - 100) {
     Left(power);
-  } else if(xPos > x + 5) {
+  } else if (xPos > x + 5) {
     Right(150);
-  } else if(xPos < x - 5) {
+  } else if (xPos < x - 5) {
     Left(150);
   } else {
     StopLeft();
@@ -406,13 +408,13 @@ bool goToPosX(int x) {
 }
 
 bool goToPosY(int y) {
-  if(yPos > y + 100) {
+  if (yPos > y + 100) {
     Down(power);
-  } else if(yPos < y - 100) {
+  } else if (yPos < y - 100) {
     Up(power);
-  } else if(yPos > y + 5) {
+  } else if (yPos > y + 5) {
     Down(150);
-  } else if(yPos < y - 5) {
+  } else if (yPos < y - 5) {
     Up(150);
   } else {
     StopUp();
