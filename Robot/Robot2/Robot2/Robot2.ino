@@ -60,12 +60,17 @@ bool autoBool = true;
 bool upSmallBool = false;
 bool pickUpFinishBool = false;
 
+bool goToPos = true;
+bool goToPosFinished = false;
+bool finishedPickUP = true;
+
 int startY = 2100;
 int addOnY = -515;
 
-int startX = 4400;
+int startX = 4450;
 int addOnX = -700;
 
+int requestCase = 0;
 
 
 
@@ -105,16 +110,18 @@ void loop() {
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     yPos = yPosition;
   }
-  Serial.println(yPos);
+  // Serial.println(yPos);
 
   if (stopState) {
     StopUp();
     StopLeft();
   } else if (autoBool) {
-    goTo("A1");
-    // if (upSmallBool) {
-    //   UpSmall();
-    // }
+    if (goToPos) {
+      goTo("A1");
+    }
+    if (goToPosFinished && upSmallBool) {
+      UpSmall();
+    }
 
   } else {
     Moving();
@@ -272,32 +279,47 @@ void microSwitchUp() {
 
 void receiveData() {
   int function = Wire.read();
-  // Serial.println(function);
-  switch (function) {
-    case 1:
-      // emergency stop
-      stopState = Wire.read();
-      break;
-    case 2:
-      // stop going up
-      stopUpBool = Wire.read();
-      break;
-    case 3:
-      // go a litle bit up to pick up the box
-      upSmallBool = Wire.read();
-      break;
-    case 4:
-      // get xPos of robot
-      int byte1 = Wire.read();
-      int byte2 = Wire.read();
-      xPos = (int16_t)(byte1 << 8) + byte2;
-      // Serial.println(value);
-      break;
+ 
+  if(function == 1) {
+    // emergency stop
+    stopState = Wire.read();
+  } else if(function == 2) {
+    // stop going up
+    stopUpBool = Wire.read();
+  } else if(function == 3) {
+    // go a litle bit up to pick up the box
+    upSmallBool = Wire.read();
+  } else if(function == 4) {
+    // get xPos of robot
+    int byte1 = Wire.read();
+    int byte2 = Wire.read();
+    xPos = (int16_t)(byte1 << 8) + byte2;
+    // Serial.println(value);
+  } else if(function == 5) {
+    requestCase = Wire.read();
+  } else if(function == 6) {
+    // z axis is back in start position
+    finishedPickUP = true;
   }
 }
 
 void requestEvent() {
-  Wire.write(upSmallBool);
+  // Serial.println(requestCase);
+  switch(requestCase) {
+    case 1:
+      // check if the product is on the robot
+      Wire.write(upSmallBool);
+      break;
+    case 2:
+      // check if the robot is in the richt location
+      if(!finishedPickUP) {
+        Wire.write(goToPosFinished);
+      } else {
+        Wire.write(false);
+      }
+      break;
+
+  }
 }
 
 void UpSmall() {
@@ -339,12 +361,23 @@ void goTo(char location[1]) {
   int x = (xChar - 49) * addOnX + startX;
   int y = (yChar - 65) * addOnY + startY;
 
-  goToPosX(x);
-  goToPosY(y);
+
+  Serial.print(x);
+  Serial.print(" - ");
+  Serial.println(xPos);
+
+  bool xPosBool = goToPosX(x);
+  bool yPosBool = goToPosY(y);
+
+  if(xPosBool && yPosBool) {
+    goToPos = false;
+    goToPosFinished = true;
+    finishedPickUP = false;
+  }
   
 }
 
-void goToPosX(int x) {
+bool goToPosX(int x) {
   if(xPos > x + 100) {
     Right(power);
   } else if(xPos < x - 100) {
@@ -355,10 +388,12 @@ void goToPosX(int x) {
     Left(150);
   } else {
     StopLeft();
+    return true;
   }
+  return false;
 }
 
-void goToPosY(int y) {
+bool goToPosY(int y) {
   if(yPos > y + 100) {
     Down(power);
   } else if(yPos < y - 100) {
@@ -369,5 +404,7 @@ void goToPosY(int y) {
     Up(150);
   } else {
     StopUp();
+    return true;
   }
+  return false;
 }

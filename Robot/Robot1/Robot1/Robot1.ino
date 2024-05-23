@@ -15,7 +15,7 @@ const int brakeUP = 8;
 
 const int distance = A2;
 
-const int power = 120;
+const int power = 140;
 unsigned long LastTime;
 int waitTime = 2000;
 int currentState = 4;
@@ -35,12 +35,17 @@ bool buttonPressed;
 bool stopState = true;
 
 //automatic
-bool autoBool = false;
+bool autoBool = true;
 bool pickUpBool = false;
-bool pickUpFinished = false;
+
+bool pickUpAction = false;
+
 bool pickUpDataSend = false;
 bool extendBool = false;
 long int receiveMillis;
+
+long int checkPositionMillis = 0;
+
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
@@ -65,6 +70,7 @@ int ledYellow = 9;
 int ledRed = 12;
 
 
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(directionPinUP, OUTPUT);
@@ -87,7 +93,7 @@ void setup() {
   pinMode(ledRed, OUTPUT);
 
   Wire.begin();
-  Serial.begin(500000);
+  Serial.begin(9600);
 
   attachInterrupt(digitalPinToInterrupt(zEncoderA), setEncoder, RISING);
   attachInterrupt(digitalPinToInterrupt(xEncoderA), setEncoderX, RISING);
@@ -102,6 +108,7 @@ void loop() {
     pos = zPosition;
     xPos = xPosition;
   }
+
   sendIntValue(1, 4, xPos);
 
   digitalWrite(ledRed, LOW);
@@ -130,9 +137,18 @@ void loop() {
   } else if (autoBool) {
     digitalWrite(ledYellow, LOW);
     digitalWrite(ledGreen, HIGH);
-    if (!pickUpFinished) {
-      pickUP(3);
+    if (wait(checkPositionMillis, 200)) {
+      sendSmallIntValue(1, 5, 2);
+      Wire.requestFrom(1, 6);
+      checkPositionMillis = millis();
+      if (Wire.available()) {
+        pickUpAction = Wire.read();
+      }
     }
+    if (pickUpAction) {
+      pickUP(1);
+    }
+    
   } else {
     digitalWrite(ledYellow, HIGH);
     bool tiltState = shelfTilt();
@@ -261,9 +277,16 @@ void sendValue(int location, int function, bool boolean) {
 void sendIntValue(int location, int function, int value){
   Wire.beginTransmission(location);
   Wire.write(function);
-  Serial.println(value);
+  // Serial.println(value);
   Wire.write(highByte(value));
   Wire.write(lowByte(value));
+  Wire.endTransmission();
+}
+
+void sendSmallIntValue(int location, int function, int value){
+  Wire.beginTransmission(location);
+  Wire.write(function);
+  Wire.write(value);
   Wire.endTransmission();
 }
 
@@ -290,6 +313,7 @@ void pickUP(int count) {
       value = 350;
       break;
   }
+  Serial.println(pos);
   if (!extendBool && pos < value) {
     pickUpBool = true;
     pickUpDataSend = true;
@@ -297,12 +321,13 @@ void pickUP(int count) {
   } else {
     extendBool = true;
     if (pickUpBool) {
-      Serial.println(pickUpDataSend);
+      // Serial.println(pickUpDataSend);
       if (pickUpDataSend) {
         sendValue(1, 3, true);
         pickUpDataSend = false;
       }
       if (wait(receiveMillis, 200)) {
+        sendSmallIntValue(1, 5, 1);
         Wire.requestFrom(1, 6);
         receiveMillis = millis();
         if (Wire.available()) {
@@ -315,7 +340,8 @@ void pickUP(int count) {
         GoIn();
       } else {
         Stop();
-        pickUpFinished = true;
+        pickUpAction = false;
+        sendValue(1, 6, true);
         extendBool = false;
       }
     }
