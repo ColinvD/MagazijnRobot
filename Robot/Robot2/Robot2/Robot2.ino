@@ -28,7 +28,7 @@ bool onRight = false;
 bool onLeft = false;
 
 //stop Button
-bool stopState = false;
+bool stopState = true;
 
 // microswitch
 int microswitchDown = 5;
@@ -60,11 +60,11 @@ bool autoBool = true;
 bool upSmallBool = false;
 bool pickUpFinishBool = false;
 
-int startY = 2080;
-int addOnY = -510;
+int startY = 2100;
+int addOnY = -515;
 
-int startX = 4450;
-int addOnX = -680;
+int startX = 4400;
+int addOnX = -700;
 
 
 
@@ -111,7 +111,7 @@ void loop() {
     StopUp();
     StopLeft();
   } else if (autoBool) {
-    goTo("D3");
+    goTo("A1");
     // if (upSmallBool) {
     //   UpSmall();
     // }
@@ -137,45 +137,45 @@ void Moving() {
   y = analogRead(JoyconY);
   x = analogRead(JoyconX);
   if (y < 300 && !onUp && !stopUpBool) {
-    Up();
+    Up(power);
   } else if (y > 700 && !onDown) {
-    Down();
+    Down(power);
   } else {
     StopUp();
   }
   if (x < 300 && !onRight) {
-    Right();
+    Right(power);
   } else if (x > 700 && !onLeft) {
-    Left();
+    Left(power);
   } else {
     StopLeft();
   }
 }
 
 
-void Down() {
+void Down(int powerValue) {
   digitalWrite(directionPinUP, HIGH);
-  analogWrite(pwmPinUP, power);
+  analogWrite(pwmPinUP, powerValue);
   digitalWrite(brakeUP, LOW);
   // CheckRotation("Y", false);
 }
 
-void Up() {
+void Up(int powerValue) {
   digitalWrite(directionPinUP, LOW);
-  analogWrite(pwmPinUP, power + 40);
+  analogWrite(pwmPinUP, powerValue + 40);
   digitalWrite(brakeUP, LOW);
   // CheckRotation("Y", true);
 }
 
-void Right() {
+void Right(int powerValue) {
   digitalWrite(directionLeftRight, HIGH);
-  analogWrite(pwmPinLeftRight, power);
+  analogWrite(pwmPinLeftRight, powerValue);
   digitalWrite(brakeLeftRight, LOW);
   // CheckRotation("X", false);
 }
-void Left() {
+void Left(int powerValue) {
   digitalWrite(directionLeftRight, LOW);
-  analogWrite(pwmPinLeftRight, power);
+  analogWrite(pwmPinLeftRight, powerValue);
   digitalWrite(brakeLeftRight, LOW);
   // CheckRotation("X", true);
 }
@@ -306,7 +306,7 @@ void UpSmall() {
     oldYPos = yPos;
   }
   if (yPos < oldYPos + 100) {
-    Up();
+    Up(power);
   } else {
     pickUpFinishBool = true;
     upSmallBool = false;
@@ -339,24 +339,35 @@ void goTo(char location[1]) {
   int x = (xChar - 49) * addOnX + startX;
   int y = (yChar - 65) * addOnY + startY;
 
+  goToPosX(x);
+  goToPosY(y);
+  
+}
 
-  if(xPos > x + 5) {
-    Right();
+void goToPosX(int x) {
+  if(xPos > x + 100) {
+    Right(power);
+  } else if(xPos < x - 100) {
+    Left(power);
+  } else if(xPos > x + 5) {
+    Right(150);
   } else if(xPos < x - 5) {
-    Left();
+    Left(150);
   } else {
     StopLeft();
   }
+}
 
-if(yPos > y + 5) {
-    Down();
+void goToPosY(int y) {
+  if(yPos > y + 100) {
+    Down(power);
+  } else if(yPos < y - 100) {
+    Up(power);
+  } else if(yPos > y + 5) {
+    Down(150);
   } else if(yPos < y - 5) {
-    Up();
+    Up(150);
   } else {
     StopUp();
   }
-
-  Serial.print(y);
-  Serial.print("  -  ");
-  Serial.println(yPos);
 }
