@@ -186,7 +186,7 @@ public class Database {
         ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL");
         while (result.next()) {
             int d = result.getInt("Weight");
-            weights.add(new Locatie(result.getString("StockLocation"),d));
+            weights.add(new Locatie(result.getString("StockLocation"),d,0));
         }
         return weights;
     }
@@ -198,6 +198,23 @@ public class Database {
         ResultSet rs = s.executeQuery();
         rs.next();
         return rs.getInt(1);
+    }
+    public void updatepicked(int OrderlinesId) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        System.out.println(OrderlinesId);
+        database.update("Update orderlines Set PickedQuantity = PickedQuantity + 1 Where OrderLineID = ?",String.valueOf(OrderlinesId));
+    }
+    public void updatePickedOrder(int OrderID) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        database.update("Update orders Set PickingCompletedWhen = NOW() Where OrderID = ?",String.valueOf(OrderID));
+    }
+
+    public void updateOrderlineAfterOrder(int OrderId) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        database.update("Update orderlines Set PickingCompletedWhen = NOW() Where OrderLineID = ? AND Quantity = PickedQuantity",String.valueOf(OrderId));
     }
 }
 

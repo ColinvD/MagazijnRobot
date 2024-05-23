@@ -93,6 +93,7 @@ public class OrderDialog extends JDialog implements ActionListener {
             if(selectedOrder != -1){ //-1 = geen order selected
                 try {
                     orderPanel.setOrder(selectedOrder);
+                    HMIScreen.orderid = selectedOrder;
                     System.out.println("Order inladen gelukt.");
                 } catch (SQLException ex) {
                     System.out.println("Order inladen mislukt.");

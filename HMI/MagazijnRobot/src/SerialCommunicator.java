@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -52,7 +53,15 @@ public class SerialCommunicator implements SerialPortDataListener{
                 System.out.println("Message: " + message[0]);
             }
             theMessage = theMessage.trim();
-            NotifyListeners(theMessage);
+            if (theMessage.equals("nullOut")){
+                theMessage = "Out";
+            }
+
+            try {
+                NotifyListeners(theMessage);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -62,7 +71,7 @@ public class SerialCommunicator implements SerialPortDataListener{
     public void RemoveListener(Listener listener){
         listeners.remove(listener);
     }
-    private void NotifyListeners(String message){
+    private void NotifyListeners(String message) throws SQLException {
         for (Listener listener : listeners) {
             listener.onMessageReceived(message);
         }
