@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <util/atomic.h>
-
+  bool a = false;
 #define zEncoderA 2
 #define zEncoderB 5
 #define xEncoderA 3
@@ -100,7 +100,10 @@ void setup() {
 }
 
 void loop() {
-
+  if (a == false) {
+    sendString(1, 7, "C3");
+    a = true;
+  }
   pos = 0;
   xPos = 0;
 
@@ -148,7 +151,7 @@ void loop() {
     if (pickUpAction) {
       pickUP(1);
     }
-    
+
   } else {
     digitalWrite(ledYellow, HIGH);
     bool tiltState = shelfTilt();
@@ -274,7 +277,7 @@ void sendValue(int location, int function, bool boolean) {
   Wire.endTransmission();
 }
 
-void sendIntValue(int location, int function, int value){
+void sendIntValue(int location, int function, int value) {
   Wire.beginTransmission(location);
   Wire.write(function);
   // Serial.println(value);
@@ -283,13 +286,20 @@ void sendIntValue(int location, int function, int value){
   Wire.endTransmission();
 }
 
-void sendSmallIntValue(int location, int function, int value){
+void sendSmallIntValue(int location, int function, int value) {
   Wire.beginTransmission(location);
   Wire.write(function);
   Wire.write(value);
   Wire.endTransmission();
 }
 
+void sendString(int location, int function, char value[1]) {
+  Wire.beginTransmission(location);
+  Wire.write(function);
+  Wire.write(value[0]);
+  Wire.write(value[1]);
+  Wire.endTransmission();
+}
 // void receiveEvent() {
 //   int function = Wire.read();
 //   Serial.println(function);
