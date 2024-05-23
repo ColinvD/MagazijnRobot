@@ -5,7 +5,7 @@
 #define xEncoderA 3
 #define xEncoderB A3
 
-String testPackage[3] = { "C3", "E5", "D4" };
+String testPackage[3] = { "C3", "D4", "E5" };
 
 int xPos = 0;
 int xPosition = 0;
@@ -153,7 +153,7 @@ void loop() {
       }
     }
     if (pickUpAction) {
-      pickUP(1);
+      pickUP(i);
     }
 
   } else {
