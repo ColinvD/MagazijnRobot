@@ -58,10 +58,11 @@ int previousYState = -1;
 //automatic
 bool autoBool = true;
 bool upSmallBool = false;
-bool pickUpFinishBool = false;
+
+bool PuckUpStap[2] = {false, false};
+
 
 bool goToPos = true;
-bool goToPosFinished = false;
 bool finishedPickUP = true;
 
 int startY = 2100;
@@ -119,7 +120,7 @@ void loop() {
     if (goToPos) {
       goTo("A1");
     }
-    if (goToPosFinished && upSmallBool) {
+    if (PuckUpStap[1] && upSmallBool) {
       UpSmall();
     }
 
@@ -313,7 +314,7 @@ void requestEvent() {
     case 2:
       // check if the robot is in the richt location
       if(!finishedPickUP) {
-        Wire.write(goToPosFinished);
+        Wire.write(PuckUpStap[1]);
       } else {
         Wire.write(false);
       }
@@ -324,13 +325,13 @@ void requestEvent() {
 
 void UpSmall() {
   if (oldYPos == -1) {
-    pickUpFinishBool = false;
+    PuckUpStap[0] = false;
     oldYPos = yPos;
   }
   if (yPos < oldYPos + 100) {
     Up(power);
   } else {
-    pickUpFinishBool = true;
+    PuckUpStap[0] = true;
     upSmallBool = false;
     oldYPos = -1;
 
@@ -371,7 +372,7 @@ void goTo(char location[1]) {
 
   if(xPosBool && yPosBool) {
     goToPos = false;
-    goToPosFinished = true;
+    PuckUpStap[1] = true;
     finishedPickUP = false;
   }
   
