@@ -7,19 +7,20 @@ import java.sql.SQLException;
 
 public class HMIScreen extends JFrame implements ActionListener,Listener {
     private static String location;
+    public static int orderid = -1;
     private boolean nood = false;
     private String status;
-
+    OrderPanel order = new OrderPanel();
+    public static int counter;
+  //  private SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
     public HMIScreen() throws SQLException {
-     //   SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
-       // serialCommunicator.AddListener(this);
-            setSize(800, 650);
+    //        serialCommunicator.AddListener(this);
+            setSize(900, 650);
             getContentPane().setBackground(Color.black);
             setTitle("HMI magazijn robot");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             SchapPanel schap = new SchapPanel();
             StatusPanel status = new StatusPanel();
-            OrderPanel order = new OrderPanel();
             ButtonPanel button = new ButtonPanel(order);
 
             GridBagLayout layout = new GridBagLayout(); //create grid bag layout
@@ -75,7 +76,6 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
         if (message.equals("Unlock")){
             JPopupMenu jPopupMenu = new JPopupMenu();
             jPopupMenu.setLabel("Noodstop is ontgrendeld");
-
 
         }
     }

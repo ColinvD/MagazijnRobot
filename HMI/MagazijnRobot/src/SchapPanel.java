@@ -12,6 +12,7 @@ public class SchapPanel extends JPanel implements ActionListener {
     private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
 
     public SchapPanel() throws SQLException {
+
         voorraadstiuatieWijzigen.setFocusable(false);
         setPreferredSize(new Dimension(400, 475));
         setLayout(new FlowLayout());
@@ -26,7 +27,7 @@ public class SchapPanel extends JPanel implements ActionListener {
         add(schapNaam);
         add(voorraadstiuatieWijzigen);
         add(schap);
-        //add(stockSituationPanel);
+        add(stockSituationPanel);
         add(legendaPanel);
         add(stockSituationPanel);
         addStockitems();

@@ -14,7 +14,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
   //  SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
     private JButton emergencyStop;
     public ButtonPanel(OrderPanel orderPanel){
-        setPreferredSize(new Dimension(350,200));
+        setPreferredSize(new Dimension(400,200));
         setLayout(new FlowLayout());
         setBackground(Color.white);
         setBorder(new MatteBorder(1, 0, 0, 1, Color.BLACK));
