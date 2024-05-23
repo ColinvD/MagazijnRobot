@@ -12,7 +12,7 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
     private String status;
     OrderPanel order = new OrderPanel();
     public static int counter;
-  //  private SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
+    public static SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
     public HMIScreen() throws SQLException {
     //        serialCommunicator.AddListener(this);
             setSize(900, 650);

@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class OrderPanel extends JPanel implements ActionListener,Listener {
-    //SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
+public class OrderPanel extends JPanel implements ActionListener, Listener {
+    // SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
     private boolean firstTimeGoingOut = true;
     private ResultSet selectedOrder;
     private Database database;
@@ -27,15 +27,15 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
 
     private int order;
 
-    private int counter;
-    private int counter1;
-
+    private int counterChangeAmountColor;
+    private int counterMaxAmountColor;
 
 
     private ArrayList<Integer> orderlinesIdSorted;
-    public OrderPanel(){
+
+    public OrderPanel() {
         // serialCommunicator.AddListener(this);
-        setPreferredSize(new Dimension(400,400));
+        setPreferredSize(new Dimension(400, 400));
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
         setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
@@ -46,7 +46,7 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
         jlSelectedOrder = new JLabel("Geen order geselecteerd");
 
         jbStartOrder = new JButton("Start");
-        jbStartOrder.setPreferredSize(new Dimension(100,30));
+        jbStartOrder.setPreferredSize(new Dimension(100, 30));
         jbStartOrder.addActionListener(this);
 
         orderItemsPanel = new JPanel();
@@ -55,11 +55,12 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
         orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
         orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        orderJSP.setPreferredSize(new Dimension(400,360));
+        orderJSP.setPreferredSize(new Dimension(400, 360));
         add(jlSelectedOrder);
         add(jbStartOrder);
         add(orderJSP);
     }
+
     public void setOrder(int OrderID) throws SQLException {
         order = OrderID;
         products1 = new ArrayList<>();
@@ -70,15 +71,15 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
         orderItemsPanel.removeAll();
         int itemCount = database.getOrderSize(OrderID);
 
-        if(itemCount==0){
+        if (itemCount == 0) {
             orderItemsPanel.add(new JLabel("Lege order."));
             SchapPanel.drawRoute(null);
             StatusPanel.displayRoute(null);
         } else {
             ArrayList<Locatie> products = new ArrayList<>();
-            while (orderItems.next()){
-                Locatie locatie = new Locatie(orderItems.getString("StockLocation"), orderItems.getInt("Weight"),orderItems.getInt("OrderLineID"));
-                for(int i = 0; i < orderItems.getInt("Quantity"); i++){
+            while (orderItems.next()) {
+                Locatie locatie = new Locatie(orderItems.getString("StockLocation"), orderItems.getInt("Weight"), orderItems.getInt("OrderLineID"));
+                for (int i = 0; i < orderItems.getInt("Quantity"); i++) {
                     products.add(locatie);
                 }
             }
@@ -96,19 +97,19 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
             SchapPanel.drawRoute(route);
 
 
-           // orderItems = database.getOrderlines(OrderID);
+            // orderItems = database.getOrderlines(OrderID);
             for (int i = 0; i < Boxes.size(); i++) {
-                JLabel doos = new JLabel("Doos " + (i+1) + ": ");
+                JLabel doos = new JLabel("Doos " + (i + 1) + ": ");
                 doos.setFont(new Font("Arial", Font.BOLD, 16));
-                if(i>0){
-                    doos.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
+                if (i > 0) {
+                    doos.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
                 }
                 products1.add(doos);
                 orderItemsPanel.add(doos);
                 for (int j = 0; j < Boxes.get(i).size(); j++) {
                     String location = Boxes.get(i).get(j).getLocation();
                     ResultSet stockitem = database.getStockitem(location);
-                    JLabel product = new JLabel(location + ": " + stockitem.getInt("StockItemID") + ". " + stockitem.getString("StockItemName") + ". " + stockitem.getString("Weight") + "." );
+                    JLabel product = new JLabel(location + ": " + stockitem.getInt("StockItemID") + ". " + stockitem.getString("StockItemName") + ". " + stockitem.getString("Weight") + ".");
                     products1.add(product);
                     orderlinesIdSorted.add(Boxes.get(i).get(j).getOrderlineID());
 
@@ -132,37 +133,28 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
 
     public void changeOrderColor() throws SQLException {
         orderItemsPanel.removeAll();
-        int maxCount = counter1; // Number of times to make labels green
-        counter = 0; // Reset counter to start from zero for each "Done"
-        for (JLabel label : products1){
-            if (counter < maxCount) {
+        int maxCount = counterMaxAmountColor; // Number of times to make labels green
+        counterChangeAmountColor = 0; // Reset counter to start from zero for each "Done"
+        for (JLabel label : products1) {
+            if (counterChangeAmountColor < maxCount) {
                 if (!label.getText().contains("Doos")) {
-//                    if (counter == 0){
-//                        System.out.println("cHECK");
-//                    }
-
                     label.setForeground(Color.GREEN);
-                    counter++;
-//                    System.out.println("cHECK");
-
-                    //database.updatepicked(orderlinesIdSorted.get(counter+counter1));
+                    counterChangeAmountColor++;
                 }
 
 
             }
             orderItemsPanel.add(label);
         }
-        database.updatepicked(orderlinesIdSorted.get(counter1-1));
-        database.updateOrderlineAfterOrder(orderlinesIdSorted.get(counter1-1));
+        database.updatepicked(orderlinesIdSorted.get(counterMaxAmountColor - 1));
+        database.updateOrderlineAfterOrder(orderlinesIdSorted.get(counterMaxAmountColor - 1));
         updateUI();
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if (e.getSource()==jbStartOrder){
-
-                JOptionPane.showMessageDialog(this,"De order is afgerond");
-
+        if (e.getSource() == jbStartOrder) {
 //                    try {
 //                        serialCommunicator.sendMessageToArduino("Start");
 //                    } catch (IOException ex) {
@@ -175,17 +167,16 @@ public class OrderPanel extends JPanel implements ActionListener,Listener {
 
     @Override
     public void onMessageReceived(String message) throws SQLException {
-        if (message.equals("Out")){
+        if (message.equals("Out")) {
             System.out.println("out");
-            counter1++;
+            counterMaxAmountColor++;
             changeOrderColor();
-            System.out.println(counter1);
+
         }
-        if (message.equals("Complete")){
+        if (message.equals("Complete")) {
             System.out.println("complete");
-            System.out.println(counter1);
             database.updatePickedOrder(order);
-            JOptionPane.showMessageDialog(this,"De order is afgerond");
+            JOptionPane.showMessageDialog(this, "De order is afgerond");
         }
     }
 }
