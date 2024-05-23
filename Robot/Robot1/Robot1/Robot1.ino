@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <util/atomic.h>
-  bool a = false;
+bool a = false;
 #define zEncoderA 2
 #define zEncoderB 5
 #define xEncoderA 3
@@ -101,6 +101,7 @@ void setup() {
 
 void loop() {
   if (a == false) {
+    Serial.println("??");
     sendString(1, 7, "C3");
     a = true;
   }

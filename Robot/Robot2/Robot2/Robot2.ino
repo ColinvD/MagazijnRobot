@@ -61,7 +61,7 @@ bool upSmallBool = false;
 
 bool PuckUpStap[2] = {false, false};
 
-String stockLocation = "A1";
+String stockLocation = "";
 
 bool goToPos = true;
 bool finishedPickUP = true;
@@ -306,8 +306,8 @@ void receiveData() {
     char receivedString[1];
     receivedString[0] = Wire.read();
     receivedString[1] = Wire.read();
-    stockLocation = String(receivedString);
-    Serial.println(stockLocation);
+    stockLocation = String(receivedString[0]) + String(receivedString[1]);
+    Serial.print(stockLocation);
   }
 }
 
@@ -365,9 +365,18 @@ void setEncoderY() {
 void goTo(String location) {
   char xChar = location[1];
   char yChar = toupper(location[0]);
+
+  Serial.print(xChar);
+  Serial.print(" + ");
+  Serial.println(yChar);
   
   int x = (xChar - 49) * addOnX + startX;
   int y = (yChar - 65) * addOnY + startY;
+
+
+  // Serial.print(x);
+  // Serial.print(" - ");
+  // Serial.println(xPos);
 
   bool xPosBool = goToPosX(x);
   bool yPosBool = goToPosY(y);
