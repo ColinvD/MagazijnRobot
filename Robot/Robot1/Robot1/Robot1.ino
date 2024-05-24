@@ -108,6 +108,19 @@ void setup() {
 }
 
 void loop() {
+   if (Serial.available()) {
+    String message = Serial.readStringUntil('\n');
+    if (message.equals("STOP")) {
+      stopState = true;
+      buttonPressed = true;
+      sendValue(1, 1, stopState);
+    }
+    if (message.equals("Unlock")) {
+      stopState = false;
+      buttonPressed = true;
+      sendValue(1, 1, stopState);
+    }
+  }
   
   pos = 0;
   xPos = 0;
