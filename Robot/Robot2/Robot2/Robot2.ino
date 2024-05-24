@@ -60,6 +60,8 @@ bool autoBool = true;
 bool upSmallBool = false;
 bool gettingItem = false;
 
+long int checkConnectionMillis = 0; 
+
 bool PickUpStep[2] = { false, false };
 
 String stockLocation = "";
@@ -75,10 +77,12 @@ int addOnX = -690;
 
 int requestCase = 0;
 
+// position 
 bool goToStartPos = true;
 bool goToStartPosRobot2Finished = false;
 bool goToStartPosFinished = false;
 bool zInStartPos = false;
+
 
 
 void setup() {
@@ -109,6 +113,7 @@ void setup() {
 }
 
 void loop() {
+
   // Serial.println(xPos);
 
   // Serial.print("xPos: ");
@@ -125,7 +130,13 @@ void loop() {
   microSwitch();
   microSwitchUp();
 
+  if(wait(checkConnectionMillis, 300)) {
+    checkConnectionMillis = millis();
+    stopState = true;
+  }
+
   if (stopState) {
+    Serial.println("haa");
     StopUp();
     StopLeft();
   } else if (autoBool) {
@@ -260,6 +271,13 @@ void CheckRotation(String axis, bool direction) {
   // }
 }
 
+bool wait(long int mil, int wait) {
+  if (millis() - mil > wait) {
+    return true;
+  }
+  return false;
+}
+
 void indictiveSensorReadLeft() {
   sensor_valueLeft = digitalRead(IsLeft);
   //Serial.println(sensor_valueLeft);
@@ -312,6 +330,7 @@ void microSwitchUp() {
 
 void receiveData() {
   int function = Wire.read();
+  checkConnectionMillis = millis();
   if (function == 1) {
     // emergency stop
     stopState = Wire.read();
@@ -366,6 +385,10 @@ void requestEvent() {
       break;
     case 3:
       Wire.write(goToStartPosRobot2Finished);
+      break;
+    case 4:
+      Wire.write(true);
+      break;
   }
 }
 

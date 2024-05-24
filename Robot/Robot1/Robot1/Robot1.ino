@@ -37,6 +37,8 @@ bool stopState = true;
 
 bool zInStartPos = false;
 
+long int checkConnectionMillis = 0;
+
 //automatic
 bool autoBool = true;
 bool pickUpBool = false;
@@ -78,6 +80,9 @@ int ledYellow = 9;
 int ledRed = 12;
 
 int i = 0;
+
+int stopValueOld;
+int checkStopValueOld;
 
 void setup() {
   // put your setup code here, to run once:
@@ -121,7 +126,6 @@ void loop() {
       sendValue(1, 1, stopState);
     }
   }
-  
   pos = 0;
   xPos = 0;
 
@@ -143,6 +147,7 @@ void loop() {
   digitalWrite(ledRed, LOW);
   digitalWrite(ledGreen, LOW);
   int stopValue = digitalRead(stopButton);
+ 
   if (!stopValue) {
     buttonPressed = false;
   }
@@ -161,6 +166,18 @@ void loop() {
   pressedOut = digitalRead(uit);
   pressedIn = digitalRead(in);
 
+
+  sendSmallIntValue(1, 5, 4);
+  Wire.requestFrom(1, 6);
+  if(Wire.available()) {
+    bool connection = Wire.read();
+    checkConnectionMillis = millis();
+  }
+
+  if(wait(checkConnectionMillis, 300)) {
+    stopState = true;
+  }
+
   if (stopState) {
     // emergency stop button pressed
     Stop();
@@ -174,7 +191,6 @@ void loop() {
     } else if(goToStartPosFinished) {
       if (pickingItem == false && i < sizeof(testPackage) / sizeof(testPackage[0])) {
         sendString(1, 7, testPackage[i]);
-        Serial.println(testPackage[i]);
         pickingItem = true;
         i++;
       }
@@ -361,7 +377,6 @@ void pickUP(int count) {
       value = 350;
       break;
   }
-  Serial.println(pos);
   if (!extendBool && pos < value) {
     pickUpBool = true;
     pickUpDataSend = true;
@@ -392,7 +407,6 @@ void pickUP(int count) {
         sendValue(1, 6, true);
         extendBool = false;
         pickingItem = false;
-        Serial.println("Finished");
       }
     }
   }
@@ -407,14 +421,12 @@ bool wait(long int mil, int wait) {
 
 void goToStartPosition() {
   bool robot2Ready = false; 
-  Serial.println(Distance());
-
-    if(!zInStartPos) {
-      GoIn();
-    } else {
-      zInStartPos = true;
-      Stop();
-    }
+  if(!zInStartPos) {
+    GoIn();
+  } else {
+    zInStartPos = true;
+    Stop();
+  }
 
   if(zInStartPos) {
     if(wait(checkStartPostitionMillis, 200)) {
