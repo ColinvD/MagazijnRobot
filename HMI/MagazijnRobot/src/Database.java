@@ -199,6 +199,21 @@ public class Database {
         rs.next();
         return rs.getInt(1);
     }
+
+    public void insertOrderLines(int orderID, int quantity, ResultSet data) throws SQLException{
+        data.next();
+        String query = "INSERT INTO orderlines(OrderID, StockItemID, Description, PackageTypeID, Quantity, UnitPrice, TaxRate, PickedQuantity, LastEditedBy, LastEditedWhen) " +
+                "VALUES (?,?,?,?,?,?,?,0,1,CURRENT_DATE)";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, orderID);
+        s.setInt(2, data.getInt(1));
+        s.setString(3, data.getString(2));
+        s.setInt(4, data.getInt(3));
+        s.setInt(5, quantity);
+        s.setInt(6, data.getInt(4));
+        s.setInt(7, data.getInt(5));
+        s.execute();
+    }
 }
 
 

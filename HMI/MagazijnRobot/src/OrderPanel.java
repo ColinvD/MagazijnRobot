@@ -32,6 +32,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         jbStartOrder = new JButton("Start");
         jbStartOrder.setPreferredSize(new Dimension(100,30));
         jbStartOrder.addActionListener(this);
+        jbStartOrder.setFocusable(false);
 
         orderItemsPanel = new JPanel();
         orderItemsPanel.setLayout(new BoxLayout(orderItemsPanel, BoxLayout.Y_AXIS));

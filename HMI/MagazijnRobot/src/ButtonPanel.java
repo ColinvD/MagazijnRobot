@@ -35,6 +35,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
         jbOrderUpdate = new JButton("Order Bewerken");
         jbOrderUpdate.addActionListener(this);
+        jbOrderUpdate.setFocusable(false);
         SetUpdateButtonEnabled(false);
 
         add(emergencyStop);

@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,14 +12,15 @@ import java.util.ArrayList;
 import java.sql.*;
 
 public class OrderChangeDialog extends JDialog implements ActionListener {
-    private int orderAmount; //test orders
-    private int selectedOrder = -1;
+    //private int orderAmount; //test orders
+    //private int selectedOrder = -1;
     private ArrayList<ArrayList> listOrder;
-    private DateFormat dmy = new SimpleDateFormat("dd/MM/yyyy");
+    //private ArrayList<ArrayList> tempOrder;
+    //private DateFormat dmy = new SimpleDateFormat("dd/MM/yyyy");
     private ArrayList<Integer> orderLines = new ArrayList<>();
     private ArrayList<JSpinner> orderlinesSpinners = new ArrayList<>();
-    private JButton jbCancel, jbConfirm;
-    private JLabel jlChooseOrder;
+    private JButton jbCancel, jbConfirm, jbAdd;
+    //private JLabel jlChooseOrder;
     private JScrollPane jsOrders;
     private JPanel jpTop, jpOrderlines;
     private Database database;
@@ -37,30 +40,32 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         this.orderPanel = orderPanel;
         this.order = database.getOrderlines(orderPanel.getSelectedOrderID());
         this.listOrder = new ArrayList<>();
+        //this.tempOrder = new ArrayList<>();
 
         // Haal de ResultSetMetaData op om dynamisch kolomnamen en types te krijgen
         ResultSetMetaData metaData = order.getMetaData();
         int columnCount = metaData.getColumnCount();
         while(order.next()){
             ArrayList<DatabaseValue> row = new ArrayList<>();
+            //ArrayList<DatabaseValue> temprow = new ArrayList<>();
 
             for (int i = 1; i <= columnCount; i++) {
                 String columnName = metaData.getColumnName(i);
                 Object columnValue = order.getObject(i);
 
                 DatabaseValue newValue = new DatabaseValue(columnName, columnValue);
+                //DatabaseValue tempValue = new DatabaseValue(columnName, columnValue);
                 row.add(newValue);
+                //temprow.add(tempValue);
             }
 
             listOrder.add(row);
+            //tempOrder.add(temprow);
         }
-        //System.out.println(listOrder);
-        //this.order.next();
-        //System.out.println(order.getInt("OrderID"));
-        //this.order = orderPanel.getSecondOrderSet();
-        //database.printResult(this.order);
-        //order.beforeFirst();
-        //System.out.println(order.getMetaData().getColumnLabel(1) + order.getString(1));
+
+//        ((DatabaseValue)tempOrder.get(0).get(3)).setValue(4);
+//        System.out.println((((DatabaseValue)listOrder.get(0).get(3)).getValue()));
+//        System.out.println((((DatabaseValue)tempOrder.get(0).get(3)).getValue()));
 
         jbCancel = new JButton("Annuleer");
         jbCancel.addActionListener(this);
@@ -68,30 +73,20 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         jbConfirm = new JButton("Bevestigen");
         jbConfirm.addActionListener(this);
 
-        //jbSearch = new JButton("Zoek");
-        //jbSearch.addActionListener(this);
+        jbAdd = new JButton("Product toevoegen");
+        jbAdd.addActionListener(this);
 
-        //jlChooseOrder = new JLabel("Gekozen order: geen", SwingConstants.CENTER);
-        //System.out.println(listOrder.getFirst().getFirst());
-        DatabaseValue temp  = (DatabaseValue) listOrder.getFirst().getFirst();
-
-        jlChooseOrder = new JLabel("Order: " + temp.getValue(), SwingConstants.CENTER);
+        JLabel jlChooseOrder = new JLabel("Order: " + getDatabaseValue(0,"OrderID").getValue(), SwingConstants.CENTER);
         jlChooseOrder.setPreferredSize(new Dimension(700,20));
-        //jlSearchOrder = new JLabel("Zoek ordernummer:");
-
-        //jtSearchOrder = new JTextField(15);
-        //jtSearchOrder.addActionListener(this);
 
         jpOrderlines = new JPanel();
         jpOrderlines.setLayout(new GridBagLayout());
-        //jpOrderlines.setLayout(new GridLayout(listOrder.size(), 4)); //maak row count het aantal orders
 
         jpTop = new JPanel();
         jpTop.setLayout(new FlowLayout());
 
         jsOrders = new JScrollPane(jpOrderlines);
         jsOrders.setPreferredSize(new Dimension(700,250));
-
 
         c.gridx = 0;
         c.gridy = 0;
@@ -106,12 +101,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         jpTop.add(jbCancel);
         jpTop.add(jbConfirm);
         jpTop.add(jlChooseOrder);
-        //jpTop.add(jlSearchOrder);
-        //jpTop.add(jtSearchOrder);
-        //jpTop.add(jbSearch);
-
-
-        //getOrderAmount();
+        jpTop.add(jbAdd);
         refreshData();
         setVisible(true);
     }
@@ -122,20 +112,41 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
             closeDatabase();
             dispose();
         }
-        /*if (e.getSource() == jbConfirm){
-            if(selectedOrder != -1){ //-1 = geen order selected
-                try {
-                    orderPanel.setOrder(selectedOrder);
-                    System.out.println("Order inladen gelukt.");
-                } catch (SQLException ex) {
-                    System.out.println("Order inladen mislukt.");
-                    throw new RuntimeException(ex);
-                }
+        if (e.getSource() == jbConfirm){
+            try{
+                ConfirmChange();
+            } catch (SQLException ex){
+                System.out.println("Error occured");
+                System.out.println(ex.getMessage());
             }
             closeDatabase();
             dispose();
+//            if(selectedOrder != -1){ //-1 = geen order selected
+//                try {
+//                    orderPanel.setOrder(selectedOrder);
+//                    System.out.println("Order inladen gelukt.");
+//                } catch (SQLException ex) {
+//                    System.out.println("Order inladen mislukt.");
+//                    throw new RuntimeException(ex);
+//                }
+//            }
+//            closeDatabase();
+//            dispose();
         }
-        if(e.getSource() == jbSearch){
+        if(e.getSource() == jbAdd){
+            AddProductDialog addDialog = new AddProductDialog(orderPanel.getSelectedOrderID());
+            if(addDialog.isAdd()){
+                //DatabaseValue newProduct = new DatabaseValue("StockItemID", addDialog.getChosenProductID());
+                //ArrayList<DatabaseValue> temp = new ArrayList<>();
+                //temp.add(newProduct);
+
+                ArrayList<DatabaseValue> row = makeFakeOrderLine(addDialog.getChosenProductID(), addDialog.getWantedQuantity());
+                listOrder.add(row);
+                refreshData();
+                jsOrders.updateUI();
+            }
+        }
+        /*if(e.getSource() == jbSearch){
             jpOrderlines.removeAll();
             try {
                 refreshData();
@@ -154,11 +165,14 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
     }
 
     public void refreshData(){
+        jpOrderlines.removeAll();
+
         orderLines.clear();
         orderlinesSpinners.clear();
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
+        c.gridy = 0;
         c.insets = new Insets(5,5,0,5);
         c.anchor = GridBagConstraints.NORTH;
         c.weighty = 1;
@@ -170,49 +184,35 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
 
         for (int i  = 0; i< listOrder.size(); i++) {
             ArrayList<DatabaseValue> orderline = listOrder.get(i);
-            orderLines.add((int) orderline.get(2).getValue());
-            int productID = 0;
-            String itemName = "";
-            int itemQuantity = 0;
-            for (DatabaseValue databaseValue : orderline) {
-                switch (databaseValue.getColomn()) {
-                    case "StockItemID":
-                        productID = (int) databaseValue.getValue();
-                        break;
-                    case "Description": 
-                        itemName = (String) databaseValue.getValue();
-                        break;
-                    case "Quantity":
-                        itemQuantity = (int) databaseValue.getValue();
-                        break;
-                    default:
-                        break;
+            for (int j = 0; j < orderline.size(); j++) {
+                if(orderline.get(j).getColomn().equals("StockItemID")){
+                    orderLines.add((int)orderline.get(j).getValue());
+                    break;
                 }
             }
+            //orderLines.add((int) orderline.get(2).getValue());
+            orderLines.add((int) getDatabaseValue(i, "OrderID").getValue());
+            int productID = (int) getDatabaseValue(i, "StockItemID").getValue();
+            String itemName = (String) getDatabaseValue(i, "Description").getValue();
+            int itemQuantity = (int) getDatabaseValue(i, "Quantity").getValue();
             c.gridx = 0;
             c.gridy = i+1;
             jpOrderlines.add(new JLabel("" + productID, SwingConstants.CENTER), c);
             c.gridx = 1;
             jpOrderlines.add(new JLabel(itemName, SwingConstants.CENTER), c);
-//            c.gridx = 2;
-//            jpOrderlines.add(new JLabel("" + itemQuantity, SwingConstants.CENTER), c);
 
-            JSpinner quantity = new JSpinner();
+            SpinnerNumberModel model = new SpinnerNumberModel(itemQuantity, 0, null, 1);
+            JSpinner quantity = new JSpinner(model);
             quantity.setPreferredSize(new Dimension(50,20));
-            quantity.setValue(itemQuantity);
+            quantity.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    OnSpinnerChange((int)quantity.getValue(), quantity);
+                }
+            });
             c.gridx = 2;
             orderlinesSpinners.add(quantity);
             jpOrderlines.add(quantity, c);
-//            JButton increaseButton = new JButton("+");
-//            increaseButton.addActionListener(this);
-//            orderlinesButtons.add(increaseButton);
-//            JButton decreaseButton = new JButton("-");
-//            decreaseButton.addActionListener(this);
-//            orderlinesButtons.add(decreaseButton);
-//            c.gridx = 3;
-//            jpOrderlines.add(increaseButton, c);
-//            c.gridx = 4;
-//            jpOrderlines.add(decreaseButton, c);
         }
 
         if(orderLines.isEmpty()) {
@@ -220,6 +220,8 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
             jpOrderlines.setLayout(new GridLayout(1,1));
             jpOrderlines.add(new JLabel("Geen orders gevonden.", SwingConstants.CENTER));
         }
+
+        jpOrderlines.revalidate();
     }
 
     public void closeDatabase(){
@@ -228,5 +230,79 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         } catch (Exception exception){
             System.out.println(exception.getMessage());
         }
+    }
+
+    private void OnSpinnerChange(int value, JSpinner spinner){
+        DatabaseValue oldValue = getDatabaseValue(orderlinesSpinners.indexOf(spinner),"Quantity");
+        System.out.println("Hi i'm the spinner from: " + orderlinesSpinners.indexOf(spinner) + ", with the new Value: " + value);
+        oldValue.setValue(value);
+    }
+
+    private void ConfirmChange() throws SQLException {
+        ResultSet currentOrder = database.getOrderlines(orderPanel.getSelectedOrderID());
+        while (currentOrder.next()){
+            int dbOrderlineID = currentOrder.getInt("OrderLineID");
+            if(dbOrderlineID == (int)getDatabaseValue(0, "OrderLineID").getValue()){
+                // Update uitvoeren
+                System.out.println("Updating orderline");
+                database.update("UPDATE orderlines SET Quantity= ? WHERE OrderLineID = ?", String.valueOf(getDatabaseValue(0, "Quantity").getValue()), String.valueOf(dbOrderlineID));
+                // Haal orderregel uit de array zodat de toevoegingen overblijven
+                listOrder.removeFirst();
+            }
+            else{
+                // item is verwijderd
+                System.out.println("Item wordt verwijderd");
+
+            }
+        }
+        if(!listOrder.isEmpty()){
+            // add overige dingen aan database
+            System.out.println("Item wordt toegevoegd");
+//            if(pickedID != 0 && amount >0){
+//                try{
+//                    database.insertOrderLines(orderID, amount, database.select("Select StockItemID, StockItemName, UnitPackageID, TaxRate, UnitPrice From stockitems Where StockItemID = ?", "" + productIDs.get(pickedID-1)));
+//                } catch (SQLException ex){
+//                    throw new RuntimeException(ex.getMessage());
+//                    //System.out.println(ex.getMessage());
+//                }
+//            }
+        }
+    }
+
+    private DatabaseValue getDatabaseValue(int lineRow, String searchItem){
+        ArrayList<DatabaseValue> orderline = listOrder.get(lineRow);
+        for (DatabaseValue databaseValue : orderline) {
+            if(databaseValue.getColomn().equals(searchItem)){
+                return databaseValue;
+            }
+//            switch (databaseValue.getColomn()) {
+//                case "OrderID", "Quantity", "Description", "StockItemID":
+//                    return databaseValue.getValue();
+//                default:
+//                    break;
+//            }
+        }
+        return null;
+    }
+
+    private ArrayList<DatabaseValue> makeFakeOrderLine(int productID, int wantedQuantity) {
+        ArrayList<DatabaseValue> productLine = new ArrayList<>();
+        System.out.println(productID);
+        try{
+            ResultSet productData = database.select("Select StockItemID, StockItemName, UnitPackageID, TaxRate, UnitPrice From stockitems Where StockItemID = ?", ""+productID);
+            productData.next();
+            productLine.add(new DatabaseValue("OrderLineID",-1));
+            productLine.add(new DatabaseValue("OrderID", orderPanel.getSelectedOrderID()));
+            productLine.add(new DatabaseValue("Description",productData.getString("StockItemName")));
+            productLine.add(new DatabaseValue("Quantity",wantedQuantity));
+            ResultSetMetaData data = productData.getMetaData();
+            for(int i = 1; i < data.getColumnCount(); i++){
+                DatabaseValue value  = new DatabaseValue(data.getColumnName(i),productData.getObject(i));
+                productLine.add(value);
+            }
+        } catch (SQLException ex){
+            throw  new RuntimeException(ex.getMessage());
+        }
+        return productLine;
     }
 }
