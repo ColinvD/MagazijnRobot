@@ -5,7 +5,7 @@
 #define xEncoderA 3
 #define xEncoderB A3
 
-String testPackage[3] = { "C3", "D4", "E5" };
+String testPackage[] = { "A1", "C3", "E5"};
 
 int xPos = 0;
 int xPosition = 0;
@@ -35,6 +35,8 @@ const int stopButton = 4;
 bool buttonPressed;
 bool stopState = true;
 
+bool zInStartPos = false;
+
 //automatic
 bool autoBool = true;
 bool pickUpBool = false;
@@ -47,6 +49,10 @@ bool extendBool = false;
 long int receiveMillis;
 
 long int checkPositionMillis = 0;
+long int checkStartPostitionMillis = 0;
+
+bool goToStartPos = true;
+bool goToStartPosFinished = false;
 
 // infra red sensor
 bool stoppedOut = true;
@@ -102,12 +108,7 @@ void setup() {
 }
 
 void loop() {
-  if (pickingItem == false && i < 3) {
-    sendString(1, 7, testPackage[i]);
-    Serial.println(testPackage[i]);
-    pickingItem = true;
-    i++;
-  }
+  
   pos = 0;
   xPos = 0;
 
@@ -117,6 +118,14 @@ void loop() {
   }
 
   sendIntValue(1, 4, xPos);
+
+  if(Distance() > 6.8) {
+    zInStartPos = false;
+  } else {
+    zInStartPos = true;
+  }
+
+  sendValue(1, 9, zInStartPos);
 
   digitalWrite(ledRed, LOW);
   digitalWrite(ledGreen, LOW);
@@ -136,6 +145,9 @@ void loop() {
     sendValue(1, 1, stopState);
   }
 
+  pressedOut = digitalRead(uit);
+  pressedIn = digitalRead(in);
+
   if (stopState) {
     // emergency stop button pressed
     Stop();
@@ -144,23 +156,32 @@ void loop() {
   } else if (autoBool) {
     digitalWrite(ledYellow, LOW);
     digitalWrite(ledGreen, HIGH);
-    if (wait(checkPositionMillis, 200)) {
-      sendSmallIntValue(1, 5, 2);
-      Wire.requestFrom(1, 6);
-      checkPositionMillis = millis();
-      if (Wire.available()) {
-        pickUpAction = Wire.read();
+    if(goToStartPos) {
+      goToStartPosition();
+    } else if(goToStartPosFinished) {
+      if (pickingItem == false && i < sizeof(testPackage) / sizeof(testPackage[0])) {
+        sendString(1, 7, testPackage[i]);
+        Serial.println(testPackage[i]);
+        pickingItem = true;
+        i++;
       }
-    }
-    if (pickUpAction) {
-      pickUP(i);
+
+      if (wait(checkPositionMillis, 200)) {
+        sendSmallIntValue(1, 5, 2);
+        Wire.requestFrom(1, 6);
+        checkPositionMillis = millis();
+        if (Wire.available()) {
+          pickUpAction = Wire.read();
+        }
+      }
+      if (pickUpAction) {
+        pickUP(i);
+      }
     }
 
   } else {
     digitalWrite(ledYellow, HIGH);
     bool tiltState = shelfTilt();
-    pressedOut = digitalRead(uit);
-    pressedIn = digitalRead(in);
     if (tiltState && !pastTilt) {
       pastTilt = tiltState;
       if (pressedOut) {
@@ -318,10 +339,10 @@ void pickUP(int count) {
   int value = 0;
   switch (count) {
     case 1:
-      value = 850;
+      value = 880;
       break;
     case 2:
-      value = 600;
+      value = 610;
       break;
     case 3:
       value = 350;
@@ -369,4 +390,35 @@ bool wait(long int mil, int wait) {
     return true;
   }
   return false;
+}
+
+void goToStartPosition() {
+  bool robot2Ready = false; 
+  Serial.println(Distance());
+
+    if(!zInStartPos) {
+      GoIn();
+    } else {
+      zInStartPos = true;
+      Stop();
+    }
+
+  if(zInStartPos) {
+    if(wait(checkStartPostitionMillis, 200)) {
+      checkStartPostitionMillis = millis();
+      sendSmallIntValue(1, 5, 3);
+      Wire.requestFrom(1, 6);
+      if(Wire.available()) {
+        robot2Ready = Wire.read();
+      }
+    }
+  }
+
+  if(robot2Ready && zInStartPos) {
+    goToStartPosFinished = true;
+    goToStartPos = false;
+    sendValue(1, 8, true);
+    zPosition = 0;
+    xPosition = 0;
+  }
 }
