@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener, Listener {
+    private int k = 0;
+    private int m = 0;
+
     // SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
-    private boolean firstTimeGoingOut = true;
-    private ResultSet selectedOrder;
+    ArrayList<ArrayList<Locatie>> Boxes;
     private Database database;
     private JLabel jlSelectedOrder;
     private ResultSet orderItems;
@@ -26,6 +28,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     private JScrollPane orderJSP;
 
     private int order;
+    int sizebox;
 
     private int counterChangeAmountColor;
     private int counterMaxAmountColor;
@@ -39,7 +42,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
         setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
-
         database = new Database();
         database.databaseConnect();
 
@@ -65,7 +67,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         order = OrderID;
         products1 = new ArrayList<>();
         orderlinesIdSorted = new ArrayList<>();
-        selectedOrder = database.getOrder(OrderID);
+        ResultSet selectedOrder = database.getOrder(OrderID);
         database.printResult(selectedOrder);
         orderItems = database.getOrderlines(OrderID);
         orderItemsPanel.removeAll();
@@ -83,20 +85,15 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
                     products.add(locatie);
                 }
             }
-            ArrayList<ArrayList<Locatie>> Boxes = BBP.firstFitDec(products, products.size(), 10);
+            Boxes = BBP.firstFitDec(products, products.size(), 10);
 
             //This only shows the first box of the order
-            String[] box = new String[Boxes.get(0).size()];//get the  first box
 
-            for (int i = 0; i < Boxes.get(0).size(); i++) {
-                box[i] = Boxes.get(0).get(i).getLocation();
-            }
+            ArrayList<Locatie> box = new ArrayList<>(Boxes.getFirst());
 
-            String[] route = TSP.getRoute(box);
+            ArrayList<Locatie> route = TSP.getRoute(box);
             StatusPanel.displayRoute(route);
             SchapPanel.drawRoute(route);
-
-
             // orderItems = database.getOrderlines(OrderID);
             for (int i = 0; i < Boxes.size(); i++) {
                 JLabel doos = new JLabel("Doos " + (i + 1) + ": ");
@@ -128,38 +125,66 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
             }
         }
         jlSelectedOrder.setText("Order: " + OrderID + " ");
+        //  counterMaxAmountColor = 0;
+        m = 0;
+        k = 0;
         this.updateUI();
     }
 
     public void changeOrderColor() throws SQLException {
+        int l = 0;
         orderItemsPanel.removeAll();
-        int maxCount = counterMaxAmountColor; // Number of times to make labels green
-        counterChangeAmountColor = 0; // Reset counter to start from zero for each "Done"
+        sizebox = Boxes.get(m).size();
+        if (k == sizebox) {
+            m++;
+            k = 0;
+            sizebox = Boxes.get(m).size();
+        }
+        ArrayList<Locatie> locaties = new ArrayList<>();
+        counterChangeAmountColor = 0;
+        for (int i = 0; i < sizebox; i++) {
+            locaties.add(Boxes.get(m).get(i));
+        }
+        // System.out.println(Arrays.toString(box));
+        ArrayList<Locatie> route = TSP.getRoute(locaties);
+        System.out.println(route);
+        database.updatepicked(route.get(k).getOrderlineID());
+        database.updateOrderlineAfterOrder(route.get(k).getOrderlineID());
+        int doosCount = 0;
+        if (k == 1 && sizebox > 2) {
+            l = 1; // idk why this but it works for now. (get back to it later)
+        }
         for (JLabel label : products1) {
-            if (counterChangeAmountColor < maxCount) {
-                if (!label.getText().contains("Doos")) {
-                    label.setForeground(Color.GREEN);
-                    counterChangeAmountColor++;
+            if (!label.getText().contains("Doos")) {
+                if (label.getText().substring(0, 2).equals(route.get(k).getLocation()) && m + 1 == doosCount) {
+                    if (l <= k) {
+                        label.setForeground(Color.GREEN);
+                        l++;
+                    }
                 }
-
-
+            } else {
+                doosCount++;
             }
             orderItemsPanel.add(label);
         }
-        database.updatepicked(orderlinesIdSorted.get(counterMaxAmountColor - 1));
-        database.updateOrderlineAfterOrder(orderlinesIdSorted.get(counterMaxAmountColor - 1));
+        k++;
         updateUI();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (e.getSource() == jbStartOrder) {
 //                    try {
 //                        serialCommunicator.sendMessageToArduino("Start");
 //                    } catch (IOException ex) {
 //                        throw new RuntimeException(ex);
 //                    }
+//            try {
+//                counterMaxAmountColor++;
+//                changeOrderColor();
+//            } catch (SQLException ex) {
+//                throw new RuntimeException(ex);
+//            }
         }
 
     }
@@ -171,7 +196,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
             System.out.println("out");
             counterMaxAmountColor++;
             changeOrderColor();
-
         }
         if (message.equals("Complete")) {
             System.out.println("complete");

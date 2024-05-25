@@ -14,6 +14,15 @@ public class Locatie {
 
     }
 
+    @Override
+    public String toString() {
+        return "Locatie{" +
+                "location='" + location + '\'' +
+                ", weight=" + weight +
+                ", orderlineID=" + orderlineID +
+                '}';
+    }
+
     public String getLocation() {
         return location;
     }
