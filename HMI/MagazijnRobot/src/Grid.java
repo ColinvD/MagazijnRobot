@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Grid extends JPanel {
+    //
     private GridSpace[][] grid;
     protected static String locationRobot2 = "X:290 Y:290";
     private int robotX;
