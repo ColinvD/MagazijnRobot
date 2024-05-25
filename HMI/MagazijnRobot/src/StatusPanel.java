@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class StatusPanel extends JPanel implements ActionListener {
     private JLabel jlStatus;
@@ -38,19 +39,19 @@ public class StatusPanel extends JPanel implements ActionListener {
         jlRobotStatus.setText(robotOnline == true ? "Robot: online" : "Robot: offline");
     }
 
-    public static void displayRoute(String[] r){
+    public static void displayRoute(ArrayList<Locatie> r){
         if(r != null) {
             int c = 0;
             String route = "Route: ";
-            for (int i = 0; i <r.length; i++) {
+            for (int i = 0; i <r.size(); i++) {
                 if(i%3==0){
                    c++;
                    route += (c+". ");
                 }
                 if((i-2)%3!=0){
-                    route += (r[i] + ", ");
+                    route += (r.get(i).getLocation() + ", ");
                 } else {
-                    route += (r[i] + ".  ");
+                    route += (r.get(i).getLocation() + ".  ");
                 }
             }
             jlRoute.setText(route);

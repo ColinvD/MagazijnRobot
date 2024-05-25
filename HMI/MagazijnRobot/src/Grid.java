@@ -13,7 +13,7 @@ public class Grid extends JPanel {
     protected static String locationRobot2 = "X:290 Y:290";
     private int robotX;
     private int robotY;
-    private String[] route;
+    private ArrayList<Locatie> route;
     private String name;
     public Grid(int width, int height) {
         setBackground(Color.white);
@@ -109,20 +109,20 @@ public class Grid extends JPanel {
         return name;
     }
 
-    public void drawRoute(String[] route, Graphics g){
+    public void drawRoute(ArrayList<Locatie> route, Graphics g){
         int prevX = robotX+10;
         int prevY = robotY+10;
         g.setColor(Color.RED);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(3));
-        for (int i = 0; i < (route.length); i++) {
-            int xy[] = convertLocationToXY(route[i]);
+        for (int i = 0; i < (route.size()); i++) {
+            int[] xy = convertLocationToXY(route.get(i).getLocation());
             int x = xy[0];
             int y = xy[1];
             g.drawLine(prevX, prevY, x, y);
             prevX = x;
             prevY = y;
-            if(i==2 || i==route.length-1){
+            if(i==2 || i==route.size()-1){
                 prevX = 300;
                 prevY = 300;
                 g.setColor(Color.BLUE);
@@ -131,7 +131,7 @@ public class Grid extends JPanel {
     }
 
     public int[] convertLocationToXY(String location){
-        int xy[] = new int[2];
+        int[] xy = new int[2];
 
         xy[0] = (Integer.parseInt(location.substring(1,2))-1) * 60 + 30;
 
@@ -155,7 +155,7 @@ public class Grid extends JPanel {
         return xy;
     }
 
-    public void setRoute(String[] r){
+    public void setRoute(ArrayList<Locatie> r){
         route = r;
     }
 
