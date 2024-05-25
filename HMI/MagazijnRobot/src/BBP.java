@@ -76,11 +76,13 @@ public class BBP {
 //        System.out.print("Number of bins required in First Fit : "
 //                + Arrays.toString(firstFitDec(weight, n, c)));
         ArrayList<ArrayList<Locatie>> Boxes = firstFitDec(weight, n, c);
-        for (ArrayList<Locatie> locaties : Boxes) {
-            ArrayList<Locatie> box = new ArrayList<>(locaties.size());
-            //System.out.println(Boxes.get(i).get(j).getLocation() + ": " + Boxes.get(i).get(j).getWeight());
-            box.addAll(locaties);
-           // System.out.println(Arrays.toString(TSP.getRoute(box)));
+        for (int i = 0; i < Boxes.size(); i++) {
+            String box[] = new String[Boxes.get(i).size()];
+            for (int j = 0; j < Boxes.get(i).size(); j++) {
+                box[j] = Boxes.get(i).get(j).getLocation();
+                //System.out.println(Boxes.get(i).get(j).getLocation() + ": " + Boxes.get(i).get(j).getWeight());
+            }
+            System.out.println(Arrays.toString(TSP.getRoute(box)));
         }
 
     }

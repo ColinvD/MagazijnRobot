@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class SchapPanel extends JPanel implements ActionListener {
     private static String[] route;
@@ -59,7 +58,7 @@ public class SchapPanel extends JPanel implements ActionListener {
         schap.repaint();
     }
 
-    public static void drawRoute(ArrayList<Locatie> r){
+    public static void drawRoute(String[] r){
         schap.setRoute(r);
         schap.repaint();
     }

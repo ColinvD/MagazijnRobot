@@ -4,25 +4,11 @@ public class Coordinates { //wordt gebruikt bij TSP
     private int y;
     private boolean visited;
 
-    private int gewicht;
-
-    private int orderlineid;
-
-    public Coordinates(String location, int x, int y,int gewicht,int orderlineid){
+    public Coordinates(String location, int x, int y){
         this.location = location;
         this.x = x;
         this.y = y;
         this.visited = false;
-        this.gewicht = gewicht;
-        this.orderlineid = orderlineid;
-    }
-
-    public int getGewicht() {
-        return gewicht;
-    }
-
-    public int getOrderlineid() {
-        return orderlineid;
     }
 
     public Coordinates(int x, int y){

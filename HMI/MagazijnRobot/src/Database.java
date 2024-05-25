@@ -203,7 +203,7 @@ public class Database {
         Database database = new Database();
         database.databaseConnect();
         System.out.println(OrderlinesId);
-        database.update("Update orderlines Set PickedQuantity = PickedQuantity + 1 Where OrderLineId = ?",String.valueOf(OrderlinesId));
+        database.update("Update orderlines Set PickedQuantity = PickedQuantity + 1 Where OrderLineID = ?",String.valueOf(OrderlinesId));
     }
     public void updatePickedOrder(int OrderID) throws SQLException {
         Database database = new Database();
