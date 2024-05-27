@@ -116,6 +116,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         if (e.getSource() == jbConfirm){
             try{
                 ConfirmChange();
+                orderPanel.setOrder(orderPanel.getSelectedOrderID());
             } catch (SQLException ex){
                 System.out.println("Error occured");
                 System.out.println(ex.getMessage());
