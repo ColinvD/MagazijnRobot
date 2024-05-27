@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -200,18 +201,58 @@ public class Database {
         return rs.getInt(1);
     }
 
-    public void insertOrderLines(int orderID, int quantity, ResultSet data) throws SQLException{
-        data.next();
+//    public void insertOrderLines(int orderID, int quantity, ResultSet data) throws SQLException{
+//        data.next();
+//        String query = "INSERT INTO orderlines(OrderID, StockItemID, Description, PackageTypeID, Quantity, UnitPrice, TaxRate, PickedQuantity, LastEditedBy, LastEditedWhen) " +
+//                "VALUES (?,?,?,?,?,?,?,0,1,CURRENT_DATE)";
+//        PreparedStatement s = connection.prepareStatement(query);
+//        s.setInt(1, orderID);
+//        s.setInt(2, data.getInt(1));
+//        s.setString(3, data.getString(2));
+//        s.setInt(4, data.getInt(3));
+//        s.setInt(5, quantity);
+//        s.setInt(6, data.getInt(4));
+//        s.setInt(7, data.getInt(5));
+//        s.execute();
+//    }
+
+    public void insertOrderLines(ArrayList<DatabaseValue> data) throws SQLException{
+//        data.next();
         String query = "INSERT INTO orderlines(OrderID, StockItemID, Description, PackageTypeID, Quantity, UnitPrice, TaxRate, PickedQuantity, LastEditedBy, LastEditedWhen) " +
                 "VALUES (?,?,?,?,?,?,?,0,1,CURRENT_DATE)";
         PreparedStatement s = connection.prepareStatement(query);
-        s.setInt(1, orderID);
-        s.setInt(2, data.getInt(1));
-        s.setString(3, data.getString(2));
-        s.setInt(4, data.getInt(3));
-        s.setInt(5, quantity);
-        s.setInt(6, data.getInt(4));
-        s.setInt(7, data.getInt(5));
+        for (int i = 0; i < data.size(); i++) {
+            switch (data.get(i).getColomn()){
+                case "OrderID":
+                    s.setInt(1, (int)data.get(i).getValue());
+                    break;
+                case "StockItemID":
+                    s.setInt(2, (int)data.get(i).getValue());
+                    break;
+                case "Description":
+                    s.setString(3, (String) data.get(i).getValue());
+                    break;
+                case "UnitPackageID":
+                    s.setInt(4, (int)data.get(i).getValue());
+                    break;
+                case "Quantity":
+                    s.setInt(5, (int)data.get(i).getValue());
+                    break;
+                case "UnitPrice":
+                    s.setBigDecimal(6, (BigDecimal) data.get(i).getValue());
+                    break;
+                case "TaxRate":
+                    s.setBigDecimal(7, (BigDecimal) data.get(i).getValue());
+                    break;
+            }
+        }
+//        s.setInt(1, orderID); // OrderID
+//        s.setInt(2, data.getInt(1)); // StockItemID
+//        s.setString(3, data.getString(2)); // Description
+//        s.setInt(4, data.getInt(3)); // PackageTypeID
+//        s.setInt(5, quantity); // Quantity
+//        s.setInt(6, data.getInt(4)); // UnitPrice
+//        s.setInt(7, data.getInt(5)); // TaxRate
         s.execute();
     }
 }

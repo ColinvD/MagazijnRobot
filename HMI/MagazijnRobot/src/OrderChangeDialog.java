@@ -140,10 +140,12 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
                 //ArrayList<DatabaseValue> temp = new ArrayList<>();
                 //temp.add(newProduct);
 
-                ArrayList<DatabaseValue> row = makeFakeOrderLine(addDialog.getChosenProductID(), addDialog.getWantedQuantity());
-                listOrder.add(row);
-                refreshData();
-                jsOrders.updateUI();
+                if(addDialog.getWantedQuantity()>0){
+                    ArrayList<DatabaseValue> row = makeFakeOrderLine(addDialog.getChosenProductID(), addDialog.getWantedQuantity());
+                    listOrder.add(row);
+                    refreshData();
+                    jsOrders.updateUI();
+                }
             }
         }
         /*if(e.getSource() == jbSearch){
@@ -201,7 +203,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
             c.gridx = 1;
             jpOrderlines.add(new JLabel(itemName, SwingConstants.CENTER), c);
 
-            SpinnerNumberModel model = new SpinnerNumberModel(itemQuantity, 0, null, 1);
+            SpinnerNumberModel model = new SpinnerNumberModel(itemQuantity, 1, null, 1);
             JSpinner quantity = new JSpinner(model);
             quantity.setPreferredSize(new Dimension(50,20));
             quantity.addChangeListener(new ChangeListener() {
@@ -258,6 +260,9 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         if(!listOrder.isEmpty()){
             // add overige dingen aan database
             System.out.println("Item wordt toegevoegd");
+            for (ArrayList<DatabaseValue> arrayList : listOrder) {
+                database.insertOrderLines(arrayList);
+            }
 //            if(pickedID != 0 && amount >0){
 //                try{
 //                    database.insertOrderLines(orderID, amount, database.select("Select StockItemID, StockItemName, UnitPackageID, TaxRate, UnitPrice From stockitems Where StockItemID = ?", "" + productIDs.get(pickedID-1)));
@@ -296,7 +301,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
             productLine.add(new DatabaseValue("Description",productData.getString("StockItemName")));
             productLine.add(new DatabaseValue("Quantity",wantedQuantity));
             ResultSetMetaData data = productData.getMetaData();
-            for(int i = 1; i < data.getColumnCount(); i++){
+            for(int i = 1; i <= data.getColumnCount(); i++){
                 DatabaseValue value  = new DatabaseValue(data.getColumnName(i),productData.getObject(i));
                 productLine.add(value);
             }
