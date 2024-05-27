@@ -9,6 +9,7 @@ String testPackage[] = { "A1", "C3", "E5" };
 
 int xPos = 0;
 int xPosition = 0;
+int yPos = 0;
 
 const int directionPinUP = 13;
 const int pwmPinUP = 11;
@@ -154,32 +155,44 @@ void loop() {
     joyconPressed = false;
   }
 
+  // encoder posistion
   pos = 0;
   xPos = 0;
-
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     pos = zPosition;
     xPos = xPosition;
   }
-
   sendIntValue(1, 4, xPos);
 
+  // get y position
+  sendSmallIntValue(1, 5, 5);
+  Wire.requestFrom(1, 6);
+  if(Wire.available()) {
+    int byte1 = Wire.read();
+    int byte2 = Wire.read();
+    yPos = (int16_t)(byte1 << 8) + byte2;
+  }
+  // Serial.print("Y: ");
+  // Serial.println(map(yPos, 0, 2375, 300, 0));
+  // Serial.print("X: ");
+  // Serial.println(map(xPos, 0, 4400, 300, 0));
+
+  // zPos location state
   if (Distance() > 6.8) {
     zInStartPos = false;
   } else {
     zInStartPos = true;
   }
-
   sendValue(1, 9, zInStartPos);
 
   digitalWrite(ledRed, LOW);
   digitalWrite(ledGreen, LOW);
-  int stopValue = digitalRead(stopButton);
 
+  // read stop button
+  int stopValue = digitalRead(stopButton);
   if (!stopValue) {
     buttonPressed = false;
   }
-
   // stop button state
   if (stopValue && stopState && !buttonPressed) {
     stopState = false;

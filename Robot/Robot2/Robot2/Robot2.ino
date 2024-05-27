@@ -401,6 +401,10 @@ void requestEvent() {
     case 4:
       Wire.write(true);
       break;
+    case 5:
+      Wire.write(highByte(yPos));
+      Wire.write(lowByte(yPos));
+      break;
   }
 }
 
