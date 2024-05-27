@@ -5,7 +5,7 @@
 #define xEncoderA 3
 #define xEncoderB A3
 
-String testPackage[] = { "A1", "C3", "E5"};
+String testPackage[] = { "A1", "C3", "E5" };
 
 int xPos = 0;
 int xPosition = 0;
@@ -56,6 +56,8 @@ long int checkStartPostitionMillis = 0;
 bool goToStartPos = true;
 bool goToStartPosFinished = false;
 
+int pickUpCount;
+
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
@@ -79,7 +81,6 @@ int ledGreen = A0;
 int ledYellow = 9;
 int ledRed = 12;
 
-int i = 0;
 
 int stopValueOld;
 int checkStopValueOld;
@@ -113,19 +114,24 @@ void setup() {
 }
 
 void loop() {
-   if (Serial.available()) {
+  if (Serial.available()) {
+    sendValue(1, 2, false);
     String message = Serial.readStringUntil('\n');
     if (message.equals("STOP")) {
       stopState = true;
       buttonPressed = true;
       sendValue(1, 1, stopState);
-    }
-    if (message.equals("Unlock")) {
+    } else if (message.equals("Unlock")) {
       stopState = false;
       buttonPressed = true;
       sendValue(1, 1, stopState);
+    } else if (message[0] == 'L') {
+      sendString(1, 7, message.substring(1, 3));
+      pickingItem = true;
+      pickUpCount = message.substring(3, 4).toInt();
     }
   }
+
   pos = 0;
   xPos = 0;
 
@@ -136,7 +142,7 @@ void loop() {
 
   sendIntValue(1, 4, xPos);
 
-  if(Distance() > 6.8) {
+  if (Distance() > 6.8) {
     zInStartPos = false;
   } else {
     zInStartPos = true;
@@ -147,7 +153,7 @@ void loop() {
   digitalWrite(ledRed, LOW);
   digitalWrite(ledGreen, LOW);
   int stopValue = digitalRead(stopButton);
- 
+
   if (!stopValue) {
     buttonPressed = false;
   }
@@ -166,15 +172,20 @@ void loop() {
   pressedOut = digitalRead(uit);
   pressedIn = digitalRead(in);
 
+  bool tiltState = shelfTilt();
+  if(tiltState) {
+    stopState = true;
+    sendValue(1, 1, stopState);
+  }
 
   sendSmallIntValue(1, 5, 4);
   Wire.requestFrom(1, 6);
-  if(Wire.available()) {
+  if (Wire.available()) {
     bool connection = Wire.read();
     checkConnectionMillis = millis();
   }
 
-  if(wait(checkConnectionMillis, 300)) {
+  if (wait(checkConnectionMillis, 300)) {
     stopState = true;
   }
 
@@ -186,15 +197,15 @@ void loop() {
   } else if (autoBool) {
     digitalWrite(ledYellow, LOW);
     digitalWrite(ledGreen, HIGH);
-    if(goToStartPos) {
+    if (goToStartPos) {
       goToStartPosition();
-    } else if(goToStartPosFinished) {
-      if (pickingItem == false && i < sizeof(testPackage) / sizeof(testPackage[0])) {
-        sendString(1, 7, testPackage[i]);
-        pickingItem = true;
-        i++;
-      }
-
+    } else if (goToStartPosFinished) {
+      // if (pickingItem == false && i < sizeof(testPackage) / sizeof(testPackage[0])) {
+      //   sendString(1, 7, testPackage[i]);
+      //   pickingItem = true;
+      //   i++;
+      // }
+  
       if (wait(checkPositionMillis, 200)) {
         sendSmallIntValue(1, 5, 2);
         Wire.requestFrom(1, 6);
@@ -204,13 +215,12 @@ void loop() {
         }
       }
       if (pickUpAction) {
-        pickUP(i);
+        pickUP(pickUpCount);
       }
     }
 
   } else {
     digitalWrite(ledYellow, HIGH);
-    bool tiltState = shelfTilt();
     if (tiltState && !pastTilt) {
       pastTilt = tiltState;
       if (pressedOut) {
@@ -407,6 +417,7 @@ void pickUP(int count) {
         sendValue(1, 6, true);
         extendBool = false;
         pickingItem = false;
+        Serial.println("complete");
       }
     }
   }
@@ -420,26 +431,26 @@ bool wait(long int mil, int wait) {
 }
 
 void goToStartPosition() {
-  bool robot2Ready = false; 
-  if(!zInStartPos) {
+  bool robot2Ready = false;
+  if (!zInStartPos) {
     GoIn();
   } else {
     zInStartPos = true;
     Stop();
   }
 
-  if(zInStartPos) {
-    if(wait(checkStartPostitionMillis, 200)) {
+  if (zInStartPos) {
+    if (wait(checkStartPostitionMillis, 200)) {
       checkStartPostitionMillis = millis();
       sendSmallIntValue(1, 5, 3);
       Wire.requestFrom(1, 6);
-      if(Wire.available()) {
+      if (Wire.available()) {
         robot2Ready = Wire.read();
       }
     }
   }
 
-  if(robot2Ready && zInStartPos) {
+  if (robot2Ready && zInStartPos) {
     goToStartPosFinished = true;
     goToStartPos = false;
     sendValue(1, 8, true);

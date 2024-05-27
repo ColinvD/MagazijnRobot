@@ -53,13 +53,16 @@ public class SerialCommunicator implements SerialPortDataListener{
                 System.out.println("Message: " + message[0]);
             }
             theMessage = theMessage.trim();
-            if (theMessage.equals("nullOut")){
-                theMessage = "Out";
-            }
+            theMessage = theMessage.replaceFirst("null", "");
 
+            System.out.println(theMessage);
             try {
                 NotifyListeners(theMessage);
             } catch (SQLException e) {
+                System.out.println(e.getMessage());
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
         }
@@ -71,7 +74,8 @@ public class SerialCommunicator implements SerialPortDataListener{
     public void RemoveListener(Listener listener){
         listeners.remove(listener);
     }
-    private void NotifyListeners(String message) throws SQLException {
+    private void NotifyListeners(String message) throws SQLException, IOException {
+        System.out.println("yo: " + message);
         for (Listener listener : listeners) {
             listener.onMessageReceived(message);
         }

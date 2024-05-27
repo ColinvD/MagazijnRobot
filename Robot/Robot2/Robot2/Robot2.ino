@@ -136,7 +136,6 @@ void loop() {
   }
 
   if (stopState) {
-    Serial.println("haa");
     StopUp();
     StopLeft();
   } else if (autoBool) {
@@ -357,6 +356,7 @@ void receiveData() {
     receivedString[0] = Wire.read();
     receivedString[1] = Wire.read();
     stockLocation = String(receivedString[0]) + String(receivedString[1]);
+    Serial.println(stockLocation);
   } else if (function == 8) {
     // Check if is in Start
      goToStartPosFinished = Wire.read();
