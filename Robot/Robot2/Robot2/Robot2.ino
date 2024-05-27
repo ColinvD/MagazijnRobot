@@ -333,8 +333,11 @@ void receiveData() {
   if (function == 1) {
     // emergency stop
     stopState = Wire.read();
-  } else if (function == 2) { //beschikbaar
+  } else if (function == 2) {
     Wire.read();
+    autoBool = !autoBool;
+    Serial.print("autoBool: ");
+    Serial.println(autoBool);
   } else if (function == 3) {
     // go a litle bit up to pick up the box
     upSmallBool = Wire.read();

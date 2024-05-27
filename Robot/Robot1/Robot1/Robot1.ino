@@ -23,15 +23,17 @@ int currentState = 4;
 
 
 //Button var
+const int joyconButton = 4;
 const int uit = 7;
 const int in = 10;
 bool pressedOut = false;
 bool isReleasedOut = true;
 bool pressedIn = false;
 bool isReleasedIn = true;
+bool joyconPressed = false;
 
 //Stop Button
-const int stopButton = 4;
+const int stopButton = A1;
 bool buttonPressed;
 bool stopState = true;
 
@@ -106,6 +108,9 @@ void setup() {
   pinMode(ledYellow, OUTPUT);
   pinMode(ledRed, OUTPUT);
 
+  pinMode(joyconButton, INPUT);
+  digitalWrite(joyconButton, HIGH);
+
   Wire.begin();
   Serial.begin(9600);
 
@@ -115,7 +120,7 @@ void setup() {
 
 void loop() {
   if (Serial.available()) {
-    sendValue(1, 2, false);
+    // sendValue(1, 2, false);
     String message = Serial.readStringUntil('\n');
     if (message.equals("STOP")) {
       stopState = true;
@@ -129,12 +134,23 @@ void loop() {
       goToStartPos = true;
       goToStartPosFinished = false;
       zInStartPos = false;
-      sendValue(1,0, true);
+      sendValue(1, 0, true);
     } else if (message[0] == 'L') {
       sendString(1, 7, message.substring(1, 3));
       pickingItem = true;
       pickUpCount = message.substring(3, 4).toInt();
     }
+  }
+  if (!digitalRead(joyconButton) == true) {
+    if (joyconPressed == false) {
+      joyconPressed = true;
+      sendValue(1, 2, true);
+      autoBool = !autoBool;
+      Serial.print("autoBool: ");
+      Serial.println(autoBool);
+    }
+  } else {
+    joyconPressed = false;
   }
 
   pos = 0;
@@ -231,10 +247,10 @@ void loop() {
       if (pressedOut) {
         Stop();
       }
-      sendValue(1, 2, tiltState);
+      // sendValue(1, 2, tiltState);
     } else if (!tiltState && pastTilt) {
       pastTilt = tiltState;
-      sendValue(1, 2, tiltState);
+      // sendValue(1, 2, tiltState);
     }
     // Serial.println(Distance());
     if (pressedOut && isReleasedOut && Distance() < 18.5 && !tiltState) {
