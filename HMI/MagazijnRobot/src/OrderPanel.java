@@ -6,13 +6,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener, Listener {
-
 
     private int routepoint = 0;
     private int doos = 0;
@@ -21,6 +21,8 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
 
     // SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
     private ArrayList<ArrayList<Locatie>> Boxes;
+    private ResultSet selectedOrder;
+    private int selectedOrderID;
     private Database database;
     private JLabel jlSelectedOrder;
     private ResultSet orderItems;
@@ -37,9 +39,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     private int counterChangeAmountColor;
     private int counterMaxAmountColor;
 
-
-
-
     public OrderPanel() {
         // serialCommunicator.AddListener(this);
         setPreferredSize(new Dimension(400, 400));
@@ -54,6 +53,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         jbStartOrder = new JButton("Start");
         jbStartOrder.setPreferredSize(new Dimension(100, 30));
         jbStartOrder.addActionListener(this);
+        jbStartOrder.setFocusable(false);
 
         orderItemsPanel = new JPanel();
         orderItemsPanel.setLayout(new BoxLayout(orderItemsPanel, BoxLayout.Y_AXIS));
@@ -62,6 +62,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
 
         orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         orderJSP.setPreferredSize(new Dimension(400, 360));
+        orderJSP.getVerticalScrollBar().setUnitIncrement(17);
         jbStartOrder.setEnabled(false);
         add(jlSelectedOrder);
         add(jbStartOrder);
@@ -73,6 +74,8 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         order = OrderID;
         products1 = new ArrayList<>();
         ResultSet selectedOrder = database.getOrder(OrderID);
+        this.selectedOrderID = OrderID;
+        selectedOrder = database.getOrder(OrderID);
         database.printResult(selectedOrder);
         orderItems = database.getOrderlines(OrderID);
         orderItemsPanel.removeAll();
@@ -147,6 +150,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         routepoint = 0;
         counterMaxAmountColor = 0;
         jbStartOrder.setEnabled(true);
+        ButtonPanel.SetUpdateButtonEnabled(true);
         this.updateUI();
     }
 
@@ -222,5 +226,9 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
             SchapPanel.drawRoute(route);
         }
 
+    }
+
+    public int getSelectedOrderID() {
+        return selectedOrderID;
     }
 }
