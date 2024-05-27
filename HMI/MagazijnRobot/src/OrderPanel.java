@@ -33,7 +33,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     private JButton jbStartOrder;
     private JScrollPane orderJSP;
 
-    private int order;
+    //private int order;
     private int sizebox;
 
     private int counterChangeAmountColor;
@@ -71,9 +71,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     }
 
     public void setOrder(int OrderID) throws SQLException {
-        order = OrderID;
         products1 = new ArrayList<>();
-        ResultSet selectedOrder = database.getOrder(OrderID);
         this.selectedOrderID = OrderID;
         selectedOrder = database.getOrder(OrderID);
         database.printResult(selectedOrder);
@@ -214,7 +212,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         }
         if (message.equals("Complete")) {
             System.out.println("complete");
-            database.updatePickedOrder(order);
+            database.updatePickedOrder(selectedOrderID);
             JOptionPane.showMessageDialog(this, "De order is afgerond");
         }
         if (message.equals("Done")) {
@@ -230,5 +228,9 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
 
     public int getSelectedOrderID() {
         return selectedOrderID;
+    }
+
+    public void refreshOrder() throws SQLException {
+        setOrder(this.selectedOrderID);
     }
 }

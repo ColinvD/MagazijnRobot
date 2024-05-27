@@ -222,7 +222,8 @@ public class Database {
         database.databaseConnect();
         ResultSet set = database.select("Select Stockitems.StockItemID,Stockitems.StockItemName,Stockitems.Weight From Stockitems join Orderlines on Stockitems.StockItemID = Orderlines.StockItemID Where OrderlineID = ?", String.valueOf(orderLineId));
         set.next();
-        return set.getInt("StockItemID")+ ". " + set.getString("StockItemName") + ". " + set.getString("Weight") + ".";
+        return set.getInt("StockItemID") + ". " + set.getString("StockItemName") + ". " + set.getString("Weight") + ".";
+    }
 
     public void insertOrderLines(ArrayList<DatabaseValue> data) throws SQLException{
         String query = "INSERT INTO orderlines(OrderID, StockItemID, Description, PackageTypeID, Quantity, UnitPrice, TaxRate, PickedQuantity, LastEditedBy, LastEditedWhen) " +
