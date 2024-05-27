@@ -1,17 +1,22 @@
 #include <Wire.h>
 #include <util/atomic.h>
-
 #define zEncoderA 2
 #define zEncoderB 5
-const int directionPinUP = 12;
-const int pwmPinUP = 3;
-const int brakeUP = 9;
+#define xEncoderA 3
+#define xEncoderB A3
+
+String testPackage[] = { "A1", "C3", "E5"};
+
+int xPos = 0;
+int xPosition = 0;
+
+const int directionPinUP = 13;
+const int pwmPinUP = 11;
+const int brakeUP = 8;
 
 const int distance = A2;
 
-
-
-const int power = 120;
+const int power = 140;
 unsigned long LastTime;
 int waitTime = 2000;
 int currentState = 4;
@@ -28,7 +33,29 @@ bool isReleasedIn = true;
 //Stop Button
 const int stopButton = 4;
 bool buttonPressed;
-bool stopState = false;
+bool stopState = true;
+
+bool zInStartPos = false;
+
+long int checkConnectionMillis = 0;
+
+//automatic
+bool autoBool = true;
+bool pickUpBool = false;
+
+bool pickUpAction = false;
+bool pickingItem = false;
+
+bool pickUpDataSend = false;
+bool extendBool = false;
+long int receiveMillis;
+
+long int checkPositionMillis = 0;
+long int checkStartPostitionMillis = 0;
+
+bool goToStartPos = true;
+bool goToStartPosFinished = false;
+
 // infra red sensor
 bool stoppedOut = true;
 bool stoppedIn = true;
@@ -44,12 +71,18 @@ bool pastTilt = false;
 volatile int zPosition = 0;
 int prevEncoderValueA = 0;
 int prevEncoderValueB = 0;
+int pos = 0;
+
 
 //led light
-int ledGreen = 8;
-int ledYellow = 11;
-int ledRed = 13;
+int ledGreen = A0;
+int ledYellow = 9;
+int ledRed = 12;
 
+int i = 0;
+
+int stopValueOld;
+int checkStopValueOld;
 
 void setup() {
   // put your setup code here, to run once:
@@ -65,8 +98,8 @@ void setup() {
 
   pinMode(zEncoderA, INPUT);
   pinMode(zEncoderB, INPUT);
-  pinMode(xEncoderA, INPUT);
-  pinMode(xEncoderB, INPUT);
+  pinMode(xEncoderA, INPUT_PULLUP);
+  pinMode(xEncoderB, INPUT_PULLUP);
 
   pinMode(ledGreen, OUTPUT);
   pinMode(ledYellow, OUTPUT);
@@ -76,12 +109,11 @@ void setup() {
   Serial.begin(9600);
 
   attachInterrupt(digitalPinToInterrupt(zEncoderA), setEncoder, RISING);
-  attachInterrupt(digitalPinToInterrupt(xEncoderA), setEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(xEncoderA), setEncoderX, RISING);
 }
 
 void loop() {
-  Serial.println(Distance());
-  if (Serial.available()) {
+   if (Serial.available()) {
     String message = Serial.readStringUntil('\n');
     if (message.equals("STOP")) {
       stopState = true;
@@ -94,12 +126,28 @@ void loop() {
       sendValue(1, 1, stopState);
     }
   }
+  pos = 0;
+  xPos = 0;
 
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    pos = zPosition;
+    xPos = xPosition;
+  }
 
+  sendIntValue(1, 4, xPos);
 
+  if(Distance() > 6.8) {
+    zInStartPos = false;
+  } else {
+    zInStartPos = true;
+  }
+
+  sendValue(1, 9, zInStartPos);
 
   digitalWrite(ledRed, LOW);
+  digitalWrite(ledGreen, LOW);
   int stopValue = digitalRead(stopButton);
+ 
   if (!stopValue) {
     buttonPressed = false;
   }
@@ -115,18 +163,54 @@ void loop() {
     sendValue(1, 1, stopState);
   }
 
+  pressedOut = digitalRead(uit);
+  pressedIn = digitalRead(in);
+
+
+  sendSmallIntValue(1, 5, 4);
+  Wire.requestFrom(1, 6);
+  if(Wire.available()) {
+    bool connection = Wire.read();
+    checkConnectionMillis = millis();
+  }
+
+  if(wait(checkConnectionMillis, 300)) {
+    stopState = true;
+  }
+
   if (stopState) {
     // emergency stop button pressed
     Stop();
-   // Serial.println("STOP");
     digitalWrite(ledYellow, LOW);
     digitalWrite(ledRed, HIGH);
+  } else if (autoBool) {
+    digitalWrite(ledYellow, LOW);
+    digitalWrite(ledGreen, HIGH);
+    if(goToStartPos) {
+      goToStartPosition();
+    } else if(goToStartPosFinished) {
+      if (pickingItem == false && i < sizeof(testPackage) / sizeof(testPackage[0])) {
+        sendString(1, 7, testPackage[i]);
+        pickingItem = true;
+        i++;
+      }
+
+      if (wait(checkPositionMillis, 200)) {
+        sendSmallIntValue(1, 5, 2);
+        Wire.requestFrom(1, 6);
+        checkPositionMillis = millis();
+        if (Wire.available()) {
+          pickUpAction = Wire.read();
+        }
+      }
+      if (pickUpAction) {
+        pickUP(i);
+      }
+    }
+
   } else {
-   // Serial.println("Unlock");
     digitalWrite(ledYellow, HIGH);
     bool tiltState = shelfTilt();
-    pressedOut = digitalRead(uit);
-    pressedIn = digitalRead(in);
     if (tiltState && !pastTilt) {
       pastTilt = tiltState;
       if (pressedOut) {
@@ -138,25 +222,23 @@ void loop() {
       sendValue(1, 2, tiltState);
     }
     // Serial.println(Distance());
-    if (pressedOut && isReleasedOut && Distance() < 17.8 && !tiltState) {
+    if (pressedOut && isReleasedOut && Distance() < 18.5 && !tiltState) {
       isReleasedOut = false;
       GoOut();
       stoppedOut = false;
       // Serial.println("OUT!!!!!!");
-    } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 18 && !stoppedOut)) {
+    } else if ((!pressedOut && !isReleasedOut) || (Distance() >= 18.7 && !stoppedOut)) {
       isReleasedOut = true;
       stoppedOut = true;
       Stop();
     }
 
-    if (pressedIn && isReleasedIn && Distance() > 7.2) {
+    if (pressedIn && isReleasedIn && Distance() > 6.8) {
       isReleasedIn = false;
       GoIn();
       stoppedIn = false;
-
       //Serial.println("In!!!!!!");
-    } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 7 && !stoppedIn)) {
-
+    } else if ((!pressedIn && !isReleasedIn) || (Distance() <= 6.5 && !stoppedIn)) {
       isReleasedIn = true;
       stoppedIn = true;
       Stop();
@@ -186,8 +268,6 @@ void loop() {
     // }
     //Serial.println(encoder_variable);
   }
-
- // Serial.println(zPosition);
 }
 
 void GoIn() {
@@ -226,48 +306,144 @@ bool shelfTilt() {
   return true;
 }
 
-void setEncoderZ() {
-  //int encoderValueA = digitalRead(zEncoderA);
-  //int encoderValueB = digitalRead(zEncoderB);
-
-  // int b = digitalRead(zEncoderB);
-  // if (b > 0) {
-  //   zPosition--;
-  //   if (zPosition < 0) {
-  //     zPosition = 0;
-  //   }
-  // } else {
-  //   zPosition++;
-  // }
+void setEncoder() {
+  int zEncoderValueB = digitalRead(zEncoderB);
+  if (zEncoderValueB > 0) {
+    zPosition--;
+  } else {
+    zPosition++;
+  }
 }
 
-// void setEncoderX() {
-//   //int encoderValueA = digitalRead(zEncoderA);
-//   //int encoderValueB = digitalRead(zEncoderB);
+void setEncoderX() {
+  int b = digitalRead(xEncoderB);
+  if (b > 0) {
+    xPosition--;
+  } else {
+    xPosition++;
+  }
+}
 
-//   int b = digitalRead(xEncoderB);
-//   if (b > 0) {
-//     xPosition--;
-//     if (zPosition < 0) {
-//       zPosition = 0;
-//     }
-//   } else {
-//     zPosition++;
-//   }
-
-  // if (encoderValueA != prevEncoderValueA && encoderValueB != prevEncoderValueB) {
-  //   if(direction) {
-  //     zPosition--;
-  //   } else {
-  //     zPosition++;
-  //   }
-  // }
-  // prevEncoderValueA = encoderValueA;
-//}
-
-void sendValue(int location, int functie, bool boolean) {
+void sendValue(int location, int function, bool boolean) {
   Wire.beginTransmission(location);
-  Wire.write(functie);
+  Wire.write(function);
   Wire.write(boolean);
   Wire.endTransmission();
+}
+
+void sendIntValue(int location, int function, int value) {
+  Wire.beginTransmission(location);
+  Wire.write(function);
+  // Serial.println(value);
+  Wire.write(highByte(value));
+  Wire.write(lowByte(value));
+  Wire.endTransmission();
+}
+
+void sendSmallIntValue(int location, int function, int value) {
+  Wire.beginTransmission(location);
+  Wire.write(function);
+  Wire.write(value);
+  Wire.endTransmission();
+}
+
+void sendString(int location, int function, String value) {
+  Wire.beginTransmission(location);
+  Wire.write(function);
+  Wire.write(value[0]);
+  Wire.write(value[1]);
+  Wire.endTransmission();
+}
+// void receiveEvent() {
+//   int function = Wire.read();
+//   Serial.println(function);
+//   switch (function) {
+//     case 1:
+//       pickUpBool = Wire.read();
+//       break;
+//   }
+// }
+
+void pickUP(int count) {
+  int value = 0;
+  switch (count) {
+    case 1:
+      value = 880;
+      break;
+    case 2:
+      value = 610;
+      break;
+    case 3:
+      value = 350;
+      break;
+  }
+  if (!extendBool && pos < value) {
+    pickUpBool = true;
+    pickUpDataSend = true;
+    GoOut();
+  } else {
+    extendBool = true;
+    if (pickUpBool) {
+      // Serial.println(pickUpDataSend);
+      if (pickUpDataSend) {
+        sendValue(1, 3, true);
+        pickUpDataSend = false;
+      }
+      if (wait(receiveMillis, 200)) {
+        sendSmallIntValue(1, 5, 1);
+        Wire.requestFrom(1, 6);
+        receiveMillis = millis();
+        if (Wire.available()) {
+          pickUpBool = Wire.read();
+        }
+      }
+      Stop();
+    } else {
+      if (pos > 20) {
+        GoIn();
+      } else {
+        Stop();
+        pickUpAction = false;
+        sendValue(1, 6, true);
+        extendBool = false;
+        pickingItem = false;
+      }
+    }
+  }
+}
+
+bool wait(long int mil, int wait) {
+  if (millis() - mil > wait) {
+    return true;
+  }
+  return false;
+}
+
+void goToStartPosition() {
+  bool robot2Ready = false; 
+  if(!zInStartPos) {
+    GoIn();
+  } else {
+    zInStartPos = true;
+    Stop();
+  }
+
+  if(zInStartPos) {
+    if(wait(checkStartPostitionMillis, 200)) {
+      checkStartPostitionMillis = millis();
+      sendSmallIntValue(1, 5, 3);
+      Wire.requestFrom(1, 6);
+      if(Wire.available()) {
+        robot2Ready = Wire.read();
+      }
+    }
+  }
+
+  if(robot2Ready && zInStartPos) {
+    goToStartPosFinished = true;
+    goToStartPos = false;
+    sendValue(1, 8, true);
+    zPosition = 0;
+    xPosition = 0;
+  }
 }

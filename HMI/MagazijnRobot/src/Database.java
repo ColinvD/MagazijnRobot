@@ -187,7 +187,7 @@ public class Database {
         ResultSet result = database.select("SELECT StockLocation,Weight FROM stockitems WHERE StockLocation IS NOT NULL");
         while (result.next()) {
             int d = result.getInt("Weight");
-            weights.add(new Locatie(result.getString("StockLocation"),d));
+            weights.add(new Locatie(result.getString("StockLocation"),d,0));
         }
         return weights;
     }
@@ -200,24 +200,31 @@ public class Database {
         rs.next();
         return rs.getInt(1);
     }
+    public void updatepicked(int OrderlinesId) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        System.out.println(OrderlinesId);
+        database.update("Update orderlines Set PickedQuantity = PickedQuantity + 1 Where OrderLineId = ?",String.valueOf(OrderlinesId));
+    }
+    public void updatePickedOrder(int OrderID) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        database.update("Update orders Set PickingCompletedWhen = NOW() Where OrderID = ?",String.valueOf(OrderID));
+    }
 
-//    public void insertOrderLines(int orderID, int quantity, ResultSet data) throws SQLException{
-//        data.next();
-//        String query = "INSERT INTO orderlines(OrderID, StockItemID, Description, PackageTypeID, Quantity, UnitPrice, TaxRate, PickedQuantity, LastEditedBy, LastEditedWhen) " +
-//                "VALUES (?,?,?,?,?,?,?,0,1,CURRENT_DATE)";
-//        PreparedStatement s = connection.prepareStatement(query);
-//        s.setInt(1, orderID);
-//        s.setInt(2, data.getInt(1));
-//        s.setString(3, data.getString(2));
-//        s.setInt(4, data.getInt(3));
-//        s.setInt(5, quantity);
-//        s.setInt(6, data.getInt(4));
-//        s.setInt(7, data.getInt(5));
-//        s.execute();
-//    }
+    public void updateOrderlineAfterOrder(int OrderId) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        database.update("Update orderlines Set PickingCompletedWhen = NOW() Where OrderLineID = ? AND Quantity = PickedQuantity",String.valueOf(OrderId));
+    }
+    public String selectEmptyLocation(int orderLineId) throws SQLException {
+        Database database = new Database();
+        database.databaseConnect();
+        ResultSet set = database.select("Select Stockitems.StockItemID,Stockitems.StockItemName,Stockitems.Weight From Stockitems join Orderlines on Stockitems.StockItemID = Orderlines.StockItemID Where OrderlineID = ?", String.valueOf(orderLineId));
+        set.next();
+        return set.getInt("StockItemID")+ ". " + set.getString("StockItemName") + ". " + set.getString("Weight") + ".";
 
     public void insertOrderLines(ArrayList<DatabaseValue> data) throws SQLException{
-//        data.next();
         String query = "INSERT INTO orderlines(OrderID, StockItemID, Description, PackageTypeID, Quantity, UnitPrice, TaxRate, PickedQuantity, LastEditedBy, LastEditedWhen) " +
                 "VALUES (?,?,?,?,?,?,?,0,1,CURRENT_DATE)";
         PreparedStatement s = connection.prepareStatement(query);

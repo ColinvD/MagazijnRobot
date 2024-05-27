@@ -15,7 +15,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private JButton emergencyStop;
     private static JButton jbOrderUpdate;
     public ButtonPanel(OrderPanel orderPanel){
-        setPreferredSize(new Dimension(350,200));
+        setPreferredSize(new Dimension(400,200));
         setLayout(new FlowLayout());
         setBackground(Color.white);
         setBorder(new MatteBorder(1, 0, 0, 1, Color.BLACK));
