@@ -55,7 +55,7 @@ public class AddProductDialog extends JDialog implements ActionListener {
 
         jcbProducts = new JComboBox(boxValue);
 
-        SpinnerNumberModel model = new SpinnerNumberModel(0, 1, null, 1);
+        SpinnerNumberModel model = new SpinnerNumberModel(1, 1, null, 1);
         jsAmount = new JSpinner(model);
         jsAmount.setPreferredSize(new Dimension(50,20));
 

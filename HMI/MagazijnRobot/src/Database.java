@@ -246,13 +246,13 @@ public class Database {
                     break;
             }
         }
-//        s.setInt(1, orderID); // OrderID
-//        s.setInt(2, data.getInt(1)); // StockItemID
-//        s.setString(3, data.getString(2)); // Description
-//        s.setInt(4, data.getInt(3)); // PackageTypeID
-//        s.setInt(5, quantity); // Quantity
-//        s.setInt(6, data.getInt(4)); // UnitPrice
-//        s.setInt(7, data.getInt(5)); // TaxRate
+        s.execute();
+    }
+
+    public void deleteOrderLine(int orderLineID)throws SQLException{
+        String query = "DELETE FROM orderlines WHERE OrderLineID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, orderLineID);
         s.execute();
     }
 }

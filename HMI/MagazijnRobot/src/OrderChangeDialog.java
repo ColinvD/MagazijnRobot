@@ -17,8 +17,9 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
     private ArrayList<ArrayList> listOrder;
     //private ArrayList<ArrayList> tempOrder;
     //private DateFormat dmy = new SimpleDateFormat("dd/MM/yyyy");
-    private ArrayList<Integer> orderLines = new ArrayList<>();
+    //private ArrayList<Integer> orderLines = new ArrayList<>();
     private ArrayList<JSpinner> orderlinesSpinners = new ArrayList<>();
+    private ArrayList<JButton> deleteButtons = new ArrayList<>();
     private JButton jbCancel, jbConfirm, jbAdd;
     //private JLabel jlChooseOrder;
     private JScrollPane jsOrders;
@@ -144,8 +145,16 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
                     ArrayList<DatabaseValue> row = makeFakeOrderLine(addDialog.getChosenProductID(), addDialog.getWantedQuantity());
                     listOrder.add(row);
                     refreshData();
-                    jsOrders.updateUI();
+                    //jsOrders.updateUI();
                 }
+            }
+        }
+        for(int i = 0; i < deleteButtons.size(); i++){
+            if(e.getSource() == deleteButtons.get(i)){
+                listOrder.remove(i);
+                orderlinesSpinners.remove(i);
+                deleteButtons.remove(i);
+                refreshData();
             }
         }
         /*if(e.getSource() == jbSearch){
@@ -169,8 +178,9 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
     public void refreshData(){
         jpOrderlines.removeAll();
 
-        orderLines.clear();
+        //orderLines.clear();
         orderlinesSpinners.clear();
+        deleteButtons.clear();
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -186,14 +196,14 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
 
         for (int i  = 0; i< listOrder.size(); i++) {
             ArrayList<DatabaseValue> orderline = listOrder.get(i);
-            for (int j = 0; j < orderline.size(); j++) {
-                if(orderline.get(j).getColomn().equals("StockItemID")){
-                    orderLines.add((int)orderline.get(j).getValue());
-                    break;
-                }
-            }
+//            for (int j = 0; j < orderline.size(); j++) {
+//                if(orderline.get(j).getColomn().equals("StockItemID")){
+//                    orderLines.add((int)orderline.get(j).getValue());
+//                    break;
+//                }
+//            }
             //orderLines.add((int) orderline.get(2).getValue());
-            orderLines.add((int) getDatabaseValue(i, "OrderID").getValue());
+            //orderLines.add((int) getDatabaseValue(i, "OrderID").getValue());
             int productID = (int) getDatabaseValue(i, "StockItemID").getValue();
             String itemName = (String) getDatabaseValue(i, "Description").getValue();
             int itemQuantity = (int) getDatabaseValue(i, "Quantity").getValue();
@@ -215,15 +225,23 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
             c.gridx = 2;
             orderlinesSpinners.add(quantity);
             jpOrderlines.add(quantity, c);
+            JButton deleteButton = new JButton("X");
+            deleteButton.addActionListener(this);
+            deleteButton.setBackground(Color.red);
+            deleteButton.setForeground(Color.white);
+            deleteButtons.add(deleteButton);
+            c.gridx = 3;
+            jpOrderlines.add(deleteButton,c);
         }
 
-        if(orderLines.isEmpty()) {
+        if(listOrder.isEmpty()) {
             jpOrderlines.removeAll();
-            jpOrderlines.setLayout(new GridLayout(1,1));
+            jpOrderlines.setLayout(new GridBagLayout());
             jpOrderlines.add(new JLabel("Geen orders gevonden.", SwingConstants.CENTER));
         }
 
         jpOrderlines.revalidate();
+        jsOrders.updateUI();
     }
 
     public void closeDatabase(){
@@ -254,7 +272,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
             else{
                 // item is verwijderd
                 System.out.println("Item wordt verwijderd");
-
+                database.deleteOrderLine(currentOrder.getInt("OrderLineID"));
             }
         }
         if(!listOrder.isEmpty()){
