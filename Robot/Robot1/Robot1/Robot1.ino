@@ -146,6 +146,7 @@ void loop() {
       joyconPressed = true;
       sendValue(1, 2, true);
       autoBool = !autoBool;
+      Stop();
       Serial.print("autoBool: ");
       Serial.println(autoBool);
     }
