@@ -97,7 +97,6 @@ public class OrderDialog extends JDialog implements ActionListener {
                     System.out.println("Order inladen gelukt.");
                 } catch (SQLException ex) {
                     System.out.println("Order inladen mislukt.");
-                    throw new RuntimeException(ex);
                 }
             }
             closeDatabase();
