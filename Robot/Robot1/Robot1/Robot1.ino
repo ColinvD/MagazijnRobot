@@ -125,6 +125,11 @@ void loop() {
       stopState = false;
       buttonPressed = true;
       sendValue(1, 1, stopState);
+    } else if (message.equals("GoToStart")) {
+      goToStartPos = true;
+      goToStartPosFinished = false;
+      zInStartPos = false;
+      sendValue(1,0, true);
     } else if (message[0] == 'L') {
       sendString(1, 7, message.substring(1, 3));
       pickingItem = true;
@@ -173,7 +178,7 @@ void loop() {
   pressedIn = digitalRead(in);
 
   bool tiltState = shelfTilt();
-  if(tiltState) {
+  if (tiltState) {
     stopState = true;
     sendValue(1, 1, stopState);
   }
@@ -205,7 +210,7 @@ void loop() {
       //   pickingItem = true;
       //   i++;
       // }
-  
+
       if (wait(checkPositionMillis, 200)) {
         sendSmallIntValue(1, 5, 2);
         Wire.requestFrom(1, 6);
@@ -456,5 +461,6 @@ void goToStartPosition() {
     sendValue(1, 8, true);
     zPosition = 0;
     xPosition = 0;
+    Serial.println("Finished");
   }
 }

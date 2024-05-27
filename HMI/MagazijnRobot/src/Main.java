@@ -1,17 +1,16 @@
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws SQLException, IOException, InterruptedException {
-        TestSendOrder testSendOrder = new TestSendOrder();
+        SendOrder sendOrder = new SendOrder();
         Thread.sleep(4000);
         ArrayList<String> values = new ArrayList<String>();
         values.add("E5");
-        values.add("B2");
-        values.add("E1");
-        testSendOrder.sendOrder(values);
+        values.add("E4");
+        values.add("E3");
+        sendOrder.sendOrder(values);
 
 
         HMIScreen hmiScreen = new HMIScreen();

@@ -333,9 +333,8 @@ void receiveData() {
   if (function == 1) {
     // emergency stop
     stopState = Wire.read();
-  } else if (function == 2) {
-    // stop going up
-    stopUpBool = Wire.read();
+  } else if (function == 2) { //beschikbaar
+    Wire.read();
   } else if (function == 3) {
     // go a litle bit up to pick up the box
     upSmallBool = Wire.read();
@@ -365,6 +364,12 @@ void receiveData() {
     if(zInStartPos) {
       oldYPos = yPos;
     }
+  } else if (function == 0){
+    Wire.read();
+    goToStartPos = true;
+    goToStartPosRobot2Finished = false;
+    goToStartPosFinished = false;
+    zInStartPos = false;
   }
 }
 

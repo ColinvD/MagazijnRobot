@@ -75,7 +75,6 @@ public class SerialCommunicator implements SerialPortDataListener{
         listeners.remove(listener);
     }
     private void NotifyListeners(String message) throws SQLException, IOException {
-        System.out.println("yo: " + message);
         for (Listener listener : listeners) {
             listener.onMessageReceived(message);
         }
