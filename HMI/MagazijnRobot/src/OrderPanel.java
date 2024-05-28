@@ -144,6 +144,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         counterMaxAmountColor = 0;
         jbStartOrder.setEnabled(true);
         ButtonPanel.SetUpdateButtonEnabled(true);
+        ButtonPanel.SetPackingButtonEnabled(true);
         this.updateUI();
     }
 
@@ -216,8 +217,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         }
         if (message.equals("Done")) {
             System.out.println("Done");
-            //pakbon
-
             counterBoxes++;
             ArrayList<Locatie> box = new ArrayList<>(Boxes.get(counterBoxes));
             ArrayList<Locatie> route = TSP.getRoute(box);
