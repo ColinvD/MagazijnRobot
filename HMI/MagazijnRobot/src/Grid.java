@@ -185,6 +185,8 @@ public class Grid extends JPanel implements Listener {
     @Override
     public void onMessageReceived(String message) throws SQLException, IOException {
         if(message.startsWith("X:") && message.contains("Y:")) {
+//            System.out.println("check");
+            serialCommunicator.sendMessageToArduino("checkJavaConnection");
             locationRobot2 = message;
             repaint();
         }

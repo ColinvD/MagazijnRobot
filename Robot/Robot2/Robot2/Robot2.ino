@@ -66,6 +66,7 @@ bool upSmallBool = false;
 bool gettingItem = false;
 
 long int checkConnectionMillis = 0;
+bool checkConnectionBool = true;
 
 bool PickUpStep[2] = { false, false };
 
@@ -150,7 +151,11 @@ void loop() {
 
   if (wait(checkConnectionMillis, 300)) {
     checkConnectionMillis = millis();
+    checkConnectionBool = false;
     stopState = 2;
+  } else if(!checkConnectionBool) {
+    checkConnectionBool = true;
+    stopState = 1;
   }
 
   if (stopState) {

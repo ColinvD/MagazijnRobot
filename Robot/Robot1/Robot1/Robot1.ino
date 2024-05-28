@@ -42,7 +42,10 @@ bool stopButtonConnected = true;
 bool zInStartPos = false;
 
 long int checkConnectionMillis = 0;
+long int checkJavaConnectionMillis = 0;
 long int checkStopButtonMillis = 0;
+
+bool checkJavaConnectionBool = true;
 
 //automatic
 bool autoBool = true;
@@ -124,8 +127,7 @@ void setup() {
 void loop() {
   if (Serial.available()) {
     // sendValue(1, 2, false);
-  String message = Serial.readStringUntil('\n');
-      Serial.println(message);
+    String message = Serial.readStringUntil('\n');
     if (message.equals("STOP")) {
       stopState = 1;
       buttonPressed = true;
@@ -143,8 +145,20 @@ void loop() {
       sendString(1, 7, message.substring(1, 3));
       pickingItem = true;
       pickUpCount = message.substring(3, 4).toInt();
+    } else if (message.equals("checkJavaConnection")) {
+      checkJavaConnectionMillis = millis();
     }
   }
+  if(wait(checkJavaConnectionMillis, 300)) {
+    checkJavaConnectionBool = false;
+    stopState = 2;
+    sendSmallIntValue(1, 1, stopState);
+  } else if(!checkJavaConnectionBool) {
+    checkJavaConnectionBool = true;
+    stopState = 1;
+    sendSmallIntValue(1, 1, stopState);
+  }
+
   if (!digitalRead(joyconButton) == true) {
     if (joyconPressed == false) {
       joyconPressed = true;
@@ -468,7 +482,7 @@ void pickUP(int count) {
         sendValue(1, 6, true);
         extendBool = false;
         pickingItem = false;
-        Serial.println("complete");
+        Serial.println("Out");
       }
     }
   }
@@ -507,6 +521,6 @@ void goToStartPosition() {
     sendValue(1, 8, true);
     zPosition = 0;
     xPosition = 0;
-    Serial.println("Finished");
+    Serial.println("Complete");
   }
 }

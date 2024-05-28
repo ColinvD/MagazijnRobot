@@ -23,15 +23,15 @@ public class SendOrder implements Listener {
         if(!message.contains("X:") && !message.isEmpty()) {
             System.out.println(message);
         }
-        if(message.equals("complete") && i < stockLocations.size()) { //per item die completed is
+        if(message.equals("Out") && i < stockLocations.size()) { //per item die completed is
             System.out.println("L" + stockLocations.get(i) + (i + 1));
             serialCommunicator.sendMessageToArduino("L" + stockLocations.get(i) + (i + 1));
             i++;
-        } else if (message.equals("complete") && i==stockLocations.size()) {
+        } else if (message.equals("Out") && i==stockLocations.size()) {
             serialCommunicator.sendMessageToArduino("GoToStart");
         }
 
-        if(message.equals("Finished") && i==stockLocations.size()){ //als doos completed is
+        if(message.equals("Complete") && i==stockLocations.size()){ //als doos completed is
             System.out.println("Box completed");
         }
     }
