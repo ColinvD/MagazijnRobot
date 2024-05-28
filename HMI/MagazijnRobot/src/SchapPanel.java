@@ -11,7 +11,7 @@ public class SchapPanel extends JPanel implements ActionListener {
     private static String[] route;
     private static Grid schap;
     private JLabel schapNaam = new JLabel("Schap");
-    private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
+    private JButton voorraadstiuatieWijzigen = new JButton("Voorraadsituatie wijzigen");
     private OrderPanel orderPanel;
 
     public SchapPanel( OrderPanel orderPanel) throws SQLException, IOException, InterruptedException {

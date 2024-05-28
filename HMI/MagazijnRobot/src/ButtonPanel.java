@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 public class ButtonPanel extends JPanel implements ActionListener {
     private JButton jbOrder;
+    private static JButton jbPackingSlip;
     private OrderPanel orderPanel;
 
     private boolean emergencyStatus;
@@ -39,9 +40,14 @@ public class ButtonPanel extends JPanel implements ActionListener {
         jbOrderUpdate.setFocusable(false);
         SetUpdateButtonEnabled(false);
 
+        jbPackingSlip = new JButton("Pakbon Genereren");
+        jbPackingSlip.addActionListener(this);
+        jbPackingSlip.setFocusable(false);
+        SetPackingButtonEnabled(false);
         add(emergencyStop);
         add(jbOrder);
         add(jbOrderUpdate);
+        add(jbPackingSlip);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -56,6 +62,13 @@ public class ButtonPanel extends JPanel implements ActionListener {
             System.out.println("UPDATE!!!!!");
             try {
                 OrderChangeDialog dialog = new OrderChangeDialog(orderPanel);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        if(e.getSource() == jbPackingSlip){
+            try {
+                PackingSlipDialog dialog = new PackingSlipDialog(orderPanel);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -104,5 +117,8 @@ public class ButtonPanel extends JPanel implements ActionListener {
     }
     public static void SetUpdateButtonEnabled(boolean state){
         jbOrderUpdate.setEnabled(state);
+    }
+    public static void SetPackingButtonEnabled(boolean state){
+        jbPackingSlip.setEnabled(state);
     }
 }

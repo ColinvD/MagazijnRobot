@@ -99,8 +99,8 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         c.weightx = 0;
         c.weighty = 3;
         this.add(jsOrders, c);
-        jpTop.add(jbCancel);
         jpTop.add(jbConfirm);
+        jpTop.add(jbCancel);
         jpTop.add(jlChooseOrder);
         jpTop.add(jbAdd);
         refreshData();
