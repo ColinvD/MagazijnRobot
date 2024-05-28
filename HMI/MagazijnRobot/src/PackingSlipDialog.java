@@ -21,8 +21,6 @@ public class PackingSlipDialog extends JDialog implements ActionListener {
 
     public PackingSlipDialog(OrderPanel orderPanel) throws SQLException {
         this.orderPanel = orderPanel;
-        database = new Database();
-        database.databaseConnect();
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -75,12 +73,27 @@ public class PackingSlipDialog extends JDialog implements ActionListener {
             dispose();
 
         }
+        if (e.getSource() == confirm){
+            ArrayList<JLabel> box = new ArrayList<>();
+            boolean stillinbox = false;
+            for (JLabel item : allBoxesInfo){
+                if (item.getText().contains(selectedBox)){
+                   stillinbox = true;
+                }
+                else if (item.getText().contains("Doos")){
+                    stillinbox = false;
+                }
+                if (stillinbox){
+                    box.add(item);
+                }
+            }
+            CheckPackingslipDialog checkPackingslipDialog = new CheckPackingslipDialog(box);
+        }
         for (JButton allBox : allBoxes) {
             if (e.getSource() == allBox) {
                 System.out.println(allBox.getText());
                 selectedBox = allBox.getText();
                 chosenBox.setText("Gekozen Doos: " + selectedBox);
-                top.revalidate();
                 top.updateUI();
             }
         }
