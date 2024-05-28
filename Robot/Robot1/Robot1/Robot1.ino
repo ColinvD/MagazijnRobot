@@ -39,7 +39,9 @@ bool buttonPressed;
 int stopState = 1;
 bool stopButtonConnected = true;
 
-bool zInStartPos = false;
+bool zInStartPos = true;
+bool zInStartPosOld = true;
+
 
 long int checkConnectionMillis = 0;
 long int checkJavaConnectionMillis = 0;
@@ -201,12 +203,17 @@ void loop() {
   Serial.println(map(yPos, 0, 2375, 293, 10));
 
   // zPos location state
-  if (Distance() > 6.8) {
+  if (Distance() > 6.6) {
     zInStartPos = false;
   } else {
     zInStartPos = true;
   }
   sendValue(1, 9, zInStartPos);
+
+  if(zInStartPos != zInStartPosOld) {
+    Serial.println("zAxisChange");
+  }
+  zInStartPosOld = zInStartPos;
 
   digitalWrite(ledRed, LOW);
   digitalWrite(ledGreen, LOW);

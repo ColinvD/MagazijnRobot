@@ -18,15 +18,15 @@ public class Grid extends JPanel implements Listener {
     private String name;
     private SerialCommunicator serialCommunicator;
 
+    private boolean zAxisOut;
+
     public Grid(int width, int height) throws IOException, InterruptedException {
         serialCommunicator = new SerialCommunicator("COM6", 9600);
         serialCommunicator.AddListener(this);
         SendOrder sendOrder = new SendOrder(serialCommunicator);
         Thread.sleep(4000);
         ArrayList<String> values = new ArrayList<String>();
-        values.add("E5");
-        values.add("E4");
-        values.add("E3");
+        values.add("B5");
         sendOrder.sendOrderValues(values);
 
         setBackground(Color.white);
@@ -110,7 +110,11 @@ public class Grid extends JPanel implements Listener {
     }
 
     public void locationRobot(String locatieRobot,Graphics g){
-        g.setColor(Color.green);
+        if(zAxisOut) {
+            g.setColor(Color.ORANGE);
+        } else {
+            g.setColor(Color.green);
+        }
         try {
             robotX = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(':') + 1, locatieRobot.indexOf('Y') - 1));
             robotY = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(":", locatieRobot.indexOf(':') + 1) + 1));
@@ -184,6 +188,9 @@ public class Grid extends JPanel implements Listener {
 
     @Override
     public void onMessageReceived(String message) throws SQLException, IOException {
+        if(message.equals("zAxisChange")) {
+            zAxisOut = !zAxisOut;
+        }
         if(message.startsWith("X:") && message.contains("Y:")) {
 //            System.out.println("check");
             serialCommunicator.sendMessageToArduino("checkJavaConnection");
