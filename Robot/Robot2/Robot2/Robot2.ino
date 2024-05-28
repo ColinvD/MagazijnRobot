@@ -10,6 +10,8 @@ const int JoyconX = A3;
 int x = 0;
 int y = 0;
 
+bool joyconPressed = false;
+
 //x variabls
 const int directionLeftRight = 13;
 const int pwmPinLeftRight = 11;
@@ -28,7 +30,10 @@ bool onRight = false;
 bool onLeft = false;
 
 //stop Button
-bool stopState = true;
+int stopState = 1;
+//on Button
+const int onButton = A0;
+bool onButtonPressed;
 
 // microswitch
 int microswitchDown = 5;
@@ -60,7 +65,8 @@ bool autoBool = true;
 bool upSmallBool = false;
 bool gettingItem = false;
 
-long int checkConnectionMillis = 0; 
+long int checkConnectionMillis = 0;
+bool checkConnectionBool = true;
 
 bool PickUpStep[2] = { false, false };
 
@@ -77,7 +83,7 @@ int addOnX = -690;
 
 int requestCase = 0;
 
-// position 
+// position
 bool goToStartPos = true;
 bool goToStartPosRobot2Finished = false;
 bool goToStartPosFinished = false;
@@ -124,25 +130,41 @@ void loop() {
   }
   // Serial.println(yPos);
 
+  // on button
+  int onValue = digitalRead(onButton);
+
+  if(!onValue) {
+    onButtonPressed = false;
+  }
+
+  // stop button state
+  if (onValue && stopState == 1 && !onButtonPressed) {
+    stopState = 0;
+    onButtonPressed = true;
+  }
+
   indictiveSensorReadLeft();
   indictiveSensorRead();
-  
+
   microSwitch();
   microSwitchUp();
 
-  if(wait(checkConnectionMillis, 300)) {
+  if (wait(checkConnectionMillis, 300)) {
     checkConnectionMillis = millis();
-    stopState = true;
+    checkConnectionBool = false;
+    stopState = 2;
+  } else if(!checkConnectionBool) {
+    checkConnectionBool = true;
+    stopState = 1;
   }
 
   if (stopState) {
-    Serial.println("haa");
     StopUp();
     StopLeft();
   } else if (autoBool) {
-    if(goToStartPos) {
+    if (goToStartPos) {
       goToStartPosition();
-    } else if(goToStartPosFinished) {
+    } else if (goToStartPosFinished) {
       if (goToPos) {
         goTo(stockLocation);
       }
@@ -150,12 +172,14 @@ void loop() {
         UpSmall();
       }
     }
-    
-
   } else {
     Moving();
   }
-
+  if(joyconPressed) {
+    StopLeft();
+    StopUp();
+    joyconPressed = false;
+  }
   // Serial.print("x = ");
   // Serial.print(x);
 
@@ -186,20 +210,19 @@ void Moving() {
 
 void Down(int powerValue) {
 
-  if(zInStartPos) {
+  if (zInStartPos) {
     digitalWrite(directionPinUP, HIGH);
     analogWrite(pwmPinUP, powerValue);
     digitalWrite(brakeUP, LOW);
     // CheckRotation("Y", false);
-  
+
   } else {
     StopUp();
   }
- 
 }
 
 void Up(int powerValue) {
-  if(zInStartPos || yPos < oldYPos + 100) {
+  if (zInStartPos || yPos < oldYPos + 100) {
     digitalWrite(directionPinUP, LOW);
     analogWrite(pwmPinUP, powerValue + 40);
     digitalWrite(brakeUP, LOW);
@@ -211,7 +234,7 @@ void Up(int powerValue) {
 
 void Right(int powerValue) {
   Serial.println(zInStartPos);
-  if(zInStartPos) {
+  if (zInStartPos) {
     digitalWrite(directionLeftRight, HIGH);
     analogWrite(pwmPinLeftRight, powerValue);
     digitalWrite(brakeLeftRight, LOW);
@@ -221,7 +244,7 @@ void Right(int powerValue) {
   // CheckRotation("X", false);
 }
 void Left(int powerValue) {
-  if(zInStartPos) {
+  if (zInStartPos) {
     digitalWrite(directionLeftRight, LOW);
     analogWrite(pwmPinLeftRight, powerValue);
     digitalWrite(brakeLeftRight, LOW);
@@ -334,9 +357,14 @@ void receiveData() {
   if (function == 1) {
     // emergency stop
     stopState = Wire.read();
+    Serial.print("stopState: ");
+    Serial.println(stopState);
   } else if (function == 2) {
-    // stop going up
-    stopUpBool = Wire.read();
+    Wire.read();
+    autoBool = !autoBool;
+    joyconPressed = true;
+    Serial.print("autoBool: ");
+    Serial.println(autoBool);
   } else if (function == 3) {
     // go a litle bit up to pick up the box
     upSmallBool = Wire.read();
@@ -357,14 +385,21 @@ void receiveData() {
     receivedString[0] = Wire.read();
     receivedString[1] = Wire.read();
     stockLocation = String(receivedString[0]) + String(receivedString[1]);
+    Serial.println(stockLocation);  
   } else if (function == 8) {
     // Check if is in Start
-     goToStartPosFinished = Wire.read();
+    goToStartPosFinished = Wire.read();
   } else if (function == 9) {
     zInStartPos = Wire.read();
-    if(zInStartPos) {
+    if (zInStartPos) {
       oldYPos = yPos;
     }
+  } else if (function == 0) {
+    Wire.read();
+    goToStartPos = true;
+    goToStartPosRobot2Finished = false;
+    goToStartPosFinished = false;
+    zInStartPos = false;
   }
 }
 
@@ -389,7 +424,16 @@ void requestEvent() {
     case 4:
       Wire.write(true);
       break;
-  }
+    case 5:
+      // send y pos to master
+      Wire.write(highByte(yPos));
+      Wire.write(lowByte(yPos));
+      break;
+    case 6:
+      // on button
+      Wire.write(stopState);
+      break;
+    }
 }
 
 void UpSmall() {
@@ -479,18 +523,18 @@ bool goToPosY(int y) {
 
 bool goToStartPosition() {
   goToStartPosRobot2Finished = false;
-  if(!onRight) {
+  if (!onRight) {
     Right(power);
   } else {
     StopLeft();
   }
-  if(!onDown) {
+  if (!onDown) {
     Down(power);
   } else {
     StopUp();
   }
-  
-  if(onRight && onDown) {
+
+  if (onRight && onDown) {
     goToStartPos = false;
     goToStartPosRobot2Finished = true;
     yPosition = 0;

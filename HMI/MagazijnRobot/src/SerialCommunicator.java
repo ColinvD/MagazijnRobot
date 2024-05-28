@@ -30,7 +30,7 @@ public class SerialCommunicator implements SerialPortDataListener{
         port.addDataListener(this);
     }
 
-    public void sendMessageToArduino(String message) throws IOException{
+    public void sendMessageToArduino(String message) throws IOException     {
         message += "\n";
         port.getOutputStream().write(message.getBytes());
         port.getOutputStream().flush();
@@ -50,16 +50,21 @@ public class SerialCommunicator implements SerialPortDataListener{
                 String[] message = messages.split("\\n", 2);
                 messages = (message.length > 1) ? message[1] : "";
                 theMessage = message[0];
-                System.out.println("Message: " + message[0]);
+//                System.out.println("Message: " + message[0]);
             }
             theMessage = theMessage.trim();
-            if (theMessage.equals("nullOut")){
-                theMessage = "Out";
-            }
+            theMessage = theMessage.replaceFirst("null", "");
 
+//            System.out.println(theMessage);
             try {
                 NotifyListeners(theMessage);
             } catch (SQLException e) {
+                System.out.println(e.getMessage());
+                StatusPanel.changeRobotStatus(false);
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                StatusPanel.changeRobotStatus(false);
                 throw new RuntimeException(e);
             }
         }
@@ -71,7 +76,7 @@ public class SerialCommunicator implements SerialPortDataListener{
     public void RemoveListener(Listener listener){
         listeners.remove(listener);
     }
-    private void NotifyListeners(String message) throws SQLException {
+    private void NotifyListeners(String message) throws SQLException, IOException {
         for (Listener listener : listeners) {
             listener.onMessageReceived(message);
         }
