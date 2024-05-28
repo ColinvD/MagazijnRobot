@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class HMIScreen extends JFrame implements ActionListener,Listener {
@@ -12,8 +13,8 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
     private String status;
     OrderPanel order = new OrderPanel();
     public static int counter;
-    // public static SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
-    public HMIScreen() throws SQLException {
+     public static SerialCommunicator serialCommunicator = new SerialCommunicator("COM6", 9600);
+    public HMIScreen() throws SQLException, IOException, InterruptedException {
     //        serialCommunicator.AddListener(this);
             setSize(900, 650);
             getContentPane().setBackground(Color.black);
@@ -21,6 +22,7 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             SchapPanel schap = new SchapPanel(order);
             StatusPanel status = new StatusPanel();
+            StatusPanel.changeRobotStatus(true);
             ButtonPanel button = new ButtonPanel(order);
 
             GridBagLayout layout = new GridBagLayout(); //create grid bag layout
