@@ -87,7 +87,7 @@ public class PackingSlipDialog extends JDialog implements ActionListener {
                     box.add(item);
                 }
             }
-            CheckPackingslipDialog checkPackingslipDialog = new CheckPackingslipDialog(box);
+            CheckPackingslipDialog checkPackingslipDialog = new CheckPackingslipDialog(box,orderPanel);
         }
         for (JButton allBox : allBoxes) {
             if (e.getSource() == allBox) {

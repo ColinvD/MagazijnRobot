@@ -265,12 +265,13 @@ public class Database {
     }
 
     public ArrayList<ArrayList> getPackingSlipData(int OrderID) throws SQLException {
-        String query = "SELECT cu.CustomerName, cu.DeliveryAddressLine1, cu. PostalAddressLine1, ci.CityName, current_timestamp() packageDate, ol.Description, ol.Quantity, ol.PickedQuantity" +
+        databaseConnect();
+        String query = "SELECT cu.CustomerName, cu.DeliveryAddressLine1, cu.PostalAddressLine1, ci.CityName, current_timestamp() PackageDate, ol.Description, ol.Quantity, ol.PickedQuantity " +
                 "FROM customers cu " +
                 "JOIN cities ci ON ci.CityID = cu.DeliveryCityID " +
                 "JOIN orders o USING (CustomerID) " +
-                "JOIN orderlines ol USING (OrderID)" +
-                "WHERE o.OrderID = ?";
+                "JOIN orderlines ol USING (OrderID) " +
+                "WHERE o.OrderID = ?;";
         PreparedStatement s = connection.prepareStatement(query);
         s.setInt(1, OrderID);
         ResultSet result = s.executeQuery();
@@ -294,6 +295,7 @@ public class Database {
 
             table.add(row);
         }
+        close();
         return table;
     }
 
