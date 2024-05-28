@@ -532,7 +532,7 @@ void goToStartPosition() {
     if (StartUpStart) {
       StartUpStart = false;
     } else {
-      Serial.println("Complete");
+      Serial.println("Done");
     }
   }
 }

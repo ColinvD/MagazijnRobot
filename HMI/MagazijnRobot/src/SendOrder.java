@@ -31,7 +31,7 @@ public class SendOrder implements Listener {
             serialCommunicator.sendMessageToArduino("GoToStart");
         }
 
-        if(message.equals("Complete") && i==stockLocations.size()){ //als doos completed is
+        if(message.equals("Done") && i==stockLocations.size()){ //als doos completed is
             System.out.println("Box completed");
         }
     }
