@@ -4,18 +4,31 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Grid extends JPanel {
+public class Grid extends JPanel implements Listener {
     private GridSpace[][] grid;
     protected static String locationRobot2 = "X:290 Y:290";
     private int robotX;
     private int robotY;
     private ArrayList<Locatie> route;
     private String name;
-    public Grid(int width, int height) {
+    private SerialCommunicator serialCommunicator;
+
+    public Grid(int width, int height) throws IOException, InterruptedException {
+        serialCommunicator = new SerialCommunicator("COM6", 9600);
+        serialCommunicator.AddListener(this);
+        SendOrder sendOrder = new SendOrder(serialCommunicator);
+        Thread.sleep(4000);
+        ArrayList<String> values = new ArrayList<String>();
+        values.add("E5");
+        values.add("E4");
+        values.add("E3");
+        sendOrder.sendOrderValues(values);
+
         setBackground(Color.white);
         grid = new GridSpace[width][height];
         setLayout(new FlowLayout());
@@ -28,6 +41,7 @@ public class Grid extends JPanel {
                 //add(grid[i][j]);
             }
         }
+
         getSpaceName();
 
     }
@@ -36,7 +50,6 @@ public class Grid extends JPanel {
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
                 //System.out.println(me);
-                System.out.println("X: " + me.getX() + ", Y: " + me.getY());
                 //System.out.println(getSelectedCell(me.getX(), me.getY()).getGridText());
                 name = getSelectedCell(me.getX(), me.getY()).getGridText();
                 try {
@@ -98,10 +111,20 @@ public class Grid extends JPanel {
 
     public void locationRobot(String locatieRobot,Graphics g){
         g.setColor(Color.green);
-        robotX = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(':')+1,locatieRobot.indexOf('Y')-1));
-        robotY = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(":",locatieRobot.indexOf(':')+1)+1));
-        g.fillOval(robotX,robotY,15,15);
+        try {
+            robotX = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(':') + 1, locatieRobot.indexOf('Y') - 1));
+            robotY = Integer.parseInt(locatieRobot.substring(locatieRobot.indexOf(":", locatieRobot.indexOf(':') + 1) + 1));
+        } catch (NumberFormatException e) {
 
+        }
+
+        if(robotX > 295) {
+            robotX = 295;
+        }
+        if(robotY > 293) {
+            robotY = 293;
+        }
+        g.fillOval(robotX,robotY,15,15);
     }
 
     public String getNamePositie() {
@@ -159,4 +182,11 @@ public class Grid extends JPanel {
         route = r;
     }
 
+    @Override
+    public void onMessageReceived(String message) throws SQLException, IOException {
+        if(message.startsWith("X:") && message.contains("Y:")) {
+            locationRobot2 = message;
+            repaint();
+        }
+    }
 }

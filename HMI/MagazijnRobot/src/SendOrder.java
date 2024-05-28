@@ -6,12 +6,12 @@ public class SendOrder implements Listener {
     private ArrayList<String> stockLocations = new ArrayList<String>();
     private SerialCommunicator serialCommunicator;
     private int i;
-    public SendOrder() {
-        serialCommunicator = new SerialCommunicator("COM6", 9600);
+    public SendOrder(SerialCommunicator serialCommunicator) {
+        this.serialCommunicator = serialCommunicator;
         serialCommunicator.AddListener(this);
     }
 
-    public void sendOrder(ArrayList<String> values) throws IOException {
+    public void sendOrderValues(ArrayList<String> values) throws IOException {
         i = 1;
         stockLocations = values;
         System.out.println("L" + stockLocations.getFirst() + "1");
@@ -20,8 +20,9 @@ public class SendOrder implements Listener {
 
     @Override
     public void onMessageReceived(String message) throws SQLException, IOException {
-//        System.out.println(message);
-//        System.out.println("i = " + i);
+        if(!message.contains("X:") && !message.isEmpty()) {
+            System.out.println(message);
+        }
         if(message.equals("complete") && i < stockLocations.size()) { //per item die completed is
             System.out.println("L" + stockLocations.get(i) + (i + 1));
             serialCommunicator.sendMessageToArduino("L" + stockLocations.get(i) + (i + 1));

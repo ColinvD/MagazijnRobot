@@ -30,7 +30,7 @@ public class SerialCommunicator implements SerialPortDataListener{
         port.addDataListener(this);
     }
 
-    public void sendMessageToArduino(String message) throws IOException{
+    public void sendMessageToArduino(String message) throws IOException     {
         message += "\n";
         port.getOutputStream().write(message.getBytes());
         port.getOutputStream().flush();
@@ -50,12 +50,12 @@ public class SerialCommunicator implements SerialPortDataListener{
                 String[] message = messages.split("\\n", 2);
                 messages = (message.length > 1) ? message[1] : "";
                 theMessage = message[0];
-                System.out.println("Message: " + message[0]);
+//                System.out.println("Message: " + message[0]);
             }
             theMessage = theMessage.trim();
             theMessage = theMessage.replaceFirst("null", "");
 
-            System.out.println(theMessage);
+//            System.out.println(theMessage);
             try {
                 NotifyListeners(theMessage);
             } catch (SQLException e) {

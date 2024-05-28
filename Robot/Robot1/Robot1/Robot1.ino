@@ -122,7 +122,8 @@ void setup() {
 void loop() {
   if (Serial.available()) {
     // sendValue(1, 2, false);
-    String message = Serial.readStringUntil('\n');
+  String message = Serial.readStringUntil('\n');
+      Serial.println(message);
     if (message.equals("STOP")) {
       stopState = true;
       buttonPressed = true;
@@ -172,10 +173,10 @@ void loop() {
     int byte2 = Wire.read();
     yPos = (int16_t)(byte1 << 8) + byte2;
   }
-  // Serial.print("Y: ");
-  // Serial.println(map(yPos, 0, 2375, 300, 0));
-  // Serial.print("X: ");
-  // Serial.println(map(xPos, 0, 4400, 300, 0));
+  Serial.print("X:");
+  Serial.print(map(xPos, 1340, 4500, 295, 20));
+  Serial.print(" Y:");
+  Serial.println(map(yPos, 0, 2375, 293, 10));
 
   // zPos location state
   if (Distance() > 6.8) {

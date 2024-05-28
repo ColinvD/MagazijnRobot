@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class HMIScreen extends JFrame implements ActionListener,Listener {
@@ -13,7 +14,7 @@ public class HMIScreen extends JFrame implements ActionListener,Listener {
     OrderPanel order = new OrderPanel();
     public static int counter;
     // public static SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
-    public HMIScreen() throws SQLException {
+    public HMIScreen() throws SQLException, IOException, InterruptedException {
     //        serialCommunicator.AddListener(this);
             setSize(900, 650);
             getContentPane().setBackground(Color.black);

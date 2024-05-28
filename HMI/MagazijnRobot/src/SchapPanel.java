@@ -3,6 +3,7 @@ import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -12,7 +13,7 @@ public class SchapPanel extends JPanel implements ActionListener {
     private JLabel schapNaam = new JLabel("Schap");
     private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
 
-    public SchapPanel() throws SQLException {
+    public SchapPanel() throws SQLException, IOException, InterruptedException {
 
         voorraadstiuatieWijzigen.setFocusable(false);
         setPreferredSize(new Dimension(400, 475));

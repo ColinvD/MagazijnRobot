@@ -362,7 +362,7 @@ void receiveData() {
     receivedString[0] = Wire.read();
     receivedString[1] = Wire.read();
     stockLocation = String(receivedString[0]) + String(receivedString[1]);
-    Serial.println(stockLocation);
+    Serial.println(stockLocation);  
   } else if (function == 8) {
     // Check if is in Start
     goToStartPosFinished = Wire.read();
