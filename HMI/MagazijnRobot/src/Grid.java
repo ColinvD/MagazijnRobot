@@ -21,7 +21,7 @@ public class Grid extends JPanel implements Listener {
     private boolean zAxisOut;
 
     public Grid(int width, int height) throws IOException, InterruptedException {
-        serialCommunicator = new SerialCommunicator("COM6", 9600);
+        serialCommunicator = HMIScreen.serialCommunicator;
         serialCommunicator.AddListener(this);
         SendOrder sendOrder = new SendOrder(serialCommunicator);
         Thread.sleep(4000);

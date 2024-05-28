@@ -60,9 +60,11 @@ public class SerialCommunicator implements SerialPortDataListener{
                 NotifyListeners(theMessage);
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
+                StatusPanel.changeRobotStatus(false);
                 throw new RuntimeException(e);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
+                StatusPanel.changeRobotStatus(false);
                 throw new RuntimeException(e);
             }
         }
