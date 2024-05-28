@@ -34,13 +34,15 @@ bool isReleasedIn = true;
 bool joyconPressed = false;
 
 //Stop Button
-const int stopButton = A1;
+const int stopButton = 12;
 bool buttonPressed;
-bool stopState = true;
+int stopState = 1;
+bool stopButtonConnected = true;
 
 bool zInStartPos = false;
 
 long int checkConnectionMillis = 0;
+long int checkStopButtonMillis = 0;
 
 //automatic
 bool autoBool = true;
@@ -82,7 +84,7 @@ int pos = 0;
 //led light
 int ledGreen = A0;
 int ledYellow = 9;
-int ledRed = 12;
+int ledRed = A1;
 
 
 int stopValueOld;
@@ -125,13 +127,13 @@ void loop() {
   String message = Serial.readStringUntil('\n');
       Serial.println(message);
     if (message.equals("STOP")) {
-      stopState = true;
+      stopState = 1;
       buttonPressed = true;
-      sendValue(1, 1, stopState);
+      sendSmallIntValue(1, 1, stopState);
     } else if (message.equals("Unlock")) {
-      stopState = false;
+      stopState = 0;
       buttonPressed = true;
-      sendValue(1, 1, stopState);
+      sendSmallIntValue(1, 1, stopState);
     } else if (message.equals("GoToStart")) {
       goToStartPos = true;
       goToStartPosFinished = false;
@@ -154,6 +156,12 @@ void loop() {
     }
   } else {
     joyconPressed = false;
+  }
+
+  sendSmallIntValue(1, 5, 6);
+  Wire.requestFrom(1, 6);
+  if(Wire.available()) {
+    stopState = Wire.read();
   }
 
   // encoder posistion
@@ -191,18 +199,25 @@ void loop() {
 
   // read stop button
   int stopValue = digitalRead(stopButton);
-  if (!stopValue) {
+
+  if (stopValue) {
+    checkStopButtonMillis = millis();
     buttonPressed = false;
   }
   // stop button state
-  if (stopValue && stopState && !buttonPressed) {
-    stopState = false;
+  if (!stopValue && !stopState && !buttonPressed) {
+    stopState = 1;
     buttonPressed = true;
-    sendValue(1, 1, stopState);
-  } else if (stopValue && !stopState && !buttonPressed) {
-    stopState = true;
-    buttonPressed = true;
-    sendValue(1, 1, stopState);
+    sendSmallIntValue(1, 1, stopState);
+  }
+  if (wait(checkStopButtonMillis, 300)) {
+    stopState = 2;
+    sendSmallIntValue(1, 1, stopState);
+    stopButtonConnected = false;
+  } else if(!stopButtonConnected) {
+    stopButtonConnected = true;
+    stopState = 1;
+    sendSmallIntValue(1, 1, stopState);
   }
 
   pressedOut = digitalRead(uit);
@@ -210,8 +225,8 @@ void loop() {
 
   bool tiltState = shelfTilt();
   if (tiltState) {
-    stopState = true;
-    sendValue(1, 1, stopState);
+    stopState = 1;
+    sendSmallIntValue(1, 1, stopState);
   }
 
   sendSmallIntValue(1, 5, 4);
@@ -222,7 +237,7 @@ void loop() {
   }
 
   if (wait(checkConnectionMillis, 300)) {
-    stopState = true;
+    stopState = 1;
   }
 
   if (stopState) {

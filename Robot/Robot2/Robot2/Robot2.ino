@@ -30,7 +30,10 @@ bool onRight = false;
 bool onLeft = false;
 
 //stop Button
-bool stopState = true;
+int stopState = 1;
+//on Button
+const int onButton = A0;
+bool onButtonPressed;
 
 // microswitch
 int microswitchDown = 5;
@@ -126,6 +129,19 @@ void loop() {
   }
   // Serial.println(yPos);
 
+  // on button
+  int onValue = digitalRead(onButton);
+
+  if(!onValue) {
+    onButtonPressed = false;
+  }
+
+  // stop button state
+  if (onValue && stopState == 1 && !onButtonPressed) {
+    stopState = 0;
+    onButtonPressed = true;
+  }
+
   indictiveSensorReadLeft();
   indictiveSensorRead();
 
@@ -134,7 +150,7 @@ void loop() {
 
   if (wait(checkConnectionMillis, 300)) {
     checkConnectionMillis = millis();
-    stopState = true;
+    stopState = 2;
   }
 
   if (stopState) {
@@ -336,6 +352,8 @@ void receiveData() {
   if (function == 1) {
     // emergency stop
     stopState = Wire.read();
+    Serial.print("stopState: ");
+    Serial.println(stopState);
   } else if (function == 2) {
     Wire.read();
     autoBool = !autoBool;
@@ -402,10 +420,15 @@ void requestEvent() {
       Wire.write(true);
       break;
     case 5:
+      // send y pos to master
       Wire.write(highByte(yPos));
       Wire.write(lowByte(yPos));
       break;
-  }
+    case 6:
+      // on button
+      Wire.write(stopState);
+      break;
+    }
 }
 
 void UpSmall() {
