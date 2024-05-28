@@ -1,18 +1,14 @@
-import com.mysql.cj.x.protobuf.MysqlxCrud;
-
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class OrderPanel extends JPanel implements ActionListener, Listener {
+
 
     private int routepoint = 0;
     private int doos = 0;
@@ -67,7 +63,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         add(jlSelectedOrder);
         add(jbStartOrder);
         add(orderJSP);
-
     }
 
     public void setOrder(int OrderID) throws SQLException {
@@ -107,6 +102,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
                 }
                 products1.add(doos);
                 orderItemsPanel.add(doos);
+
                 try {
                     ArrayList<Locatie> box1 = new ArrayList<>(Boxes.get(i));
                     ArrayList<Locatie> routes = TSP.getRoute(box1);
@@ -139,7 +135,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
                         }
                         products1.add(product);
                         orderItemsPanel.add(product);
-
                 }
             }
         }
@@ -155,31 +150,35 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     public void changeOrderColor() throws SQLException {
         counterChangeAmountColor = 0;
         orderItemsPanel.removeAll();
-        sizebox = Boxes.get(doos).size();
-        if (routepoint == sizebox) {
-            doos++;
-            routepoint= 0;
-            sizebox = Boxes.get(doos).size();
-        }
         ArrayList<Locatie> locaties = new ArrayList<>();
-        for (int i = 0; i < sizebox; i++) {
-            locaties.add(Boxes.get(doos).get(i));
+        try {
+            sizebox = Boxes.get(doos).size();
+            if (routepoint == sizebox) {
+                doos++;
+                routepoint = 0;
+                sizebox = Boxes.get(doos).size();
+            }
+            for (int i = 0; i < sizebox; i++) {
+                locaties.add(Boxes.get(doos).get(i));
+            }
+        } catch (IndexOutOfBoundsException e){
+            System.out.println();
         }
         // System.out.println(Arrays.toString(box));
         ArrayList<Locatie> route = TSP.getRoute(locaties);
         System.out.println(route);
         database.updatepicked(route.get(routepoint).getOrderlineID());
         database.updateOrderlineAfterOrder(route.get(routepoint).getOrderlineID());
-        for (JLabel label : products1) {
-            if (!label.getText().contains("Doos")) {
-                if (counterChangeAmountColor <= counterMaxAmountColor){
-                    counterChangeAmountColor++;
-                    label.setForeground(Color.GREEN);
+            for (JLabel label : products1) {
+                if (!label.getText().contains("Doos")) {
+                    if (counterChangeAmountColor <= counterMaxAmountColor) {
+                        counterChangeAmountColor++;
+                        label.setForeground(Color.GREEN);
 
+                    }
                 }
+                orderItemsPanel.add(label);
             }
-            orderItemsPanel.add(label);
-        }
         routepoint++;
         updateUI();
     }
@@ -217,11 +216,14 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         }
         if (message.equals("Done")) {
             System.out.println("Done");
+            //pakbon
+
             counterBoxes++;
             ArrayList<Locatie> box = new ArrayList<>(Boxes.get(counterBoxes));
             ArrayList<Locatie> route = TSP.getRoute(box);
             StatusPanel.displayRoute(route);
             SchapPanel.drawRoute(route);
+
         }
 
     }
@@ -232,5 +234,8 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
 
     public void refreshOrder() throws SQLException {
         setOrder(this.selectedOrderID);
+    }
+    public ArrayList<JLabel> getBoxes(){
+        return products1;
     }
 }

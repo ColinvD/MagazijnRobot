@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class ButtonPanel extends JPanel implements ActionListener {
-    private JButton jbOrder;
+    private JButton jbOrder,jbPackingSlip;
     private OrderPanel orderPanel;
 
     private boolean emergencyStatus;
@@ -38,9 +38,13 @@ public class ButtonPanel extends JPanel implements ActionListener {
         jbOrderUpdate.setFocusable(false);
         SetUpdateButtonEnabled(false);
 
+        jbPackingSlip = new JButton("Pakbon Genereren");
+        jbPackingSlip.addActionListener(this);
+        jbPackingSlip.setFocusable(false);
         add(emergencyStop);
         add(jbOrder);
         add(jbOrderUpdate);
+        add(jbPackingSlip);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -55,6 +59,13 @@ public class ButtonPanel extends JPanel implements ActionListener {
             System.out.println("UPDATE!!!!!");
             try {
                 OrderChangeDialog dialog = new OrderChangeDialog(orderPanel);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        if(e.getSource() == jbPackingSlip){
+            try {
+                PackingSlipDialog dialog = new PackingSlipDialog(orderPanel);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -96,9 +107,10 @@ public class ButtonPanel extends JPanel implements ActionListener {
 //                        throw new RuntimeException(ex);
 //                    }
 //                } else if (choice == JOptionPane.NO_OPTION) {
-//                    JOptionPane.showMessageDialog(null, "Noodstop niet ontgrendeldt.");
+//                    JOptionPane.showMessageDialog(null, "Noodstop niet ontgrendeld.");
 //                }
 //            }
+
         }
     }
     public static void SetUpdateButtonEnabled(boolean state){
