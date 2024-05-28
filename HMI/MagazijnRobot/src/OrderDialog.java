@@ -56,7 +56,7 @@ public class OrderDialog extends JDialog implements ActionListener {
 
         jsOrders = new JScrollPane(jpOrders);
         jsOrders.setPreferredSize(new Dimension(700,250));
-
+        jsOrders.getVerticalScrollBar().setUnitIncrement(17);
 
         c.gridx = 0;
         c.gridy = 0;
@@ -97,7 +97,6 @@ public class OrderDialog extends JDialog implements ActionListener {
                     System.out.println("Order inladen gelukt.");
                 } catch (SQLException ex) {
                     System.out.println("Order inladen mislukt.");
-                    throw new RuntimeException(ex);
                 }
             }
             closeDatabase();

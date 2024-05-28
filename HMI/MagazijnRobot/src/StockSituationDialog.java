@@ -24,8 +24,10 @@ public class StockSituationDialog extends JDialog implements ActionListener {
     private JButton activeJButton;
 
     private Grid schap;
+    private OrderPanel orderPanel;
 
-    public StockSituationDialog(Grid schap) {
+    public StockSituationDialog(Grid schap, OrderPanel orderPanel) {
+        this.orderPanel = orderPanel;
         this.schap = schap;
         setModal(true);
         setTitle("Voorraadsituatie");
@@ -155,6 +157,11 @@ public class StockSituationDialog extends JDialog implements ActionListener {
             changeProductStock();
             try {
                 SchapPanel.addStockitems();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            try {
+                orderPanel.refreshOrder();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }

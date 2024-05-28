@@ -12,9 +12,10 @@ public class SchapPanel extends JPanel implements ActionListener {
     private static Grid schap;
     private JLabel schapNaam = new JLabel("Schap");
     private JButton voorraadstiuatieWijzigen = new JButton("Voorraadstiuatie wijzigen");
+    private OrderPanel orderPanel;
 
-    public SchapPanel() throws SQLException, IOException, InterruptedException {
-
+    public SchapPanel( OrderPanel orderPanel) throws SQLException, IOException, InterruptedException {
+        this.orderPanel = orderPanel;
         voorraadstiuatieWijzigen.setFocusable(false);
         setPreferredSize(new Dimension(400, 475));
         setLayout(new FlowLayout());
@@ -38,7 +39,7 @@ public class SchapPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == voorraadstiuatieWijzigen) {
-            StockSituationDialog stockSituationDialog = new StockSituationDialog(schap);
+            StockSituationDialog stockSituationDialog = new StockSituationDialog(schap, orderPanel);
         }
     }
 

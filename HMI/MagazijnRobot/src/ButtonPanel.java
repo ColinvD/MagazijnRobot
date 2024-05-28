@@ -11,8 +11,9 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private OrderPanel orderPanel;
 
     private boolean emergencyStatus;
-  //  SerialCommunicator serialCommunicator = new SerialCommunicator("COM4",500000);
+    //SerialCommunicator serialCommunicator = new SerialCommunicator("COM3",500000);
     private JButton emergencyStop;
+    private static JButton jbOrderUpdate;
     public ButtonPanel(OrderPanel orderPanel){
         setPreferredSize(new Dimension(400,200));
         setLayout(new FlowLayout());
@@ -31,8 +32,15 @@ public class ButtonPanel extends JPanel implements ActionListener {
         emergencyStop.setFocusable(false);
         emergencyStop.setBorder(BorderFactory.createLineBorder(Color.black));
         jbOrder.setFocusable(false);
+
+        jbOrderUpdate = new JButton("Order Bewerken");
+        jbOrderUpdate.addActionListener(this);
+        jbOrderUpdate.setFocusable(false);
+        SetUpdateButtonEnabled(false);
+
         add(emergencyStop);
         add(jbOrder);
+        add(jbOrderUpdate);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -43,48 +51,57 @@ public class ButtonPanel extends JPanel implements ActionListener {
                 throw new RuntimeException(ex);
             }
         }
+        if(e.getSource() == jbOrderUpdate){
+            System.out.println("UPDATE!!!!!");
+            try {
+                OrderChangeDialog dialog = new OrderChangeDialog(orderPanel);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         if (e.getSource()== emergencyStop){
 
-            if (!emergencyStatus) {
-                UIManager.put("OptionPane.noButtonText", "Nee");
-                UIManager.put("OptionPane.yesButtonText", "Ja");
-                int choice = JOptionPane.showConfirmDialog(null, "Wil je de noodstop vergrendelen?",
-                        "Confirmation", JOptionPane.YES_NO_OPTION);
-                if (choice == JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(null, "Noodstop vergrendeld.");
-                    emergencyStatus = true;
-                    emergencyStop.setText("Schakel noodstop uit");
+//            if (!emergencyStatus) {
+//                UIManager.put("OptionPane.noButtonText", "Nee");
+//                UIManager.put("OptionPane.yesButtonText", "Ja");
+//                int choice = JOptionPane.showConfirmDialog(null, "Wil je de noodstop vergrendelen?",
+//                        "Confirmation", JOptionPane.YES_NO_OPTION);
+//                if (choice == JOptionPane.YES_OPTION) {
+//                    JOptionPane.showMessageDialog(null, "Noodstop vergrendeld.");
+//                    emergencyStatus = true;
+//                    emergencyStop.setText("Schakel noodstop uit");
 //                    try {
 //                        serialCommunicator.sendMessageToArduino("STOP");
 //                    } catch (IOException ex) {
 //                        throw new RuntimeException(ex);
 //                    }
-                } else if (choice == JOptionPane.NO_OPTION) {
-                    JOptionPane.showMessageDialog(null, "Noodstop niet vergrendeld.");
-                }
-
-            }
-            else{
-                UIManager.put("OptionPane.yesButtonText", "Ja");
-                UIManager.put("OptionPane.noButtonText", "Nee");
-                int choice = JOptionPane.showConfirmDialog(null, "Wil je de noodstop ontgrendelen?",
-                        "Confirmation", JOptionPane.YES_NO_OPTION);
-
-                if (choice == JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(null, "Noodstop ontgrendeld.");
-                    emergencyStop.setText("Schakel noodstop in");
-                    emergencyStatus = false;
+//                } else if (choice == JOptionPane.NO_OPTION) {
+//                    JOptionPane.showMessageDialog(null, "Noodstop niet vergrendeld.");
+//                }
+//
+//            }
+//            else{
+//                UIManager.put("OptionPane.yesButtonText", "Ja");
+//                UIManager.put("OptionPane.noButtonText", "Nee");
+//                int choice = JOptionPane.showConfirmDialog(null, "Wil je de noodstop ontgrendelen?",
+//                        "Confirmation", JOptionPane.YES_NO_OPTION);
+//
+//                if (choice == JOptionPane.YES_OPTION) {
+//                    JOptionPane.showMessageDialog(null, "Noodstop ontgrendeld.");
+//                    emergencyStop.setText("Schakel noodstop in");
+//                    emergencyStatus = false;
 //                    try {
 //                        serialCommunicator.sendMessageToArduino("Unlock");
 //                    } catch (IOException ex) {
 //                        throw new RuntimeException(ex);
 //                    }
-                } else if (choice == JOptionPane.NO_OPTION) {
-                    JOptionPane.showMessageDialog(null, "Noodstop niet ontgrendeldt.");
-                }
-            }
-
-
+//                } else if (choice == JOptionPane.NO_OPTION) {
+//                    JOptionPane.showMessageDialog(null, "Noodstop niet ontgrendeldt.");
+//                }
+//            }
         }
+    }
+    public static void SetUpdateButtonEnabled(boolean state){
+        jbOrderUpdate.setEnabled(state);
     }
 }
