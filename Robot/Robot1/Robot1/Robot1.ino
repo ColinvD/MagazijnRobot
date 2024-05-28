@@ -41,7 +41,7 @@ bool stopButtonConnected = true;
 
 bool zInStartPos = true;
 bool zInStartPosOld = true;
-
+bool receivedOrder = false;
 
 long int checkConnectionMillis = 0;
 long int checkJavaConnectionMillis = 0;
@@ -65,6 +65,7 @@ long int checkStartPostitionMillis = 0;
 
 bool goToStartPos = true;
 bool goToStartPosFinished = false;
+bool StartUpStart = true; //Going to the start position because of startup
 
 int pickUpCount;
 
@@ -151,11 +152,11 @@ void loop() {
       checkJavaConnectionMillis = millis();
     }
   }
-  if(wait(checkJavaConnectionMillis, 300)) {
+  if (wait(checkJavaConnectionMillis, 300)) {
     checkJavaConnectionBool = false;
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
-  } else if(!checkJavaConnectionBool) {
+  } else if (!checkJavaConnectionBool) {
     checkJavaConnectionBool = true;
     stopState = 1;
     sendSmallIntValue(1, 1, stopState);
@@ -176,7 +177,7 @@ void loop() {
 
   sendSmallIntValue(1, 5, 6);
   Wire.requestFrom(1, 6);
-  if(Wire.available()) {
+  if (Wire.available()) {
     stopState = Wire.read();
   }
 
@@ -192,7 +193,7 @@ void loop() {
   // get y position
   sendSmallIntValue(1, 5, 5);
   Wire.requestFrom(1, 6);
-  if(Wire.available()) {
+  if (Wire.available()) {
     int byte1 = Wire.read();
     int byte2 = Wire.read();
     yPos = (int16_t)(byte1 << 8) + byte2;
@@ -210,7 +211,7 @@ void loop() {
   }
   sendValue(1, 9, zInStartPos);
 
-  if(zInStartPos != zInStartPosOld) {
+  if (zInStartPos != zInStartPosOld) {
     Serial.println("zAxisChange");
   }
   zInStartPosOld = zInStartPos;
@@ -235,7 +236,7 @@ void loop() {
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
     stopButtonConnected = false;
-  } else if(!stopButtonConnected) {
+  } else if (!stopButtonConnected) {
     stopButtonConnected = true;
     stopState = 1;
     sendSmallIntValue(1, 1, stopState);
@@ -528,6 +529,10 @@ void goToStartPosition() {
     sendValue(1, 8, true);
     zPosition = 0;
     xPosition = 0;
-    Serial.println("Complete");
+    if (StartUpStart) {
+      StartUpStart = false;
+    } else {
+      Serial.println("Complete");
+    }
   }
 }
