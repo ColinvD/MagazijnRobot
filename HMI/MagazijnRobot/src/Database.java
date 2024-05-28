@@ -263,6 +263,50 @@ public class Database {
         s.setInt(1, orderLineID);
         s.execute();
     }
+
+    public ArrayList<ArrayList> getPackingSlipData(int OrderID) throws SQLException {
+        String query = "SELECT cu.CustomerName, cu.DeliveryAddressLine1, cu. PostalAddressLine1, ci.CityName, current_timestamp() packageDate, ol.Description, ol.Quantity, ol.PickedQuantity" +
+                "FROM customers cu " +
+                "JOIN cities ci ON ci.CityID = cu.DeliveryCityID " +
+                "JOIN orders o USING (CustomerID) " +
+                "JOIN orderlines ol USING (OrderID)" +
+                "WHERE o.OrderID = ?";
+        PreparedStatement s = connection.prepareStatement(query);
+        s.setInt(1, OrderID);
+        ResultSet result = s.executeQuery();
+
+        ArrayList<ArrayList> table = new ArrayList<>();
+        //this.listOrder = new ArrayList<>();
+
+        // Haal de ResultSetMetaData op om dynamisch kolomnamen en types te krijgen
+        ResultSetMetaData metaData = result.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        while(result.next()){
+            ArrayList<DatabaseValue> row = new ArrayList<>();
+
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnName(i);
+                Object columnValue = result.getObject(i);
+
+                DatabaseValue newValue = new DatabaseValue(columnName, columnValue);
+                row.add(newValue);
+            }
+
+            table.add(row);
+        }
+        return table;
+    }
+
+    public Object getValueInRow(ArrayList<DatabaseValue> tableRow, String wantedValue){
+        if(tableRow.isEmpty()) return null;
+
+        for (DatabaseValue databaseValue : tableRow) {
+            if (databaseValue.getColomn().equals(wantedValue)) {
+                return databaseValue.getValue();
+            }
+        }
+        return null;
+    }
 }
 
 
