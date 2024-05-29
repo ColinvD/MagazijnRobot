@@ -65,7 +65,6 @@ public class SchapPanel extends JPanel implements ActionListener {
         schap.setRoute(r);
         schap.repaint();
     }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

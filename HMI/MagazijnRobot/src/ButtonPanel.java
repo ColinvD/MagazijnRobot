@@ -81,6 +81,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
                         "Confirmation", JOptionPane.YES_NO_OPTION);
                 if (choice == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(null, "Noodstop vergrendeld.");
+                    Grid.noodStop = true;
                     emergencyStatus = true;
                     updateEmergencyButtonText();
                     try {
@@ -101,6 +102,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
                 if (choice == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(null, "Noodstop ontgrendeld.");
+                    Grid.noodStop = false;
                     emergencyStatus = false;
                     updateEmergencyButtonText();
                     try {
