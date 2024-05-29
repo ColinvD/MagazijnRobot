@@ -19,6 +19,7 @@ public class Grid extends JPanel implements Listener {
     private SerialCommunicator serialCommunicator;
 
     private boolean zAxisOut;
+    public static boolean noodStop;
 
     public Grid(int width, int height) throws IOException, InterruptedException {
         serialCommunicator = HMIScreen.serialCommunicator;
@@ -26,8 +27,8 @@ public class Grid extends JPanel implements Listener {
         SendOrder sendOrder = new SendOrder(serialCommunicator);
         Thread.sleep(4000);
         ArrayList<String> values = new ArrayList<String>();
-        values.add("B5");
-        sendOrder.sendOrderValues(values);
+//        values.add("B5");
+//        sendOrder.sendOrderValues(values);
 
         setBackground(Color.white);
         grid = new GridSpace[width][height];
@@ -110,7 +111,9 @@ public class Grid extends JPanel implements Listener {
     }
 
     public void locationRobot(String locatieRobot,Graphics g){
-        if(zAxisOut) {
+        if (noodStop){
+            g.setColor(Color.RED);
+        } else if(zAxisOut) {
             g.setColor(Color.ORANGE);
         } else {
             g.setColor(Color.green);
@@ -196,6 +199,14 @@ public class Grid extends JPanel implements Listener {
             serialCommunicator.sendMessageToArduino("checkJavaConnection");
             locationRobot2 = message;
             repaint();
+        }
+        if(message.equals("Stop")){
+            noodStop = true;
+            ButtonPanel.updateEmergencyButtonText();
+        }
+        if(message.equals("Unlock")){
+            noodStop = false;
+            ButtonPanel.updateEmergencyButtonText();
         }
     }
 }

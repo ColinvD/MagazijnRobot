@@ -11,9 +11,9 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private static JButton jbPackingSlip;
     private OrderPanel orderPanel;
 
-    private boolean emergencyStatus;
+    public static boolean emergencyStatus = Grid.noodStop;
     private SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
-    private JButton emergencyStop;
+    private static JButton emergencyStop;
     private static JButton jbOrderUpdate;
     public ButtonPanel(OrderPanel orderPanel){
         setPreferredSize(new Dimension(400,150));
@@ -82,7 +82,7 @@ public class ButtonPanel extends JPanel implements ActionListener {
                 if (choice == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(null, "Noodstop vergrendeld.");
                     emergencyStatus = true;
-                    emergencyStop.setText("Schakel noodstop uit");
+                    updateEmergencyButtonText();
                     try {
                         serialCommunicator.sendMessageToArduino("STOP");
                     } catch (IOException ex) {
@@ -101,8 +101,8 @@ public class ButtonPanel extends JPanel implements ActionListener {
 
                 if (choice == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(null, "Noodstop ontgrendeld.");
-                    emergencyStop.setText("Schakel noodstop in");
                     emergencyStatus = false;
+                    updateEmergencyButtonText();
                     try {
                         serialCommunicator.sendMessageToArduino("Unlock");
                     } catch (IOException ex) {
@@ -119,5 +119,8 @@ public class ButtonPanel extends JPanel implements ActionListener {
     }
     public static void SetPackingButtonEnabled(boolean state){
         jbPackingSlip.setEnabled(state);
+    }
+    public static void updateEmergencyButtonText(){
+        emergencyStop.setText("Schakel de noodknop " + (emergencyStatus ? "uit" : "in"));
     }
 }
