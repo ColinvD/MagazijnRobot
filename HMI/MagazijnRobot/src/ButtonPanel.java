@@ -27,7 +27,8 @@ public class ButtonPanel extends JPanel implements ActionListener {
         jbOrder = new JButton("Order inladen");
 
         jbOrder.addActionListener(this);
-        emergencyStop = new JButton("Schakel noodstop in");
+        emergencyStop = new JButton();
+        updateEmergencyButtonText();
         emergencyStop.addActionListener(this);
         emergencyStop.setPreferredSize(new Dimension(340,30));
        // emergencyStop.setBackground(Color.red);

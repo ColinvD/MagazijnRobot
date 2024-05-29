@@ -121,7 +121,7 @@ void setup() {
   digitalWrite(joyconButton, HIGH);
 
   Wire.begin();
-  Serial.begin(9600);
+  Serial.begin(250000);
 
   attachInterrupt(digitalPinToInterrupt(zEncoderA), setEncoder, RISING);
   attachInterrupt(digitalPinToInterrupt(xEncoderA), setEncoderX, RISING);
@@ -210,7 +210,7 @@ void loop() {
   Serial.println(map(yPos, 0, 2375, 293, 10));
 
   // zPos location state
-  if (Distance() > 6.6) {
+  if (Distance() > 6.8) {
     zInStartPos = false;
   } else {
     zInStartPos = true;
@@ -218,7 +218,8 @@ void loop() {
   sendValue(1, 9, zInStartPos);
 
   if (zInStartPos != zInStartPosOld) {
-    Serial.println("zAxisChange");
+    Serial.print("InZAxis ");
+    Serial.println(zInStartPos);
   }
   zInStartPosOld = zInStartPos;
 
@@ -496,8 +497,8 @@ void pickUP(int count) {
       if (pos > 20) {
         GoIn();
       } else {
-        Stop();
         Serial.println("Out");
+        Stop();
         sendValue(1, 6, true);
         pickUpAction = false;
         extendBool = false;

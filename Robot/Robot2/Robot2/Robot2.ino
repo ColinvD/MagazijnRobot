@@ -355,8 +355,8 @@ void receiveData() {
   if (function == 1) {
     // emergency stop
     stopState = Wire.read();
-    Serial.print("stopState: ");
-    Serial.println(stopState);
+    // Serial.print("stopState: ");
+    // Serial.println(stopState);
   } else if (function == 2) {
     Wire.read();
     autoBool = !autoBool;
@@ -375,6 +375,7 @@ void receiveData() {
   } else if (function == 5) {
     requestCase = Wire.read();
   } else if (function == 6) {
+    Serial.println("reached");
     // z axis is back in start position
     finishedPickUP = Wire.read();
   } else if (function == 7) {
