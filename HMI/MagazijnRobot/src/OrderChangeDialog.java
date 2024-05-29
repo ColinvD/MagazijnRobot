@@ -77,7 +77,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         jbAdd = new JButton("Product toevoegen");
         jbAdd.addActionListener(this);
 
-        JLabel jlChooseOrder = new JLabel("Order: " + getDatabaseValue(0,"OrderID").getValue(), SwingConstants.CENTER);
+        JLabel jlChooseOrder = new JLabel("Order: " + orderPanel.getSelectedOrderID(), SwingConstants.CENTER);
         jlChooseOrder.setPreferredSize(new Dimension(700,20));
 
         jpOrderlines = new JPanel();
@@ -263,7 +263,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
         ResultSet currentOrder = database.getOrderlines(orderPanel.getSelectedOrderID());
         while (currentOrder.next()){
             int dbOrderlineID = currentOrder.getInt("OrderLineID");
-            if(dbOrderlineID == (int)getDatabaseValue(0, "OrderLineID").getValue()){
+            if(!listOrder.isEmpty() && dbOrderlineID == (int)getDatabaseValue(0, "OrderLineID").getValue()){
                 // Update uitvoeren
                 System.out.println("Updating orderline");
                 database.update("UPDATE orderlines SET Quantity= ? WHERE OrderLineID = ?", String.valueOf(getDatabaseValue(0, "Quantity").getValue()), String.valueOf(dbOrderlineID));
@@ -296,7 +296,7 @@ public class OrderChangeDialog extends JDialog implements ActionListener {
     private DatabaseValue getDatabaseValue(int lineRow, String searchItem){
         ArrayList<DatabaseValue> orderline = listOrder.get(lineRow);
         for (DatabaseValue databaseValue : orderline) {
-            if(databaseValue.getColomn().equals(searchItem)){
+            if (databaseValue.getColomn().equals(searchItem)) {
                 return databaseValue;
             }
 //            switch (databaseValue.getColomn()) {
