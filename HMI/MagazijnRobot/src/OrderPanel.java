@@ -3,6 +3,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
 
     private int counterBoxes = 0;
 
-    // SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
+    SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
     private ArrayList<ArrayList<Locatie>> Boxes;
     private ResultSet selectedOrder;
     private int selectedOrderID;
@@ -37,7 +38,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
 
     public OrderPanel() {
         // serialCommunicator.AddListener(this);
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(400, 450));
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
         setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
@@ -57,7 +58,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         orderItemsPanel.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
 
         orderJSP = new JScrollPane(orderItemsPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        orderJSP.setPreferredSize(new Dimension(400, 360));
+        orderJSP.setPreferredSize(new Dimension(400, 410));
         orderJSP.getVerticalScrollBar().setUnitIncrement(17);
         jbStartOrder.setEnabled(false);
         add(jlSelectedOrder);
@@ -131,7 +132,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
                             product = new JLabel(location + ": " + stockitem.getInt("StockItemID") + ". " + stockitem.getString("StockItemName") + ". " + stockitem.getString("Weight") + ".");
                         } catch (SQLException e){
                             System.out.println();
-                            product = new JLabel("Geen Locatie:" + database.selectEmptyLocation(Boxes.get(i).get(j).getOrderlineID()));
+                            product = new JLabel("Geen Locatie: " + database.selectEmptyLocation(Boxes.get(i).get(j).getOrderlineID()));
                         }
                         products1.add(product);
                         orderItemsPanel.add(product);
@@ -187,11 +188,11 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == jbStartOrder) {
-//                    try {
-//                        serialCommunicator.sendMessageToArduino("Start");
-//                    } catch (IOException ex) {
-//                        throw new RuntimeException(ex);
-//                    }
+                    try {
+                        serialCommunicator.sendMessageToArduino("Start");
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
 //            try {
 //                changeOrderColor();
 //                counterMaxAmountColor++;

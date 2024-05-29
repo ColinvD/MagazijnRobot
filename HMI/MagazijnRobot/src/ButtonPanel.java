@@ -12,16 +12,16 @@ public class ButtonPanel extends JPanel implements ActionListener {
     private OrderPanel orderPanel;
 
     private boolean emergencyStatus;
-    private SerialCommunicator serialCommunicator;
+    private SerialCommunicator serialCommunicator = HMIScreen.serialCommunicator;
     private JButton emergencyStop;
     private static JButton jbOrderUpdate;
     public ButtonPanel(OrderPanel orderPanel){
-        setPreferredSize(new Dimension(400,200));
+        setPreferredSize(new Dimension(400,150));
         setLayout(new FlowLayout());
         setBackground(Color.white);
         setBorder(new MatteBorder(1, 0, 0, 1, Color.BLACK));
 
-        serialCommunicator = HMIScreen.serialCommunicator;
+        //serialCommunicator = HMIScreen.serialCommunicator;
         this.orderPanel = orderPanel;
 
         jbOrder = new JButton("Order inladen");
@@ -39,7 +39,6 @@ public class ButtonPanel extends JPanel implements ActionListener {
         jbOrderUpdate.addActionListener(this);
         jbOrderUpdate.setFocusable(false);
         SetUpdateButtonEnabled(false);
-
         jbPackingSlip = new JButton("Pakbon Genereren");
         jbPackingSlip.addActionListener(this);
         jbPackingSlip.setFocusable(false);
