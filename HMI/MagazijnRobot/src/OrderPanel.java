@@ -37,7 +37,7 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     private int counterMaxAmountColor;
 
     public OrderPanel() {
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(400, 450));
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
         setBorder(new MatteBorder(1, 0, 1, 1, Color.BLACK));
