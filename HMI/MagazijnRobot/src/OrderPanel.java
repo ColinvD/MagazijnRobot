@@ -232,7 +232,9 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     }
 
     public void refreshOrder() throws SQLException {
-        setOrder(this.selectedOrderID);
+        if(selectedOrderID > 0) {
+            setOrder(this.selectedOrderID);
+        }
     }
     public ArrayList<JLabel> getBoxes(){
         return products1;

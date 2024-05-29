@@ -154,7 +154,14 @@ public class StockSituationDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == confirmButton) {
-            changeProductStock();
+            if(selectedStockLocation != null) {
+                changeProductStock();
+                confirmButton.setBackground(cancelButton.getBackground());
+                confirmButton.setText("Pas voorraadsituatie aan");
+            } else {
+                confirmButton.setBackground(Color.orange);
+                confirmButton.setText("Kies een locatie");
+            }
             try {
                 SchapPanel.addStockitems();
             } catch (SQLException ex) {

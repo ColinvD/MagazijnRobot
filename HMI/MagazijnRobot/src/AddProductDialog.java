@@ -72,18 +72,10 @@ public class AddProductDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == jbAdd){
             int pickedID = jcbProducts.getSelectedIndex();
-            add = true;
-            chosenProductID = productIDs.get(pickedID-1);
-//            System.out.println(pickedID);
-//            int amount = (int)jsAmount.getValue();
-//            if(pickedID != 0 && amount >0){
-//                try{
-//                    database.insertOrderLines(orderID, amount, database.select("Select StockItemID, StockItemName, UnitPackageID, TaxRate, UnitPrice From stockitems Where StockItemID = ?", "" + productIDs.get(pickedID-1)));
-//                } catch (SQLException ex){
-//                    throw new RuntimeException(ex.getMessage());
-//                    //System.out.println(ex.getMessage());
-//                }
-//            }
+            if(pickedID>0) {
+                add = true;
+                chosenProductID = productIDs.get(pickedID - 1);
+            }
         }
         dispose();
     }
