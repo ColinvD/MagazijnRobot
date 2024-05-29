@@ -27,7 +27,7 @@ public class SendOrder implements Listener {
             System.out.println("L" + stockLocations.get(i) + (i + 1));
             serialCommunicator.sendMessageToArduino("L" + stockLocations.get(i) + (i + 1));
             i++;
-        } else if (message.equals("Out") && i==stockLocations.size()) {
+        } else if (message.equals("Out") && i == stockLocations.size()) {
             serialCommunicator.sendMessageToArduino("GoToStart");
         }
 

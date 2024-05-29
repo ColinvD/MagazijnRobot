@@ -12,6 +12,8 @@ public class SerialCommunicator implements SerialPortDataListener{
     private final String portName;
     private final int rate;
     private final SerialPort port;
+    SendOrder sendOrder;
+
 
     public SerialCommunicator(String portName, int bitRate) {
         this.portName = portName;
@@ -28,6 +30,7 @@ public class SerialCommunicator implements SerialPortDataListener{
         }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {port.closePort(); }));
         port.addDataListener(this);
+        sendOrder = new SendOrder(this);
     }
 
     public void sendMessageToArduino(String message) throws IOException     {

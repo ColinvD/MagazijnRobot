@@ -3,6 +3,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     private int counterMaxAmountColor;
 
     public OrderPanel() {
-        // serialCommunicator.AddListener(this);
         setPreferredSize(new Dimension(400, 400));
         setLayout(new FlowLayout());
         setBackground(new Color(159, 159, 159));
@@ -63,9 +63,11 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
         add(jlSelectedOrder);
         add(jbStartOrder);
         add(orderJSP);
+        HMIScreen.serialCommunicator.AddListener(this);
     }
 
     public void setOrder(int OrderID) throws SQLException {
+        counterBoxes = 0;
         products1 = new ArrayList<>();
         this.selectedOrderID = OrderID;
         selectedOrder = database.getOrder(OrderID);
@@ -187,6 +189,20 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == jbStartOrder) {
+            ArrayList<String> locationNames = new ArrayList<String>();
+            try {
+                ArrayList<Locatie> box = new ArrayList<>(Boxes.get(counterBoxes));
+                ArrayList<Locatie> route = TSP.getRoute(box);
+                for (Locatie locatie : route) {
+                    locationNames.add(locatie.getLocation());
+                }
+                HMIScreen.serialCommunicator.sendOrder.sendOrderValues(locationNames);
+            } catch (IndexOutOfBoundsException er) {
+                System.out.println("Box already full");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
 //                    try {
 //                        serialCommunicator.sendMessageToArduino("Start");
 //                    } catch (IOException ex) {
@@ -210,19 +226,22 @@ public class OrderPanel extends JPanel implements ActionListener, Listener {
             changeOrderColor();
             counterMaxAmountColor++;
         }
-        if (message.equals("Complete")) {
-            System.out.println("complete");
-            database.updatePickedOrder(selectedOrderID);
-            JOptionPane.showMessageDialog(this, "De order is afgerond");
-        }
+
         if (message.equals("Done")) {
             System.out.println("Done");
             counterBoxes++;
-            ArrayList<Locatie> box = new ArrayList<>(Boxes.get(counterBoxes));
-            ArrayList<Locatie> route = TSP.getRoute(box);
-            StatusPanel.displayRoute(route);
-            SchapPanel.drawRoute(route);
+            if(counterBoxes < Boxes.size()) {
+                ArrayList<Locatie> box = new ArrayList<>(Boxes.get(counterBoxes));
+                ArrayList<Locatie> route = TSP.getRoute(box);
+                StatusPanel.displayRoute(route);
+                SchapPanel.drawRoute(route);
+            }
+        }
 
+        if (message.equals("Done") && counterBoxes >= Boxes.size()) {
+            System.out.println("complete");
+            database.updatePickedOrder(selectedOrderID);
+            JOptionPane.showMessageDialog(this, "De order is afgerond");
         }
 
     }

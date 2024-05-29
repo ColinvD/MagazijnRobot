@@ -23,12 +23,6 @@ public class Grid extends JPanel implements Listener {
     public Grid(int width, int height) throws IOException, InterruptedException {
         serialCommunicator = HMIScreen.serialCommunicator;
         serialCommunicator.AddListener(this);
-        SendOrder sendOrder = new SendOrder(serialCommunicator);
-        Thread.sleep(4000);
-        ArrayList<String> values = new ArrayList<String>();
-        values.add("B5");
-        sendOrder.sendOrderValues(values);
-
         setBackground(Color.white);
         grid = new GridSpace[width][height];
         setLayout(new FlowLayout());

@@ -78,7 +78,7 @@ bool finishedPickUP = true;
 int startY = 2150;
 int addOnY = -515;
 
-int startX = 4460;
+int startX = 4420;
 int addOnX = -690;
 
 int requestCase = 0;
@@ -119,7 +119,6 @@ void setup() {
 }
 
 void loop() {
-
   // Serial.println(xPos);
 
   // Serial.print("xPos: ");
@@ -233,7 +232,6 @@ void Up(int powerValue) {
 }
 
 void Right(int powerValue) {
-  Serial.println(zInStartPos);
   if (zInStartPos) {
     digitalWrite(directionLeftRight, HIGH);
     analogWrite(pwmPinLeftRight, powerValue);

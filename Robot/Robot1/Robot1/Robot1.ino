@@ -152,7 +152,7 @@ void loop() {
       checkJavaConnectionMillis = millis();
     }
   }
-  if (wait(checkJavaConnectionMillis, 300)) {
+  if (wait(checkJavaConnectionMillis, 400)) {
     checkJavaConnectionBool = false;
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
@@ -486,11 +486,11 @@ void pickUP(int count) {
         GoIn();
       } else {
         Stop();
-        pickUpAction = false;
+        Serial.println("Out");
         sendValue(1, 6, true);
+        pickUpAction = false;
         extendBool = false;
         pickingItem = false;
-        Serial.println("Out");
       }
     }
   }
