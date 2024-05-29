@@ -65,7 +65,7 @@ long int checkStartPostitionMillis = 0;
 
 bool goToStartPos = true;
 bool goToStartPosFinished = false;
-bool StartUpStart = true; //Going to the start position because of startup
+bool StartUpStart = true;  //Going to the start position because of startup
 
 int pickUpCount;
 
@@ -156,10 +156,12 @@ void loop() {
     checkJavaConnectionBool = false;
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
+    Serial.println("Stop");
   } else if (!checkJavaConnectionBool) {
     checkJavaConnectionBool = true;
     stopState = 1;
     sendSmallIntValue(1, 1, stopState);
+    Serial.println("Stop");
   }
 
   if (!digitalRead(joyconButton) == true) {
@@ -178,7 +180,11 @@ void loop() {
   sendSmallIntValue(1, 5, 6);
   Wire.requestFrom(1, 6);
   if (Wire.available()) {
-    stopState = Wire.read();
+    bool state = Wire.read();
+    if (stopState != state) {
+      Serial.println("Unlock");
+    }
+    stopState = state;
   }
 
   // encoder posistion
@@ -231,15 +237,18 @@ void loop() {
     stopState = 1;
     buttonPressed = true;
     sendSmallIntValue(1, 1, stopState);
+    Serial.println("Stop");
   }
   if (wait(checkStopButtonMillis, 300)) {
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
+    Serial.println("Stop");
     stopButtonConnected = false;
   } else if (!stopButtonConnected) {
     stopButtonConnected = true;
     stopState = 1;
     sendSmallIntValue(1, 1, stopState);
+    Serial.println("Stop");
   }
 
   pressedOut = digitalRead(uit);
@@ -249,6 +258,7 @@ void loop() {
   if (tiltState) {
     stopState = 1;
     sendSmallIntValue(1, 1, stopState);
+    Serial.println("Stop");
   }
 
   sendSmallIntValue(1, 5, 4);
@@ -260,6 +270,7 @@ void loop() {
 
   if (wait(checkConnectionMillis, 300)) {
     stopState = 1;
+    Serial.println("Stop");
   }
 
   if (stopState) {

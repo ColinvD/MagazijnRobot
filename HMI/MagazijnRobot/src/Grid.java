@@ -196,10 +196,12 @@ public class Grid extends JPanel implements Listener {
         }
         if(message.equals("Stop")){
             noodStop = true;
+            ButtonPanel.emergencyStatus = true;
             ButtonPanel.updateEmergencyButtonText();
         }
         if(message.equals("Unlock")){
             noodStop = false;
+            ButtonPanel.emergencyStatus = false;
             ButtonPanel.updateEmergencyButtonText();
         }
     }
