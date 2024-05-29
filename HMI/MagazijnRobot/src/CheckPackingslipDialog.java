@@ -76,7 +76,6 @@ public class CheckPackingslipDialog extends JDialog implements ActionListener {
                     for (JLabel item : items) {
                         if (item.getText().contains((String) database.getValueInRow(data, "Description"))) {
                             myWriter.write("\nProduct beschrijving: " + database.getValueInRow(data, "Description"));
-                            myWriter.write("\nAantal: " + database.getValueInRow(data, "Quantity"));
                             myWriter.write("\nGepakte aantal: " + database.getValueInRow(data, "PickedQuantity"));
                         }
                     }

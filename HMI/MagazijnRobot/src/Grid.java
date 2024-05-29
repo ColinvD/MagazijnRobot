@@ -83,10 +83,10 @@ public class Grid extends JPanel implements Listener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         DrawGrid(g);
-        locationRobot(locationRobot1(locationRobot2),g);
         if(route != null) {
             drawRoute(route, g);
         }
+        locationRobot(locationRobot1(locationRobot2),g);
     }
     public String locationRobot1(String location){
         repaint();
@@ -137,8 +137,8 @@ public class Grid extends JPanel implements Listener {
     }
 
     public void drawRoute(ArrayList<Locatie> route, Graphics g){
-        int prevX = robotX+10;
-        int prevY = robotY+10;
+        int prevX = 300;
+        int prevY = 300;
         g.setColor(Color.RED);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(3));
