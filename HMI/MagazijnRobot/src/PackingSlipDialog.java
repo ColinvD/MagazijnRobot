@@ -76,6 +76,7 @@ public class PackingSlipDialog extends JDialog implements ActionListener {
 
         }
         if (e.getSource() == confirm){
+            if (!chosenBox.getText().equals("Gekozen doos: geen")) {
             ArrayList<JLabel> box = new ArrayList<>();
             boolean stillinbox = false;
             for (JLabel item : allBoxesInfo){
@@ -89,7 +90,8 @@ public class PackingSlipDialog extends JDialog implements ActionListener {
                     box.add(item);
                 }
             }
-            CheckPackingslipDialog checkPackingslipDialog = new CheckPackingslipDialog(box,orderPanel);
+                CheckPackingslipDialog checkPackingslipDialog = new CheckPackingslipDialog(box, orderPanel);
+            }
         }
         for (JButton allBox : allBoxes) {
             if (e.getSource() == allBox) {
