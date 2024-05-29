@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -31,7 +32,7 @@ public class StockSituationDialog extends JDialog implements ActionListener {
         this.schap = schap;
         setModal(true);
         setTitle("Voorraadsituatie");
-        setSize(new Dimension(500, 500));
+        setSize(new Dimension(700, 550));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
         stockStatus.add(new ArrayList<>());
@@ -45,19 +46,19 @@ public class StockSituationDialog extends JDialog implements ActionListener {
 
         confirmButton.addActionListener(this);
         cancelButton.addActionListener(this);
-
-        confirmButton.setPreferredSize(new Dimension(200, 30));
-        cancelButton.setPreferredSize(new Dimension(200, 30));
+        confirmButton.setPreferredSize(new Dimension(250, 30));
+        cancelButton.setPreferredSize(new Dimension(250, 30));
 
         buttonPanel.add(confirmButton);
         buttonPanel.add(cancelButton);
         buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
 
 //        grid
-        gridPanel = new JPanel();
-        gridPanel.setPreferredSize(new Dimension(250, 250));
-        gridPanel.setLayout(new GridLayout(5, 5));
         gridTitle = new JLabel("Welke Positie wil je aanpassen?");
+
+        gridPanel = new JPanel();
+        gridPanel.setPreferredSize(new Dimension(280, 280));
+        gridPanel.setLayout(new GridLayout(5, 5));
 
         Database database = new Database();
         database.databaseConnect();
@@ -104,8 +105,8 @@ public class StockSituationDialog extends JDialog implements ActionListener {
         valueTitle = new JLabel("Welke waarde wil je meegeven?");
 
         valuePanel = new JPanel();
-        valuePanel.setLayout(new GridLayout(2, 2));
-        valuePanel.setPreferredSize(new Dimension(350, 80));
+        valuePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2,5));
+        valuePanel.setPreferredSize(new Dimension(680, 80));
         valuePanel.setBorder(BorderFactory.createLineBorder(Color.black));
         jcEmpty = new JCheckBox("Leeg");
         jcFull = new JCheckBox("Gevuld met item:");
@@ -130,8 +131,9 @@ public class StockSituationDialog extends JDialog implements ActionListener {
             System.out.println(e.getMessage());
         }
 
-        jcbProduct = new JComboBox(boxValue);
 
+        jcbProduct = new JComboBox(boxValue);
+        jcbProduct.setPreferredSize(new Dimension(550,30));
         valuePanel.add(jcFull);
         valuePanel.add(jcbProduct);
         valuePanel.add(jcEmpty);
@@ -140,10 +142,12 @@ public class StockSituationDialog extends JDialog implements ActionListener {
 //        fill dialog
 
         add(buttonPanel);
-        gridTitle.setPreferredSize(new Dimension(250, 30));
+        gridTitle.setPreferredSize(new Dimension(550, 30));
+        gridTitle.setHorizontalAlignment(SwingConstants.CENTER);
         add(gridTitle);
         add(gridPanel);
-        valueTitle.setPreferredSize(new Dimension(250, 30));
+        valueTitle.setPreferredSize(new Dimension(550, 30));
+        valueTitle.setHorizontalAlignment(SwingConstants.CENTER);
         add(valueTitle);
         add(valuePanel);
         setLayout(new FlowLayout());
