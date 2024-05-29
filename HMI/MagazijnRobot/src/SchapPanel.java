@@ -17,7 +17,7 @@ public class SchapPanel extends JPanel implements ActionListener {
     public SchapPanel( OrderPanel orderPanel) throws SQLException, IOException, InterruptedException {
         this.orderPanel = orderPanel;
         voorraadstiuatieWijzigen.setFocusable(false);
-        setPreferredSize(new Dimension(400, 475));
+        setPreferredSize(new Dimension(400, 500));
         setLayout(new FlowLayout());
         schapNaam.setFont(new Font("default", Font.BOLD, 20));
         voorraadstiuatieWijzigen.setPreferredSize(new Dimension(350, 30));

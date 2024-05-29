@@ -266,7 +266,7 @@ public class Database {
 
     public ArrayList<ArrayList> getPackingSlipData(int OrderID) throws SQLException {
         databaseConnect();
-        String query = "SELECT cu.CustomerName, cu.DeliveryAddressLine1, cu.PostalAddressLine1, ci.CityName, current_timestamp() PackageDate, ol.Description, ol.Quantity, ol.PickedQuantity " +
+        String query = "SELECT cu.CustomerName, cu.DeliveryAddressLine1, cu.PostalAddressLine1, ci.CityName, current_timestamp() PackageDate, ol.Description " +
                 "FROM customers cu " +
                 "JOIN cities ci ON ci.CityID = cu.DeliveryCityID " +
                 "JOIN orders o USING (CustomerID) " +

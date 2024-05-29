@@ -10,7 +10,7 @@ public class StatusPanel extends JPanel implements ActionListener {
     private static JLabel jlRobotStatus, jlRoute;
     private static boolean robotOnline;
     public StatusPanel(){
-        setPreferredSize(new Dimension(400,125));
+        setPreferredSize(new Dimension(400,100));
         setLayout(new FlowLayout());
         setBackground(new Color(0, 200, 200));
         setBorder(BorderFactory.createLineBorder(Color.black));
@@ -22,8 +22,6 @@ public class StatusPanel extends JPanel implements ActionListener {
         jlRobotStatus.setPreferredSize(new Dimension(390,16));
         jlRoute = new JLabel("Route: geen route gevonden.");
         jlRoute.setPreferredSize(new Dimension(390,16));
-
-
         add(jlStatus);
         add(jlRobotStatus);
         add(jlRoute);
