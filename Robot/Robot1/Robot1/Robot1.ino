@@ -152,7 +152,7 @@ void loop() {
       checkJavaConnectionMillis = millis();
     }
   }
-  if (wait(checkJavaConnectionMillis, 400)) {
+  if (wait(checkJavaConnectionMillis, 500)) {
     checkJavaConnectionBool = false;
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
@@ -240,7 +240,7 @@ void loop() {
     sendSmallIntValue(1, 1, stopState);
     Serial.println("Stop");
   }
-  if (wait(checkStopButtonMillis, 300)) {
+  if (wait(checkStopButtonMillis, 400)) {
     stopState = 2;
     sendSmallIntValue(1, 1, stopState);
     Serial.println("Stop");
@@ -269,7 +269,7 @@ void loop() {
     checkConnectionMillis = millis();
   }
 
-  if (wait(checkConnectionMillis, 300)) {
+  if (wait(checkConnectionMillis, 400)) {
     stopState = 1;
     Serial.println("Stop");
   }
