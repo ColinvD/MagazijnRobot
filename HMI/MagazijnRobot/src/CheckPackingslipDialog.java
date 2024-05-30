@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -54,7 +56,12 @@ public class CheckPackingslipDialog extends JDialog implements ActionListener {
 
             try {
                 //myObj.createNewFile();
-                FileWriter myWriter = new FileWriter("./HMI/MagazijnRobot/Packing_Slips/" + orderPanel.getSelectedOrderID() + "_" + items.getFirst().getText() + ".txt");
+                String path = "./Packing_Slips/";
+                File pathAsFile = new File(path);
+                if(!Files.exists(Paths.get(path))){
+                    pathAsFile.mkdir();
+                }
+                FileWriter myWriter = new FileWriter(path + orderPanel.getSelectedOrderID() + "_" + items.getFirst().getText() + ".txt");
                 database.databaseConnect();
                 try {
                     dataToSend = database.getPackingSlipData(orderPanel.getSelectedOrderID());

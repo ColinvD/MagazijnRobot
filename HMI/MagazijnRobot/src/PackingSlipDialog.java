@@ -16,7 +16,6 @@ public class PackingSlipDialog extends JDialog implements ActionListener {
     private JLabel textGeneratePackingSlip;
     private JLabel chosenBox;
 
-
     private JButton confirm,cancel;
     private Database database;
     private JPanel top,bottom;
