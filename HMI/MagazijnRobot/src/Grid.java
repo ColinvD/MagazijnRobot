@@ -19,7 +19,7 @@ public class Grid extends JPanel implements Listener {
     private SerialCommunicator serialCommunicator;
 
     private boolean zAxisOut;
-    public static boolean noodStop;
+    public static boolean noodStop = true;
 
     public Grid(int width, int height) throws IOException, InterruptedException {
         serialCommunicator = HMIScreen.serialCommunicator;
@@ -136,14 +136,16 @@ public class Grid extends JPanel implements Listener {
     public void drawRoute(ArrayList<Locatie> route, Graphics g){
         int prevX = 300;
         int prevY = 300;
-        g.setColor(Color.RED);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(3));
         for (int i = 0; i < (route.size()); i++) {
             int[] xy = convertLocationToXY(route.get(i).getLocation());
             int x = xy[0];
             int y = xy[1];
+            g.setColor(new Color(255, 0 , 0 , 255));
             g.drawLine(prevX, prevY, x, y);
+            g.setColor(new Color(255, 0 , 0 , 125));
+            g.fillOval(x-10, y-10, 20, 20);
             prevX = x;
             prevY = y;
             if(i==2 || i==route.size()-1){
@@ -185,8 +187,12 @@ public class Grid extends JPanel implements Listener {
 
     @Override
     public void onMessageReceived(String message) throws SQLException, IOException {
-        if(message.equals("zAxisChange")) {
-            zAxisOut = !zAxisOut;
+        if(message.startsWith("InZAxis")) {
+            if(message.contains("1")){
+                zAxisOut = false;
+            } else {
+                zAxisOut = true;
+            }
         }
         if(message.startsWith("X:") && message.contains("Y:")) {
 //            System.out.println("check");
